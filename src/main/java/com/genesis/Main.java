@@ -4,6 +4,10 @@
 
 package com.genesis;
 
+import com.genesis.controladores.AuthController;
+import com.genesis.controladores.RegistrosController;
+import com.genesis.vistas.Principal;
+import com.genesis.vistas.Login;
 /**
  *
  * @author eacks
@@ -11,6 +15,7 @@ package com.genesis;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        AuthController.mostrarLoginView();
+        
     }
 }
