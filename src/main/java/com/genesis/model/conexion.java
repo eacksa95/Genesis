@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.genesis.model;
 
 
@@ -20,7 +16,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Gregorio Quintana
+ * @author Ezequiel Cristaldo
  */
 public class conexion {
     public static Connection con = null;
@@ -41,6 +37,7 @@ public class conexion {
     private static int il_usu = 0;
     private static String is_usu = "";
     private static int il_grupo = 0;
+    private static String grupo_name;
     //Para leer archivo externo
     static FileInputStream inputStream = null;
     private static int ii_con = 0; //Cero si no se conecto o 1 si està conectado
@@ -174,6 +171,12 @@ public class conexion {
     }
     public static void setGrupoId(int aruser){
         il_grupo = aruser;
+    }
+    public static String getGrupoName(){
+        return grupo_name;
+    }
+    public static void setGrupoName(String arname){
+        grupo_name = arname;
     }
     public static int isConected(){
         return ii_con;

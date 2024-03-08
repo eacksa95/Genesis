@@ -1,16 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package com.genesis;
 
 import com.genesis.controladores.AuthController;
-import com.genesis.controladores.RegistrosController;
-import com.genesis.vistas.Principal;
-import com.genesis.vistas.Login;
 /**
  *
- * @author eacks
+ * @author Ezequiel Cristaldo
+ * @lastUpdate 05/03/24
+ * @version 0.1
  */
 public class Main {
 

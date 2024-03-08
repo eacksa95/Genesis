@@ -4,7 +4,6 @@ import com.genesis.model.conexion;
 import com.genesis.model.tableModel;
 import com.genesis.vistas.Login;
 import com.genesis.vistas.Principal;
-import java.awt.Component;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +12,11 @@ import javax.swing.JOptionPane;
 import util.Tools;
 
 public class AuthController {
-    //private static Principal principalView;
+    private static Principal principalView;
     private static Login loginView;
     private static Map<String, String> paramsMap = new HashMap<>();
     private static ArrayList<Map<String, String>> alMapData;
+    private static Map<String, String> userData;
     
     public static void mostrarLoginView(){
         loginView = new Login();
@@ -27,7 +27,6 @@ public class AuthController {
         paramsMap = Tools.paramsToMap(loginView.formPanel);
         if (validateForm(paramsMap) == false) {
             JOptionPane.showMessageDialog(null, "Campos del Formulario imcompletos");
-            return;
         } else {
             try {
                 conexion.Conectar();
@@ -50,16 +49,15 @@ public class AuthController {
                     System.out.println("Ingrese su password!");
                     return;
                 }
-                String encryptedPSW = "";
+                String encryptedPSW;
                 encryptedPSW = Tools.encryptMD5(vPass);
                 System.out.println("AuthController.java 71 iniciarSesion CLAVE ENCRIPTADA: " + encryptedPSW);
                 
                 tableModel mUser = new tableModel();
                 mUser.init("usuarios");
                 
-                Map<String, String> where = new HashMap<String, String>();      //Por qué campo buscar los registros
-                Map<String, String> fields = new HashMap<String, String>();     //Los campos que vamos a recuperar
-                ArrayList<Map<String, String>> alDetalle;                      //Declara array de Map, cada Map es para un registro
+                Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
+                Map<String, String> fields = new HashMap<>();     //Los campos que vamos a recuperar
                 
                 fields.put("*", "*");
                 where.put("username", usr);
@@ -68,11 +66,22 @@ public class AuthController {
                 System.out.println("AuthController 85 IniciarSesion: cant. usuarios: "+alMapData.size());
                 if(!alMapData.isEmpty()){
                 System.out.println("AuthController 87 IniciarSesion: user: "+alMapData.get(0).get("username"));
-                //mostrar principal y esconder login luego return;
-                //principalView = new Principal();
-                //principalView.setVisible(true);
-                PrincipalController.mostrarPrincipalView();
-                loginView.setVisible(false);
+                //cargar datos de usuario a sesion
+                userData = alMapData.get(0);
+                int userId = Integer.parseInt(userData.get("id"));
+                if(userId > 0){
+                    conexion.setUserId(userId);
+                    conexion.setUserName(userData.get("username"));
+                    conexion.setGrupoId(Integer.parseInt(userData.get("grupo_id")));
+                    conexion.setGrupoName(userData.get("grupo"));
+                    //mostrar principal y esconder login luego return;
+                    principalView = new Principal();
+                    principalView.setVisible(true);
+                    loginView.setVisible(false);
+                }else{
+                    JOptionPane.showMessageDialog(null, "Usuario no valido", "Error", JOptionPane.OK_OPTION);
+                }
+
                 }else{
                     System.out.println("no se encontro usuario");
                 }
@@ -91,18 +100,5 @@ public class AuthController {
             return false;
         }
     }//fin validateForm
-    
-    public void mostrarMensaje() {
-    System.out.println("Hola amigo");
-    Component[] componentes = loginView.formPanel.getComponents();
-    for (Component comp : componentes) {
-        System.out.println("Tipo de componente: " + comp.getClass().getName());
-        System.out.println("Nombre: " + comp.getName());
-        System.out.println("Tamaño: " + comp.getSize());
-        System.out.println("Ubicación: " + comp.getLocation());
-        // Puedes agregar más información sobre el componente según tus necesidades
-        System.out.println("-------------------------------------");
-    }
-}  
+     
 }
-

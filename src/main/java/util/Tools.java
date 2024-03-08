@@ -1,46 +1,43 @@
 package util;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
- *
- * @author user
+ * @author Ezequiel Cristaldo
  */
 public class Tools {
 
     /**
-     *@param panel JPanel de la Vista 
+     *@param view
      *@return paramsMap
      */
-    public static Map<String, String> paramsToMap(JPanel panel){
-    Map<String, String> paramsMap = new HashMap<String, String>();
-    //recorrer los elementos del panel
-    for(Component comp : panel.getComponents()){
+    public static Map<String, String> paramsToMap(Container view){
+    Map<String, String> paramsMap = new HashMap<>();
+    //recorrer los elementos del Container
+    for(Component comp : view.getComponents()){
         if(comp instanceof JTextField){
         JTextField componente = (JTextField) comp;
         String nombreComponente = componente.getName();
         //obtener la clave para el Map a partir del nombre del componente
         String key = getKeyFromComponentName(nombreComponente, "textField");
-        paramsMap.put(key, componente.getText().toLowerCase());
+        paramsMap.put(key, componente.getText());
         }
         else if (comp instanceof JComboBox){
         JComboBox componente = (JComboBox) comp;
-        String nombreComponente = componente.getName();
+        String nombreComponente = componente.getName().toLowerCase();
         //obtener la clave para el Map a partir del nombre del componente
         String key = getKeyFromComponentName(nombreComponente, "comboBox");
-        String valor = componente.getSelectedItem().toString().toLowerCase();
+        String valor = componente.getSelectedItem().toString();
         paramsMap.put(key, valor);
         }
     }
@@ -64,12 +61,9 @@ public class Tools {
     }
     }
     
-    
-    
-    
-    
     /**
     *@param psw input password que viene de LoginForm
+    * @return String rtn encriptedPassword
     * encripta input password
     */
     public static String encryptMD5(String psw){
@@ -94,7 +88,6 @@ public class Tools {
         //System.out.println("Encrypted password MD5: "+encryptedpassword);
         return rtn;
     }//fin encryptMD5
-    
     
     public static String arrayStringtoString(Object[] a) {
         if (a == null)

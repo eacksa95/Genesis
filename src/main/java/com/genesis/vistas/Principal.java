@@ -1,35 +1,75 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.genesis.vistas;
 
-import com.genesis.controladores.PrincipalController;
-import com.genesis.controladores.RegistrosController;
 import java.awt.Dimension;
+import java.beans.PropertyVetoException;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author eacks
+ * @author Ezequiel Cristaldo
  */
 public class Principal extends javax.swing.JFrame {
+    private JInternalFrame[] w_abiertos;
+    
     /**
      * Creates new form Principal
      */
     public Principal() {
         initComponents();
-        this.setSize(new Dimension(800, 600)); // Establecer el tamaño mínimo a 400x300 píxeles
+        this.setSize(new Dimension(1200, 650));
     }
-
-    public void getActiveInternalFrame(){
+    
+    public ActiveFrame getActiveFrame(){
         //Obtener el JInternalFrame activo desde el JDesktopPane
-        ActiveFrame activeFrame = (ActiveFrame) panelPrincipal.getSelectedFrame();
-        JInternalFrame activeInternalFrame = activeFrame.getActive();
-        System.out.println("activeInternalFrame:" + activeInternalFrame.getTitle());
+        ActiveFrame v = (ActiveFrame) desktopPane.getSelectedFrame();
+        if(v == null){
+        JOptionPane.showMessageDialog(null, "No hay ventana activa...", "Atencion...", JOptionPane.OK_OPTION);
+        }
+        return v;
     }
+    
+    public boolean encuentraVentana(JInternalFrame w){
+        w_abiertos = desktopPane.getAllFrames();
+        int len = w_abiertos.length;
+        int i;
+        if (len > 0){
+            for(i = 0; i < len; i++){
+                if(w_abiertos[i].getTitle().equals(w.getTitle())){
+                return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public void mostrarVentana(javax.swing.JInternalFrame frame){
+        w_abiertos = desktopPane.getAllFrames();
+        if(encuentraVentana(frame)){
+        return;
+        }
+        desktopPane.add(frame);
+        frame.setVisible(true);
+        try{
+            frame.setSelected(true);
+        }catch(PropertyVetoException ex){
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.OK_OPTION);
+        }
+    }
+    
+    public void centrar(JInternalFrame internalFrame){
+        int x = (desktopPane.getWidth() / 2) - internalFrame.getWidth() / 2;
+        int y = (desktopPane.getHeight()/ 2) - internalFrame.getHeight() / 2;
+        
+        if (internalFrame.isShowing()){
+            internalFrame.setLocation(x, y);
+        } else{
+            desktopPane.add(internalFrame);
+            internalFrame.setLocation(x, y);
+            internalFrame.show();
+        }
+    }
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -40,7 +80,7 @@ public class Principal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panelPrincipal = new javax.swing.JDesktopPane();
+        desktopPane = new javax.swing.JDesktopPane();
         barraMenu = new javax.swing.JMenuBar();
         menuRegistros = new javax.swing.JMenu();
         mitenProveedores = new javax.swing.JMenuItem();
@@ -56,7 +96,7 @@ public class Principal extends javax.swing.JFrame {
         menuOpciones = new javax.swing.JMenu();
         mitenSalir = new javax.swing.JMenuItem();
         menuAcciones = new javax.swing.JMenu();
-        mitenNuevo = new javax.swing.JMenuItem();
+        mitenLimpiar = new javax.swing.JMenuItem();
         mitenGuardar = new javax.swing.JMenuItem();
         mitenEliminar = new javax.swing.JMenuItem();
         mitenPrimero = new javax.swing.JMenuItem();
@@ -66,14 +106,14 @@ public class Principal extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
-        panelPrincipal.setLayout(panelPrincipalLayout);
-        panelPrincipalLayout.setHorizontalGroup(
-            panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout desktopPaneLayout = new javax.swing.GroupLayout(desktopPane);
+        desktopPane.setLayout(desktopPaneLayout);
+        desktopPaneLayout.setHorizontalGroup(
+            desktopPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 662, Short.MAX_VALUE)
         );
-        panelPrincipalLayout.setVerticalGroup(
-            panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        desktopPaneLayout.setVerticalGroup(
+            desktopPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 409, Short.MAX_VALUE)
         );
 
@@ -142,29 +182,42 @@ public class Principal extends javax.swing.JFrame {
 
         menuAcciones.setText("Acciones");
 
-        mitenNuevo.setText("Nuevo");
-        menuAcciones.add(mitenNuevo);
+        mitenLimpiar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        mitenLimpiar.setText("Limpiar");
+        mitenLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenLimpiarActionPerformed(evt);
+            }
+        });
+        menuAcciones.add(mitenLimpiar);
 
+        mitenGuardar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         mitenGuardar.setText("Guardar");
-        mitenGuardar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                mitenGuardarMouseClicked(evt);
+        mitenGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenGuardarActionPerformed(evt);
             }
         });
         menuAcciones.add(mitenGuardar);
 
+        mitenEliminar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         mitenEliminar.setText("Eliminar");
+        mitenEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenEliminarActionPerformed(evt);
+            }
+        });
         menuAcciones.add(mitenEliminar);
 
         mitenPrimero.setText("Primero");
+        mitenPrimero.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenPrimeroActionPerformed(evt);
+            }
+        });
         menuAcciones.add(mitenPrimero);
 
         mitenUltimo.setText("Ultimo");
-        mitenUltimo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mitenUltimoActionPerformed(evt);
-            }
-        });
         menuAcciones.add(mitenUltimo);
 
         mitenSiguiente.setText("Siguiente");
@@ -181,56 +234,89 @@ public class Principal extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelPrincipal)
+            .addComponent(desktopPane)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelPrincipal)
+            .addComponent(desktopPane)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**Iniciar y Mostrar Ventana Clientes*/
     private void mitenClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenClientesActionPerformed
-        this.panelPrincipal.removeAll();
-        this.panelPrincipal.add(RegistrosController.getRegistrosContainer());
-        RegistrosClientes clientes = new RegistrosClientes();
-        RegistrosController.mostrarRegistroPanel(clientes, "clientes");
-        DefaultTableModel modeloTabla = RegistrosController.cargarTabla();
-        clientes.getTabla().setModel(modeloTabla);
-        
+        RegistrosClientes v_clientes = new RegistrosClientes();
+        // Verificar si ya existe una ventana abierta del mismo tipo
+        if (encuentraVentana(v_clientes)){
+           //si ya existe, no hacemos nada
+           return;
+        }
+        //si no existe mostramos la ventana y la centramos
+        mostrarVentana(v_clientes);
+        centrar(v_clientes);
     }//GEN-LAST:event_mitenClientesActionPerformed
 
+    /**Iniciar y Mostrar Ventana Inventarios*/
     private void mitenAjusteInventarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenAjusteInventarioActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_mitenAjusteInventarioActionPerformed
-
+    
+    /**Salir del Sistema*/
     private void mitenSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenSalirActionPerformed
         int respuesta = JOptionPane.showConfirmDialog(null, "Desea salir del sistema?");
-        if(respuesta == 0){
-        System.exit(0);
+            if(respuesta == 0){
+                System.exit(0); 
         }
         
     }//GEN-LAST:event_mitenSalirActionPerformed
 
+    /**Iniciar y Mostrar Ventana Empleados*/
     private void mitenEmpleadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenEmpleadosActionPerformed
-        this.panelPrincipal.removeAll();
-        this.panelPrincipal.add(RegistrosController.getRegistrosContainer());
-        RegistrosEmpleados empleados = new RegistrosEmpleados();
-        RegistrosController.mostrarRegistroPanel(empleados, "empleados");
-        DefaultTableModel modeloTabla = RegistrosController.cargarTabla();
-        empleados.getTabla().setModel(modeloTabla);
-        
+        RegistrosEmpleados v_empleados = new RegistrosEmpleados();
+        // Verificar si ya existe una ventana abierta del mismo tipo
+        if (encuentraVentana(v_empleados)) {
+            // Si ya existe, no hacemos nada más
+            return;
+        }
+        // Si no existe, mostramos la ventana y la centramos
+        mostrarVentana(v_empleados);
+        centrar(v_empleados);        
     }//GEN-LAST:event_mitenEmpleadosActionPerformed
 
-    private void mitenGuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mitenGuardarMouseClicked
-        this.getActiveInternalFrame();
-        
-    }//GEN-LAST:event_mitenGuardarMouseClicked
+    /**Ejecuta ActiveFrame.crearRegistro*/
+    private void mitenGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenGuardarActionPerformed
+            ActiveFrame activeFrame = getActiveFrame();
+            if(activeFrame == null){
+                return;
+            }
+            activeFrame.crearRegistro();
+    }//GEN-LAST:event_mitenGuardarActionPerformed
 
-    private void mitenUltimoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenUltimoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_mitenUltimoActionPerformed
+    private void mitenEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenEliminarActionPerformed
+            ActiveFrame activeFrame = getActiveFrame();
+            if(activeFrame == null){
+                return;
+            }
+            activeFrame.eliminarRegistro();
+    }//GEN-LAST:event_mitenEliminarActionPerformed
+
+    private void mitenPrimeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenPrimeroActionPerformed
+        ActiveFrame activeFrame = getActiveFrame();
+        if(activeFrame == null){
+            return;
+        }
+        //activeFrame.procesarSolicitud("F");
+    }//GEN-LAST:event_mitenPrimeroActionPerformed
+
+    /**Limpiar formulario de la vista*/
+    private void mitenLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenLimpiarActionPerformed
+        ActiveFrame activeFrame = getActiveFrame();
+        if(activeFrame == null){
+            return;
+        }
+        activeFrame.limpiarFormulario();    
+    }//GEN-LAST:event_mitenLimpiarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -269,6 +355,7 @@ public class Principal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar barraMenu;
+    public javax.swing.JDesktopPane desktopPane;
     public javax.swing.JMenu menuAcciones;
     private javax.swing.JMenu menuMovimientos;
     private javax.swing.JMenu menuOpciones;
@@ -281,7 +368,7 @@ public class Principal extends javax.swing.JFrame {
     public javax.swing.JMenuItem mitenEliminar;
     private javax.swing.JMenuItem mitenEmpleados;
     public javax.swing.JMenuItem mitenGuardar;
-    public javax.swing.JMenuItem mitenNuevo;
+    private javax.swing.JMenuItem mitenLimpiar;
     public javax.swing.JMenuItem mitenPrimero;
     private javax.swing.JMenuItem mitenProductos;
     private javax.swing.JMenuItem mitenProveedores;
@@ -290,6 +377,5 @@ public class Principal extends javax.swing.JFrame {
     public javax.swing.JMenuItem mitenSiguiente;
     public javax.swing.JMenuItem mitenUltimo;
     private javax.swing.JMenuItem mitenVentas;
-    public javax.swing.JDesktopPane panelPrincipal;
     // End of variables declaration//GEN-END:variables
 }

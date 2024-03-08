@@ -1,32 +1,70 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package com.genesis.vistas;
 
+import com.genesis.controladores.RegistrosController;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JInternalFrame;
-import javax.swing.JTable;
+import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.DefaultTableModel;
 
 /**
- *
  * @author Ezequiel Cristaldo
  */
-public class RegistrosEmpleados extends javax.swing.JPanel {
+public class RegistrosEmpleados extends javax.swing.JInternalFrame implements ActiveFrame {
+    RegistrosController rc;
     
+    /**
+     * Creates new form RegistrosEmpleados
+     */
     public RegistrosEmpleados() {
         initComponents();
+        setTitle("Empleados");
+        rc = new RegistrosController();
+        rc.init("empleados", formPanel);
+        cargarTabla();
+        limpiarFormulario();
         textFieldId.setName("textFieldId");
         textFieldNombre.setName("textFieldNombre");
         textFieldApellido.setName("textFieldApellido");
         textFieldCedula.setName("textFieldCedula");
-        textFieldOperacion.setName("textFieldOperacion");
-        textFieldOperacion.setText("C");
-    }
-    
-    public JTable getTabla(){
-    return tablaEmpleados;
+        textFieldBuscar.setName("textFieldBuscar");
+        
+        
+        
+        // Agregar ListSelectionListener al JTable
+        tablaEmpleados.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+            if (!e.getValueIsAdjusting()) {
+                // Obtener la fila seleccionada
+                int selectedRow = tablaEmpleados.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Obtener los valores de la fila seleccionada
+                    DefaultTableModel model = (DefaultTableModel) tablaEmpleados.getModel();
+                    Map<String, Object> rowData = new HashMap<>();
+                    for (int i = 0; i < model.getColumnCount(); i++) {
+                        String columnName = model.getColumnName(i);
+                        Object value = model.getValueAt(selectedRow, i);
+                        rowData.put(columnName, value);
+                    }
+                    
+                    // Establecer los valores en los JTextFields
+                    textFieldId.setText(rowData.get("id").toString());
+                    textFieldNombre.setText(rowData.get("nombre").toString());
+                    textFieldApellido.setText(rowData.get("apellido").toString());
+                    textFieldCedula.setText(rowData.get("cedula").toString());
+                    
+                }
+            }
+        });
+//        textFieldBuscar.addActionListener(e -> {
+//            String criterio = textFieldBuscar.getText().trim();
+//            buscar(criterio);
+//        });
     }
 
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,7 +74,9 @@ public class RegistrosEmpleados extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        textFieldId = new javax.swing.JTextField();
+        formPanel = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
+        tablaEmpleados = new javax.swing.JTable();
         textFieldCedula = new javax.swing.JTextField();
         lblCedula = new javax.swing.JLabel();
         textFieldApellido = new javax.swing.JTextField();
@@ -44,128 +84,235 @@ public class RegistrosEmpleados extends javax.swing.JPanel {
         textFieldNombre = new javax.swing.JTextField();
         lblNombre = new javax.swing.JLabel();
         lblId = new javax.swing.JLabel();
-        textFieldOperacion = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tablaEmpleados = new javax.swing.JTable();
+        textFieldId = new javax.swing.JTextField();
+        textFieldBuscar = new javax.swing.JTextField();
+        lblBuscar = new javax.swing.JLabel();
 
-        lblCedula.setText("N. Documento");
-
-        lblApellido.setText("Apellido");
-
-        lblNombre.setText("Nombre");
-
-        lblId.setText("ID");
-
-        jLabel1.setText("Operacion");
+        setClosable(true);
+        setIconifiable(true);
 
         tablaEmpleados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "id", "nombre", "apellido", "cedula"
+                "id", "cedula", "nombre", "apellido"
             }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, true, true, true
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane1.setViewportView(tablaEmpleados);
+        ));
+        jScrollPane.setViewportView(tablaEmpleados);
         if (tablaEmpleados.getColumnModel().getColumnCount() > 0) {
-            tablaEmpleados.getColumnModel().getColumn(0).setResizable(false);
-            tablaEmpleados.getColumnModel().getColumn(0).setPreferredWidth(20);
-            tablaEmpleados.getColumnModel().getColumn(1).setResizable(false);
-            tablaEmpleados.getColumnModel().getColumn(1).setPreferredWidth(80);
-            tablaEmpleados.getColumnModel().getColumn(2).setResizable(false);
-            tablaEmpleados.getColumnModel().getColumn(2).setPreferredWidth(80);
-            tablaEmpleados.getColumnModel().getColumn(3).setResizable(false);
-            tablaEmpleados.getColumnModel().getColumn(3).setPreferredWidth(80);
+            tablaEmpleados.getColumnModel().getColumn(0).setMinWidth(0);
+            tablaEmpleados.getColumnModel().getColumn(0).setPreferredWidth(0);
+            tablaEmpleados.getColumnModel().getColumn(0).setMaxWidth(0);
+            tablaEmpleados.getColumnModel().getColumn(1).setMinWidth(0);
+            tablaEmpleados.getColumnModel().getColumn(1).setPreferredWidth(0);
         }
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        textFieldCedula.setName("textFieldCedula"); // NOI18N
+
+        lblCedula.setText("N. Documento");
+
+        textFieldApellido.setName("textFieldApellido"); // NOI18N
+
+        lblApellido.setText("Apellido");
+
+        textFieldNombre.setName("textFieldNombre"); // NOI18N
+
+        lblNombre.setText("Nombre");
+
+        lblId.setText("ID");
+
+        textFieldId.setName("textFieldId"); // NOI18N
+
+        lblBuscar.setText("Buscar");
+
+        javax.swing.GroupLayout formPanelLayout = new javax.swing.GroupLayout(formPanel);
+        formPanel.setLayout(formPanelLayout);
+        formPanelLayout.setHorizontalGroup(
+            formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, formPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+                    .addGroup(formPanelLayout.createSequentialGroup()
+                        .addComponent(lblBuscar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(textFieldBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblId, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(lblNombre)
+                        .addComponent(lblApellido))
+                    .addComponent(lblCedula, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(formPanelLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(textFieldCedula, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textFieldApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(formPanelLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(textFieldNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, formPanelLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(textFieldId, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        formPanelLayout.setVerticalGroup(
+            formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(formPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textFieldBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblBuscar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(formPanelLayout.createSequentialGroup()
+                        .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblId, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(textFieldId, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(11, 11, 11)
+                        .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblNombre)
+                            .addComponent(textFieldNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(11, 11, 11)
+                        .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textFieldApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(textFieldCedula, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCedula))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 589, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblNombre)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(textFieldNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblApellido)
-                                        .addGap(40, 40, 40)
-                                        .addComponent(textFieldApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(50, 50, 50)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblCedula)
-                                    .addComponent(lblId)))
-                            .addComponent(jLabel1))
-                        .addGap(40, 40, 40)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(textFieldId)
-                            .addComponent(textFieldCedula, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
-                            .addComponent(textFieldOperacion))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(formPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblNombre)
-                    .addComponent(textFieldNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCedula)
-                    .addComponent(textFieldCedula, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textFieldApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textFieldId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblId))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textFieldOperacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(14, 14, 14))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(15, Short.MAX_VALUE)
+                .addComponent(formPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    public javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JPanel formPanel;
+    public javax.swing.JScrollPane jScrollPane;
     private javax.swing.JLabel lblApellido;
+    private javax.swing.JLabel lblBuscar;
     private javax.swing.JLabel lblCedula;
     private javax.swing.JLabel lblId;
     private javax.swing.JLabel lblNombre;
     public javax.swing.JTable tablaEmpleados;
     public javax.swing.JTextField textFieldApellido;
+    private javax.swing.JTextField textFieldBuscar;
     public javax.swing.JTextField textFieldCedula;
     public javax.swing.JTextField textFieldId;
     public javax.swing.JTextField textFieldNombre;
-    public javax.swing.JTextField textFieldOperacion;
     // End of variables declaration//GEN-END:variables
+    
+    @Override
+    public JInternalFrame getActive() {
+        return this;
+    }
+    
+    @Override
+    public final void limpiarFormulario(){
+        textFieldId.setText("0");
+        textFieldNombre.setText("");
+        textFieldApellido.setText("");
+        textFieldCedula.setText("");
+        textFieldNombre.requestFocus();
+    }
+    
+    /**
+     * Carga la TablaEmpleados con todos los datos
+     */
+    private void cargarTabla(){
+        //recupera tabModel 
+        DefaultTableModel tabModel = (DefaultTableModel) tablaEmpleados.getModel();        
+        
+        //recupera nombre de columnas de tabModel
+        ArrayList<String> tabColumnNames = new ArrayList();
+        for (int i = 0; i < tabModel.getColumnCount(); i++){
+         tabColumnNames.add(tabModel.getColumnName(i).toLowerCase());
+         // Convierte los nombres de las columnas a minúsculas para comparación
+        }
+        
+        //Recupera datos
+        ArrayList<Map<String, String>> registers;
+        Map<String, String> fields = new HashMap<>();
+        Map<String, String> where = new HashMap<>();
+        fields.put("*", "*");
+        registers = rc.searchListById(fields, where);
+        
+        // Verifica si hay registros para mostrar
+        if (registers.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay registros que mostrar", "Información", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        // Agrega los registros al modelo de la tabla
+        for (Map<String, String> register : registers) {
+            Object[] fila = new Object[tabModel.getColumnCount()];
+            for (int i = 0; i < tabModel.getColumnCount(); i++) {
+                // Nombre de la columna actual en minúsculas
+                String columnName = tabColumnNames.get(i);
+                // Verifica si el mapa de registro contiene la clave correspondiente a la columna
+                if (register.containsKey(columnName)) {
+                    fila[i] = register.get(columnName); // Asigna el valor del registro a la fila
+                } else {
+                    // Si el mapa de registro no contiene la clave correspondiente, agrega un valor vacío
+                    fila[i] = "";
+                }
+            }
+            tabModel.addRow(fila); // Agrega la fila al modelo de la tabla
+        }
+        // Asignar el modelo a la tabla
+        tablaEmpleados.setModel(tabModel);
+    }
+    
+    /**Actualiza los registros en tabla*/
+    private void recargarTabla(){
+        cargarTabla();
+    }
+    
+    @Override
+    public void crearRegistro(){
+        rc.ProcesarSolicitud("C");
+        limpiarFormulario();
+        recargarTabla();
+    }
+    
+    @Override
+    public void modificarRegistro(){
+        rc.ProcesarSolicitud("U");
+        recargarTabla();
+    }
+    
+    @Override
+    public void eliminarRegistro(){
+        rc.ProcesarSolicitud("D");
+        limpiarFormulario();
+        recargarTabla();
+    }
+    
 
 
+
+    
 }

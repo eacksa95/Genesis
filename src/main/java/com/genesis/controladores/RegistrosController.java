@@ -2,212 +2,157 @@ package com.genesis.controladores;
 
 import com.genesis.model.conexion;
 import com.genesis.model.tableModel;
-import com.genesis.vistas.Principal;
-import com.genesis.vistas.Registros;
-import java.awt.BorderLayout;
+import com.genesis.vistas.ActiveFrame;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+//import javax.swing.table.DefaultTableModel;
 import util.Tools;
 
 /**
- *
- * @author eacks
+ * @author Ezequiel Cristaldo
  */
 public class RegistrosController {
-
-    private static final Registros ventana = new Registros(); // Solo puede haber un JFrame par Registros
-    private static JPanel panelVista = new JPanel();           // Se alternan los paneles para cambiar las vistas
     
-    private static final tableModel tbModel = new tableModel();
-    private static ArrayList<String> tableKeys = new ArrayList<>();
+    private JPanel formPanel;
+    private DefaultTableModel tablaVistaModel;
+    private JTable tabView;
     
-    private static Map<String, String> paramsMap = new HashMap<>();
-    private static Map<String, String> paramsMapModel = new HashMap<>(); //params filtrados para tbmodel columns
-    private static Map<String, Object> rtn = new HashMap<>();
-
-    private static String opc = "";
+    private tableModel tbModel;
+    private ArrayList<String> tableKeys = new ArrayList<>();
+    private ArrayList<String> columnNames = new ArrayList<>(); //Nombre de todas las columnas de la tabla
+    private ArrayList<String> columnTypes = new ArrayList<>(); //Tipo de cada columna de la tabla
     
+    private Map<String, String> paramsMap = new HashMap<>();
+    private Map<String, String> paramsMapModel = new HashMap<>(); //params filtrados para tbmodel columns
+    private String opc = "";
     
-    
+    public void init(String modelo, JPanel view){
+        tbModel = new tableModel();
+        tbModel.init(modelo);
+        tableKeys = conexion.getKeyColumns(modelo, "PRI");
+        columnNames = conexion.getColumnNames(modelo);
+        columnTypes = conexion.getColumnTypes(modelo);        
+        formPanel = view;
+    } //Fin init
 
-    public static Registros getRegistrosContainer() {
-        return ventana;
-    }
-
-    public static void mostrarRegistroPanel(JPanel vista, String modelo) {
-        try {
-            ventana.panelContent.removeAll();
-            tbModel.init(modelo); //Se inicializa nuevo tableModel para la vista
-            tableKeys = conexion.getKeyColumns(modelo, "PRI");
-            panelVista = vista;
-            
-            ventana.setName("Registros");
-            ventana.setTitle(modelo);
-            // Establece BorderLayout y agrega componentes a la ventana
-            ventana.panelContent.setLayout(new BorderLayout());
-            ventana.panelContent.add(vista, BorderLayout.CENTER);
-
-            ventana.panelContent.revalidate();
-            ventana.panelContent.repaint();
-
-            ventana.pack();
-            ventana.setVisible(true);
-            ventana.show();
-        } catch (NullPointerException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public static void ProcesarSolicitud() {
+    public void ProcesarSolicitud(String opcion) {
         int rows = 0;
         String msg = "";
-        paramsMap = Tools.paramsToMap(panelVista);
-        opc = paramsMap.get("operacion");
+        paramsMap = Tools.paramsToMap(formPanel);
+        opc = opcion;
+        //System.out.println("operacion tipo:" + opc);
         switch(opc){
             case "C": //Create
                 //Aquí hay que decidir si se enviá a upd o sigue para insertar
-                if(paramsMap.containsKey("id")){
-                    if(!paramsMap.get("id").equals("")){
-                        if(Integer.parseInt(paramsMap.get("id")) > 0){
+                if(paramsMap.containsKey("id")){                        //Asegura que exista un campo id
+                    if(!paramsMap.get("id").equals("")){                //Asegura que si hay id tenga un valor distinto a vacío
+                        if(Integer.parseInt(paramsMap.get("id")) > 0){  //Si el id > 0 es porque se debe actualizar
                             ArrayList<Map<String, String>> alUPD ;
-                            alUPD = new ArrayList<Map<String, String>>(); 
+                            alUPD = new ArrayList<>(); 
                             alUPD.add(paramsMap);
                             rows = updateReg(alUPD);
                             if(rows > 0){
-                                rtn.put("msg", "¡Registro Actualizado correctamente!");
-                                rtn.put("typeAlert", "alert-success");
-                                rtn.put("rows", 1);
-                                rtn.put("data", paramsMap);
+                                System.out.println("RegistrosController 83: Registro Actualizado Correctamente");
+                                
                             }else{
-                                rtn.put("msg","¡No se pudo actualizar el Registro!");
-                                rtn.put("typeAlert", "alert-warning");
-                                rtn.put("rows", 0);
-                                rtn.put("data", "");
+                                System.out.println("RegistrosController 89: No se pudo actualizar Registro");
+                                
                             }
-                            rtn.put("opc", "U");
-                        }else{                                                 //Si el id = 0 entonces se inserta el registro 
+                        }else{   //Si el id = 0 entonces se inserta el registro 
                             rows = createReg(paramsMap);
                             if(rows > 0){
                                 msg = "Registro grabado correctamente";
-                                rtn.put("typeAlert", "alert-success");
-                                rtn.put("msg", msg);
-                                rtn.put("rows", rows);
-                                rtn.put("data", paramsMap);
+                                JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.INFORMATION_MESSAGE);
                             }else{
                                 msg = "No se pudo grabar el Registro";
-                                rtn.put("typeAlert", "alert-warning");
-                                rtn.put("msg", msg);
-                                rtn.put("rows", 0);
-                                rtn.put("data", "");
+                                JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                             }
-                            rtn.put("opc", "C");
                         }
                     }else{
                         msg = "¡El campo ID no tiene valor asignado!";
-                        rtn.put("typeAlert", "alert-danger");
-                        rtn.put("msg", msg);
-                        rtn.put("rows", 0);
-                        rtn.put("data", "");
-                        rtn.put("opc", "C");
+                        System.out.println("RegistrosController 117: El campo ID no tiene valor asignado");
+                        JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                     }
                 }else{
                     msg = "¡El campo ID no se ha enviado!"; 
-                    rtn.put("typeAlert", "alert-danger");
-                    rtn.put("msg", msg);
-                    rtn.put("rows", 0);
-                    rtn.put("data", "");
-                    rtn.put("opc", "C");
+                    System.out.println("RegistrosController 126: El campo ID no se ha enviado");
+                    JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                 }                
                 break;
             case "R": //Read
-                if(paramsMap.containsKey("id")){                            //Asegura que exista un campo id
-                    if(!paramsMap.get("id").equals("")){                    //Asegura que si hay id tenga un valor distinto a vacío
-                        if(Integer.parseInt(paramsMap.get("id")) > 0){      //Si el id > 0 es porque se debe actualizar
+                if(paramsMap.containsKey("id")){                            
+                    if(!paramsMap.get("id").equals("")){                    
+                        if(Integer.parseInt(paramsMap.get("id")) > 0){      
                             Map<String, String> alUPD ;
-                            alUPD = new HashMap<String, String>(); 
+                            //alUPD = new HashMap<>(); 
                             paramsMapModel = tbModel.justTableFields(paramsMap, false);
-                            //System.out.println(paramsMapModel.toString());
                             alUPD = searchById(paramsMapModel);
                             System.out.println("tamaño "+alUPD.size());
-                            if(alUPD.size() > 0){
+                            if(!alUPD.isEmpty()){
                                 msg = "¡Registro recuperado correctamente!";
-                                rtn.put("typeAlert", "alert-success");
-                                rtn.put("rows", 1);
+                                JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.INFORMATION_MESSAGE);
                             }else{
                                 msg = "¡No se pudo recuperar el Registro!";
-                                rtn.put("typeAlert", "alert-warning");
-                                rtn.put("rows", 0);
+                                JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                             }
-                            rtn.put("opc", "R");  
-                            rtn.put("data", alUPD);
                             
-                        }else{                                                 //Si el id = 0 entonces se inserta el registro                             
+                        }else{                             
                             msg = "El ID no es válido";
-                            rtn.put("typeAlert", "alert-warning");                            
-                            rtn.put("opc", "R");
-                            rtn.put("data", "");
-                            rtn.put("rows", 0);
+                            JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                         }
                     }else{
                         msg = "¡El campo ID no tiene valor asignado!";
-                        rtn.put("typeAlert", "alert-danger");
-                        rtn.put("opc", "R");
-                        rtn.put("data", "");
-                        rtn.put("rows", 0);
+                        JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                     }
                 }else{
-                   msg = "¡El campo ID no fue enviado!"; 
-                    rtn.put("typeAlert", "alert-danger");
-                    rtn.put("opc", "R");
-                    rtn.put("data", "");
-                    rtn.put("rows", 0);
+                   msg = "¡El campo ID no fue enviado!";
+                   JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                 }
               break;
             case "U":
               // code Update
-                ArrayList<Map<String,String>> alReg;         //Declara array de Map, cada Map es para un registro
-                alReg = new ArrayList<Map<String,String>>(); //Instancia array
+                ArrayList<Map<String,String>> alReg;
+                alReg = new ArrayList<>();
                 paramsMapModel = tbModel.justTableFields(paramsMap, false);
                 alReg.add(paramsMapModel);
                 rows = updateReg(alReg);
+                //refrescarVista();
                 if(rows > 0){
                     msg = "¡Registro actualizado correctamente!";
-                    rtn.put("typeAlert", "alert-success");
-                    rtn.put("rows", 1);
+                    JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.INFORMATION_MESSAGE);
                 }else{
                     msg = "¡No se pudo actualizar el Registro!";
-                    rtn.put("typeAlert", "alert-warning");
-                    rtn.put("rows", 0);
-                }
-                rtn.put("opc", "D");  
-                rtn.put("data", "");                
+                    JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
+                }               
               break;
             case "D":
-                alReg = new ArrayList<Map<String,String>>(); //Instancia array
+                alReg = new ArrayList<>();
                 paramsMapModel = tbModel.justTableFields(paramsMap, false);
                 alReg.add(paramsMapModel);
-                rows = deleteReg(alReg);
+                int respuesta = JOptionPane.showConfirmDialog(null, "Desea Eliminar Registro?");
+                if(respuesta == 0){
+                    rows = deleteReg(alReg);
+                }
                 if(rows > 0){
-                    msg = "¡Registro eliminado correctamente!";
-                    rtn.put("typeAlert", "alert-success");
-                    rtn.put("rows", 1);
+                    msg  = "Registro Eliminado";
+                    JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                 }else{
                     msg = "¡No se pudo eliminar el Registro!";
-                    rtn.put("typeAlert", "alert-warning");
-                    rtn.put("rows", 0);
+                    System.out.println(msg);
                 }
-                rtn.put("opc", "D");  
-                rtn.put("data", "");
               break;
             case "F":
                 Map<String, String> rtnMap ;
-                rtnMap = new HashMap<String, String>();
+                rtnMap = new HashMap<>();
 //                rtn.add(navegationReg("1", "F"));
 //                if(rtnMap.size() > 0){
 //                }
@@ -224,11 +169,9 @@ public class RegistrosController {
             default:
               // code block
         }
-        rtn.put("msg", msg);
-        //createResponse(rtn, response);
-    }//Fin processRequest
-                        
-    public static int createReg(Map<String, String> paramsMap){
+    }//Fin ProcesarSolicitud
+
+    public int createReg(Map<String, String> paramsMap){
         //Recibe todos los campos de la vista
         //Limpiar el Map dejando sólo los campos de la tabla
         paramsMapModel = tbModel.justTableFields(paramsMap, false);
@@ -252,34 +195,52 @@ public class RegistrosController {
             rtn = tbModel.saveRegister(paramsMapModel);
         }       
         return rtn;
-    }//en createReg      
-    
-    public static int updateReg(ArrayList<Map<String,String>> registers){
+    }//Fin createReg      
+     
+    /**
+     * Método que prepara la actualiación de un registro.
+     * utiliza el método updateRegister de la clase tableModel
+     * @param viewRegister Map con los datos de la vista.
+     * @return rows cantidad de filas afectadas.
+     */
+    public int updateReg(ArrayList<Map<String,String>> viewRegister){
         int rows = 0;
-        for(Map<String,String> myRow : registers){        //En el mejor de los casos será un solo registro
+        for(Map<String,String> myRow : viewRegister){        //En el mejor de los casos será un solo registro
             rows += tbModel.updateRegister(myRow);        //Hay que pasar un Map, devuelve cantidad de filas afectadas
         }
         return rows;
-    }//end updateReg
+    }//Fin updateReg
     
-    public static Map<String, String> searchById(Map<String, String> paramsMapModel){
+    /**
+     * Método que permite la búsqueda de un registro por el id. Recurre al método interno createIdVal
+     * y a readRegisterById de la clase tableModel.
+     * @param viewRegister Map par de campos y valores que se pasa desde la vista
+     * @return rtn Map con el registro recuperado
+     */
+    public Map<String, String> searchById(Map<String, String> viewRegister){
         Map<String, String> rtn;
         Map<String, String> where;
         rtn = new HashMap<String, String>();
-        where = createIdVal(paramsMapModel);
-        rtn = tbModel.readRegisterById(paramsMapModel, where);
+        where = createIdVal(viewRegister);
+        rtn = tbModel.readRegisterById(viewRegister, where);
         System.out.println(rtn.toString());
         return rtn;
-    }//fin searchById
+    }//Fin searchById
     
-    public static ArrayList<Map<String, String>> searchListById(Map<String, String> paramsMap, Map<String, String> where){ //ok
+    /**
+     * Metodo que permite la busqueda de Lista de Registros filtrados.
+     * @param fieldsToSelect
+     * @param where
+     * @return rtn
+     */
+    public ArrayList<Map<String, String>> searchListById(Map<String, String> fieldsToSelect, Map<String, String> where){
         ArrayList<Map<String, String>> rtn;
         rtn = new ArrayList<Map<String, String>>(); 
-        System.out.println("tc 88 viewreg "+paramsMap);
-        System.out.println("tc 89 where "+where);
-        rtn = tbModel.readRegisterList(paramsMap, where);
+        System.out.println("rc 88 viewreg "+fieldsToSelect);
+        System.out.println("rc 89 where "+where);
+        rtn = tbModel.readRegisterList(fieldsToSelect, where);
         return rtn;
-    }//fin searchListById
+    }//Fin searchListById
      
     /**
      * Método que prepara la navegación entre registros.
@@ -287,43 +248,36 @@ public class RegistrosController {
      * @param goTo String en que se dice a qué posición se desea mover (FIRST, NEXT, PRIOR, LAST)
      * @return rtn Map que contiene el registro recuperado
      */
-    public static Map<String, String> navegationReg(String id, String goTo){
+    public Map<String, String> navegationReg(String id, String goTo){
         Map<String, String> rtn;
         System.out.println("tc 100 id "+id+" goto "+goTo);
         rtn = new HashMap<String, String>();
         rtn = tbModel.readNavetionReg (id, goTo); 
         System.out.println("tc 103 ");
         return rtn;
-    }//fin searchById
+    }//Fin searchById
     
     /**
      * Método que prepara para la eliminación de registro. Usa el método deleteRegister de la clase tableModel
-     * @param id Sring el código actual en la vista
+     * @param registers Sring el código actual en la vista
      * @return rtn int devuelve las filas afectadas
      */
-    public static int deleteReg(ArrayList<Map<String,String>> registers){//ok
+    public int deleteReg(ArrayList<Map<String,String>> registers){
         int rows = 0;
         for(Map<String,String> myRow : registers){        //En el mejor de los casos será un solo registro
             rows += tbModel.deleteRegister(myRow);        //Hay que pasar un Map, devuelve cantidad de filas afectadas
         }
         return rows;                                      //Retorna la suma de todas las filas eliminadas
-    }//fin deleteReg
+    }//Fin deleteReg
                 
     /**
-     * Método que prepara la actualiación de un registro. Invoca métodos propios de la clase createIdVal, createSetFieldsValues; así como
-     * el método updateRegister de la clase tableModel
-     * @param viewRegister Map con los datos de la vista.
-     * @return rtn int cantidad de filas afectadas.
-     */
-    
-    /**
      * Método que construye un Map con sólo los campos de clave primar con sus respectivos valores.
-     * @param viewRegister Map con los pares campo-valor de claves primarias
+     * @param paramsMapModel Map con los pares campo-valor de claves primarias
      * @return rtn Map de las claves de tabla con sus valores si los tiene
      */
-    public static Map<String, String> createIdVal(Map<String, String> paramsMapModel){
+    public Map<String, String> createIdVal(Map<String, String> paramsMapModel){
         Map<String, String> rtn;
-        rtn = new HashMap<String, String>();
+        rtn = new HashMap<>();
         Iterator<String> arrayIterator = tableKeys.iterator();
         while(arrayIterator.hasNext()){
             String elemento = arrayIterator.next();
@@ -332,7 +286,7 @@ public class RegistrosController {
             }
         }//fin while    
         return rtn;
-    }//createIdVal
+    }//Fin createIdVal
     
     /**
      * Método que construye un Map de pares campos-valores que no sean clave primaria en la tabla.
@@ -351,78 +305,6 @@ public class RegistrosController {
         }  
         //System.out.println("C createSetFieldsValues RETURN "+rtn.toString());
         return rtn;
-    }//createSetFieldsValues
-    
-
-    
-    public static int GuardarRegistro() {
-        paramsMap = Tools.paramsToMap(panelVista);
-        String operacion = paramsMap.get("operacion");
-        if ("nuevo".equals(operacion)) { //guardar nuevo registro
-            int max_id = tbModel.getMaxId();
-            String nuevo_id = String.valueOf(max_id + 1);
-            paramsMap.put("id", nuevo_id);
-            paramsMapModel = tbModel.justTableFields(paramsMap, false);
-            int rows = tbModel.saveRegister(paramsMapModel);
-            return rows; //cantidad de registros insertados
-        }
-        if ("modificar".equals(operacion)) { //modificar registros
-            paramsMap = Tools.paramsToMap(panelVista);
-            paramsMapModel = tbModel.justTableFields(paramsMap, false);
-            System.out.println("RegistrosController 68 GuardarRegistro paramsMap:" + paramsMap);
-            int rows = tbModel.updateRegister(paramsMapModel);
-            return rows; //cantidad de filas afectadas
-        }
-        return (-1);
-    }
-    
-    public static int eliminarRegistro() {
-        int rtn = 0;
-        paramsMap = Tools.paramsToMap(panelVista);
-        paramsMapModel = tbModel.justTableFields(paramsMap, false);
-        int rows = tbModel.deleteRegister(paramsMapModel);
-        return rows; //cantidad de registros eliminados
-    }
-
-public static DefaultTableModel cargarTabla() {
-    Map<String, String> where = new HashMap<String, String>();
-    String margarita = "margarita"; 
-    //where.put("nombre", margarita); 
-
-    Map<String, String> fields = new HashMap<String, String>();
-    fields.put("*", "*");
-
-    ArrayList<Map<String, String>> registros = tbModel.readRegister(fields, where);
-
-    DefaultTableModel modeloTabla = new DefaultTableModel(); // Crear un nuevo modelo de tabla
-
-    // Agregar las columnas al modelo de tabla
-    for (String columnName : registros.get(0).keySet()) {
-        modeloTabla.addColumn(columnName);
-    }
-
-    // Agregar los registros al modelo de tabla
-    for (Map<String, String> registro : registros) {
-        Object[] fila = new Object[registro.size()];
-        int i = 0;
-        for (String value : registro.values()) {
-            fila[i++] = value;
-        }
-        modeloTabla.addRow(fila);
-    }
-
-    return modeloTabla;
-}
-
-    /**
-     * Método que permite la búsqueda de un registro por el id. Recurre al método interno createIdVal
-     * y a readRegisterById de la clase tableModel.
-     * @param viewRegister Map par de campos y valores que se pasa desde la vista
-     * @return rtn Map con el registro recuperado
-     */
-
-
-
-
-
+    }//Fin createSetFieldsValues
+   
 }

@@ -16,5 +16,8 @@ import javax.swing.JInternalFrame;
 public interface ActiveFrame {
     
     JInternalFrame getActive();
-    
+    void limpiarFormulario();
+    void crearRegistro();
+    void modificarRegistro();
+    void eliminarRegistro();
 }
