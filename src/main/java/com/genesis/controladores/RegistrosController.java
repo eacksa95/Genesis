@@ -61,11 +61,11 @@ public class RegistrosController {
                             alUPD.add(paramsMap);
                             rows = updateReg(alUPD);
                             if(rows > 0){
-                                System.out.println("RegistrosController 83: Registro Actualizado Correctamente");
-                                
+                                msg = "Registro Actualizado Correctamente";
+                                JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                             }else{
-                                System.out.println("RegistrosController 89: No se pudo actualizar Registro");
-                                
+                                msg = "No se pudo actualizar Registro";
+                                JOptionPane.showMessageDialog(formPanel, msg, "Información", JOptionPane.ERROR_MESSAGE);
                             }
                         }else{   //Si el id = 0 entonces se inserta el registro 
                             rows = createReg(paramsMap);

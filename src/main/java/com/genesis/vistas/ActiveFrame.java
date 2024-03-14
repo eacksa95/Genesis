@@ -17,7 +17,8 @@ public interface ActiveFrame {
     
     JInternalFrame getActive();
     void limpiarFormulario();
-    void crearRegistro();
-    void modificarRegistro();
-    void eliminarRegistro();
+    void crearRegistro(String operacion); //default C
+    void modificarRegistro(String operacion); //default U
+    void eliminarRegistro(String operacion);  //default D
+    
 }

@@ -1,5 +1,6 @@
 package util;
 
+import com.genesis.model.conexion;
 import java.awt.Component;
 import java.awt.Container;
 import java.security.MessageDigest;
@@ -9,7 +10,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComboBox;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
@@ -117,4 +117,23 @@ public class Tools {
         }
         //return false;
     } 
+    
+    public static int validarPermiso(int idrol, String menu, String opcion) {
+        ResultSet sql;
+        int valor = 0;
+        try {
+            //Viste que tenemos dos niveles superiores, superuser y admin
+            sql = conexion.ejecuteSQL("SELECT " + opcion
+                    + " FROM permisos WHERE rolid = " + idrol
+                    + " AND menu = '" + menu + "'");
+            if (!sql.next()) {
+                valor = 0;
+            } else {
+                valor = sql.getInt(opcion);
+            }
+//            System.out.println("SQL FUNCION VALIDARPERMISO;" + sql);
+        } catch (Exception error) {
+        }
+        return valor;
+    }
 }//FIN DE LA CLASE TOOLS

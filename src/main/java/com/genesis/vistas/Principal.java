@@ -1,9 +1,11 @@
 package com.genesis.vistas;
 
-import java.awt.Dimension;
+import com.genesis.model.conexion;
 import java.beans.PropertyVetoException;
 import javax.swing.JInternalFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import util.Tools;
 
 /**
  *
@@ -11,66 +13,27 @@ import javax.swing.JOptionPane;
  */
 public class Principal extends javax.swing.JFrame {
     private JInternalFrame[] w_abiertos;
+    conexion con;
     
     /**
      * Creates new form Principal
      */
     public Principal() {
         initComponents();
-        this.setSize(new Dimension(1200, 650));
+        this.setTitle("Genesis - Sistema de Gestion Comercial. Usuario:" + conexion.getUserName());
+        this.setExtendedState(MAXIMIZED_BOTH);
+        procesarMenus();
     }
     
-    public ActiveFrame getActiveFrame(){
-        //Obtener el JInternalFrame activo desde el JDesktopPane
-        ActiveFrame v = (ActiveFrame) desktopPane.getSelectedFrame();
-        if(v == null){
-        JOptionPane.showMessageDialog(null, "No hay ventana activa...", "Atencion...", JOptionPane.OK_OPTION);
-        }
-        return v;
+    public Principal(conexion con) {
+        initComponents();
+        this.con = con;
+        this.setTitle("Genesis - Sistema de Gestion Comercial. Usuario:" + conexion.getUserName());
+        this.setExtendedState(MAXIMIZED_BOTH);
+        procesarMenus();
     }
     
-    public boolean encuentraVentana(JInternalFrame w){
-        w_abiertos = desktopPane.getAllFrames();
-        int len = w_abiertos.length;
-        int i;
-        if (len > 0){
-            for(i = 0; i < len; i++){
-                if(w_abiertos[i].getTitle().equals(w.getTitle())){
-                return true;
-                }
-            }
-        }
-        return false;
-    }
-    
-    public void mostrarVentana(javax.swing.JInternalFrame frame){
-        w_abiertos = desktopPane.getAllFrames();
-        if(encuentraVentana(frame)){
-        return;
-        }
-        desktopPane.add(frame);
-        frame.setVisible(true);
-        try{
-            frame.setSelected(true);
-        }catch(PropertyVetoException ex){
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.OK_OPTION);
-        }
-    }
-    
-    public void centrar(JInternalFrame internalFrame){
-        int x = (desktopPane.getWidth() / 2) - internalFrame.getWidth() / 2;
-        int y = (desktopPane.getHeight()/ 2) - internalFrame.getHeight() / 2;
-        
-        if (internalFrame.isShowing()){
-            internalFrame.setLocation(x, y);
-        } else{
-            desktopPane.add(internalFrame);
-            internalFrame.setLocation(x, y);
-            internalFrame.show();
-        }
-    }
-    
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -98,6 +61,7 @@ public class Principal extends javax.swing.JFrame {
         menuAcciones = new javax.swing.JMenu();
         mitenLimpiar = new javax.swing.JMenuItem();
         mitenGuardar = new javax.swing.JMenuItem();
+        mitenActualizar = new javax.swing.JMenuItem();
         mitenEliminar = new javax.swing.JMenuItem();
         mitenPrimero = new javax.swing.JMenuItem();
         mitenUltimo = new javax.swing.JMenuItem();
@@ -120,7 +84,9 @@ public class Principal extends javax.swing.JFrame {
         menuRegistros.setText("Registros");
 
         mitenProveedores.setText("Proveedores");
+        mitenProveedores.setName(""); // NOI18N
         menuRegistros.add(mitenProveedores);
+        mitenProveedores.getAccessibleContext().setAccessibleName("mitenProveedores");
 
         mitenClientes.setText("Clientes");
         mitenClientes.addActionListener(new java.awt.event.ActionListener() {
@@ -129,6 +95,7 @@ public class Principal extends javax.swing.JFrame {
             }
         });
         menuRegistros.add(mitenClientes);
+        mitenClientes.getAccessibleContext().setAccessibleName("mitenClientes");
 
         mitenProductos.setText("Productos");
         menuRegistros.add(mitenProductos);
@@ -140,8 +107,10 @@ public class Principal extends javax.swing.JFrame {
             }
         });
         menuRegistros.add(mitenEmpleados);
+        mitenEmpleados.getAccessibleContext().setAccessibleName("mitenEmpleados");
 
         barraMenu.add(menuRegistros);
+        menuRegistros.getAccessibleContext().setAccessibleName("menuRegistros");
 
         menuMovimientos.setText("Movimientos");
 
@@ -200,6 +169,15 @@ public class Principal extends javax.swing.JFrame {
         });
         menuAcciones.add(mitenGuardar);
 
+        mitenActualizar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        mitenActualizar.setText("Actualizar");
+        mitenActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenActualizarActionPerformed(evt);
+            }
+        });
+        menuAcciones.add(mitenActualizar);
+
         mitenEliminar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         mitenEliminar.setText("Eliminar");
         mitenEliminar.addActionListener(new java.awt.event.ActionListener() {
@@ -246,7 +224,8 @@ public class Principal extends javax.swing.JFrame {
 
     /**Iniciar y Mostrar Ventana Clientes*/
     private void mitenClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenClientesActionPerformed
-        RegistrosClientes v_clientes = new RegistrosClientes();
+        JMenuItem m = (JMenuItem) evt.getSource();
+        RegClientes v_clientes = new RegClientes(m.getText());
         // Verificar si ya existe una ventana abierta del mismo tipo
         if (encuentraVentana(v_clientes)){
            //si ya existe, no hacemos nada
@@ -267,17 +246,16 @@ public class Principal extends javax.swing.JFrame {
         int respuesta = JOptionPane.showConfirmDialog(null, "Desea salir del sistema?");
             if(respuesta == 0){
                 System.exit(0); 
-        }
-        
+        }  
     }//GEN-LAST:event_mitenSalirActionPerformed
 
     /**Iniciar y Mostrar Ventana Empleados*/
     private void mitenEmpleadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenEmpleadosActionPerformed
-        RegistrosEmpleados v_empleados = new RegistrosEmpleados();
+        JMenuItem m = (JMenuItem) evt.getSource();
+        RegEmpleados v_empleados = new RegEmpleados(m.getText());
         // Verificar si ya existe una ventana abierta del mismo tipo
         if (encuentraVentana(v_empleados)) {
-            // Si ya existe, no hacemos nada más
-            return;
+            return; // Si ya existe, no hacemos nada más
         }
         // Si no existe, mostramos la ventana y la centramos
         mostrarVentana(v_empleados);
@@ -290,7 +268,7 @@ public class Principal extends javax.swing.JFrame {
             if(activeFrame == null){
                 return;
             }
-            activeFrame.crearRegistro();
+            activeFrame.crearRegistro("C");
     }//GEN-LAST:event_mitenGuardarActionPerformed
 
     private void mitenEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenEliminarActionPerformed
@@ -298,7 +276,7 @@ public class Principal extends javax.swing.JFrame {
             if(activeFrame == null){
                 return;
             }
-            activeFrame.eliminarRegistro();
+            activeFrame.eliminarRegistro("D");
     }//GEN-LAST:event_mitenEliminarActionPerformed
 
     private void mitenPrimeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenPrimeroActionPerformed
@@ -317,6 +295,14 @@ public class Principal extends javax.swing.JFrame {
         }
         activeFrame.limpiarFormulario();    
     }//GEN-LAST:event_mitenLimpiarActionPerformed
+
+    private void mitenActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenActualizarActionPerformed
+            ActiveFrame activeFrame = getActiveFrame();
+            if(activeFrame == null){
+                return;
+            }
+            activeFrame.modificarRegistro("U");
+    }//GEN-LAST:event_mitenActualizarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -354,28 +340,203 @@ public class Principal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuBar barraMenu;
+    public javax.swing.JMenuBar barraMenu;
     public javax.swing.JDesktopPane desktopPane;
     public javax.swing.JMenu menuAcciones;
     private javax.swing.JMenu menuMovimientos;
     private javax.swing.JMenu menuOpciones;
-    private javax.swing.JMenu menuRegistros;
+    public javax.swing.JMenu menuRegistros;
     private javax.swing.JMenu menuReportes;
+    private javax.swing.JMenuItem mitenActualizar;
     private javax.swing.JMenuItem mitenAjusteInventario;
     public javax.swing.JMenuItem mitenAnterior;
-    private javax.swing.JMenuItem mitenClientes;
+    public javax.swing.JMenuItem mitenClientes;
     private javax.swing.JMenuItem mitenCompras;
     public javax.swing.JMenuItem mitenEliminar;
-    private javax.swing.JMenuItem mitenEmpleados;
+    public javax.swing.JMenuItem mitenEmpleados;
     public javax.swing.JMenuItem mitenGuardar;
     private javax.swing.JMenuItem mitenLimpiar;
     public javax.swing.JMenuItem mitenPrimero;
-    private javax.swing.JMenuItem mitenProductos;
-    private javax.swing.JMenuItem mitenProveedores;
+    public javax.swing.JMenuItem mitenProductos;
+    public javax.swing.JMenuItem mitenProveedores;
     private javax.swing.JMenuItem mitenReporteVentas;
     private javax.swing.JMenuItem mitenSalir;
     public javax.swing.JMenuItem mitenSiguiente;
     public javax.swing.JMenuItem mitenUltimo;
     private javax.swing.JMenuItem mitenVentas;
     // End of variables declaration//GEN-END:variables
+
+    public ActiveFrame getActiveFrame(){
+        //Obtener el JInternalFrame activo desde el JDesktopPane
+        ActiveFrame v = (ActiveFrame) desktopPane.getSelectedFrame();
+        if(v == null){
+        JOptionPane.showMessageDialog(null, "No hay ventana activa...", "Atencion...", JOptionPane.OK_OPTION);
+        }
+        return v;
+    }
+    
+    public boolean encuentraVentana(JInternalFrame w){
+        w_abiertos = desktopPane.getAllFrames();
+        int len = w_abiertos.length;
+        int i;
+        if (len > 0){
+            for(i = 0; i < len; i++){
+                if(w_abiertos[i].getTitle().equals(w.getTitle())){
+                return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public void mostrarVentana(javax.swing.JInternalFrame frame){
+        w_abiertos = desktopPane.getAllFrames();
+        if(encuentraVentana(frame)){
+        return;
+        }
+        desktopPane.add(frame);
+        frame.setVisible(true);
+        try{
+            frame.setSelected(true);
+        }catch(PropertyVetoException ex){
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.OK_OPTION);
+        }
+    }
+    
+    public void centrar(JInternalFrame internalFrame){
+        int x = (desktopPane.getWidth() / 2) - internalFrame.getWidth() / 2;
+        int y = (desktopPane.getHeight()/ 2) - internalFrame.getHeight() / 2;
+        
+        if (internalFrame.isShowing()){
+            internalFrame.setLocation(x, y);
+        } else{
+            desktopPane.add(internalFrame);
+            internalFrame.setLocation(x, y);
+            internalFrame.show();
+        }
+    }
+    
+    private void procesarMenus() {
+        javax.swing.JMenu m_menu;
+        javax.swing.JMenu m_submenu;
+        javax.swing.JMenu m_item;
+        javax.swing.JMenu m_subitem;
+        String s_nombre = "", s_text = "", s_menu = "";
+        int cantm = 0, cod = 0, cants = 0, canti = 0, cantj = 0, li_grabados = 0;
+        int li_grabar = 0, li_cm, li_csm, li_ci, li_csi; //utilizo para saber si 1-grabo o 0-modifico
+
+        cantm = (int) barraMenu.getMenuCount();
+        cod = 0;
+        if (cantm > 0) {
+            li_cm = 0;
+            for (int m = 0; m < cantm; m++) {
+                s_nombre = "";
+                li_cm++;
+
+                if (barraMenu.getMenu(m) instanceof javax.swing.JMenu) {
+                    cod++;
+                    m_menu = barraMenu.getMenu(m);
+                    //s_nombre = m_menu.getName();
+                    s_nombre = m_menu.getText(); // Obtener el texto visible del menú
+                    System.out.println("nombreMenu:"+s_nombre);
+                    if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
+                        System.out.println("validarpermiso == 0");
+                        m_menu.setVisible(false);
+                        cants = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
+                    } else {
+                        System.out.println("validarPermiso == 1");
+                        m_menu.setVisible(true);
+                        cants = m_menu.getItemCount();
+                    }
+                }
+
+                if (cants > 0) {
+                    li_csm = 1;
+                    m_menu = barraMenu.getMenu(m);
+                    for (int s = 0; s < cants; s++) {
+                        s_nombre = "";
+                        if (m_menu.getItem(s) instanceof javax.swing.JMenu) {
+                            cod++;
+                            m_submenu = (javax.swing.JMenu) m_menu.getItem(s);
+                            s_nombre = m_submenu.getText();
+                            if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
+                                System.out.println("miten == 0");
+                                m_submenu.setVisible(false);
+                                cants = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
+                            } else {
+                                System.out.println("miten == 1");
+                                m_submenu.setVisible(true);
+                                canti = m_submenu.getItemCount();
+                                li_csm++;
+                            }                            
+                        } else {
+                            if (m_menu.getItem(s) instanceof javax.swing.JMenuItem) {
+                                cod++;
+                                s_nombre = m_menu.getItem(s).getText();
+                                if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
+                                    System.out.println("mitenhijo == 0");
+                                    m_menu.getItem(s).setVisible(false);
+                                    canti = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
+                                } else {
+                                    System.out.println("mitenhijo == 1");
+                                    m_menu.getItem(s).setVisible(true);
+                                    canti = 0;
+                                    li_csm++;
+                                }
+                            } else {
+                                canti = 0;
+                            }
+                        }
+                        
+                        if (canti > 0) {
+                            li_ci = 1;
+                            m_submenu = (javax.swing.JMenu) m_menu.getItem(s);
+                            for (int i = 0; i < canti; i++) {
+                                s_nombre = "";
+                                if (m_submenu.getItem(i) instanceof javax.swing.JMenu) {
+                                    cod++;
+                                    m_item = (javax.swing.JMenu) m_submenu.getItem(i);
+                                    s_nombre = m_item.getName();
+                                    if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
+                                        m_item.setVisible(false);
+                                        cantj = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
+                                    } else {
+                                        m_item.setVisible(true);
+                                        cantj = m_item.getItemCount();
+                                        li_ci++;
+                                    }
+                                } else {
+                                    if (m_submenu.getItem(i) instanceof javax.swing.JMenuItem) {
+                                        cod++;
+                                        s_nombre = m_submenu.getItem(i).getName();
+                                        if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
+                                            m_submenu.getItem(i).setVisible(false);
+                                            cantj = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
+                                        } else {
+                                            m_submenu.getItem(i).setVisible(true);
+                                            cantj = 0;
+                                            li_ci++;
+                                        }
+                                    } else {
+                                        cantj = 0;
+                                    }
+                                }
+                                //System.out.println(s_nombre+" con "+cantj+" subitems");
+                                if (cantj > 0) {
+                                    li_csi = 0;
+                                    for (int j = 0; j < cantj; j++) {
+                                        cod++;
+                                        s_nombre = "";
+                                        s_text = "";
+                                        m_subitem = (javax.swing.JMenu) m_menu.getItem(i);
+                                        li_csi++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }//fin procesarMenus
 }

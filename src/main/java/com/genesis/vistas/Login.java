@@ -1,39 +1,30 @@
 package com.genesis.vistas;
 
 import com.genesis.controladores.AuthController;
+import com.genesis.model.conexion;
+import com.genesis.model.tableModel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JOptionPane;
+import util.Tools;
 
 /**
  * @author Ezequiel Cristaldo
  */
 public class Login extends javax.swing.JFrame {
-
+    Principal principalView;
+    
     /**
      * Creates new form Login
      */
     public Login() {
         initComponents();
-        textFieldUsuario.setName("textFieldUsuario");
-        textFieldPassword.setName("textFieldPassword");
-        
-        // Agregar KeyListener al textFieldPassword
-        textFieldPassword.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    AuthController.iniciarSesion();
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-            }
-        });
+        this.setTitle("Genesis - Inicio de Sesion");
+        setLocationRelativeTo(null);
     }
     
     /**
@@ -50,8 +41,8 @@ public class Login extends javax.swing.JFrame {
         lblUsuario = new javax.swing.JLabel();
         textFieldUsuario = new javax.swing.JTextField();
         lblPassword = new javax.swing.JLabel();
-        textFieldPassword = new javax.swing.JTextField();
         btnEntrar = new javax.swing.JButton();
+        textFieldPassword = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -69,12 +60,18 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
+        textFieldPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textFieldPasswordKeyPressed(evt);
+            }
+        });
+
         javax.swing.GroupLayout formPanelLayout = new javax.swing.GroupLayout(formPanel);
         formPanel.setLayout(formPanelLayout);
         formPanelLayout.setHorizontalGroup(
             formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(formPanelLayout.createSequentialGroup()
-                .addGap(44, 44, 44)
+                .addGap(60, 60, 60)
                 .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(formPanelLayout.createSequentialGroup()
                         .addGap(48, 48, 48)
@@ -87,9 +84,9 @@ public class Login extends javax.swing.JFrame {
                         .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnEntrar)
                             .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(textFieldPassword)
-                                .addComponent(textFieldUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(35, Short.MAX_VALUE))
+                                .addComponent(textFieldUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                                .addComponent(textFieldPassword)))))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
         formPanelLayout.setVerticalGroup(
             formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -113,7 +110,7 @@ public class Login extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(formPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(formPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -124,8 +121,14 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
-        AuthController.iniciarSesion();
+        iniciarSesion();
     }//GEN-LAST:event_btnEntrarActionPerformed
+
+    private void textFieldPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldPasswordKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            iniciarSesion();
+        }
+    }//GEN-LAST:event_textFieldPasswordKeyPressed
 
     /**
      * @param args the command line arguments
@@ -168,7 +171,83 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblUsuario;
-    public javax.swing.JTextField textFieldPassword;
+    private javax.swing.JPasswordField textFieldPassword;
     public javax.swing.JTextField textFieldUsuario;
     // End of variables declaration//GEN-END:variables
+
+    private void iniciarSesion(){
+        String usuario = textFieldUsuario.getText();
+            //verificar que usuario no sea vacio
+            if(usuario.length() == 0){
+                JOptionPane.showMessageDialog(this, "Ingrese Usuario", "Atencion", JOptionPane.INFORMATION_MESSAGE);
+                textFieldUsuario.requestFocus();
+                return;
+            }
+
+            //verificar que password no contenga caracteres invalidos
+            char passArray[] = textFieldPassword.getPassword();
+            int li_valido = 0;
+            for (int i = 0; i < passArray.length; i++) {
+                char c = passArray[i];
+                if (!Character.isLetterOrDigit(c)) {
+                    li_valido++;
+                }
+            }
+            if (li_valido > 0) {
+                JOptionPane.showMessageDialog(rootPane, "La contrase\u00F1a tiene carcteres inválidos!");
+                textFieldPassword.requestFocus();
+                return;
+            }
+
+            //verificar que password no es vacio
+            String vPass = new String(passArray);
+            if (vPass.length() == 0) {
+                JOptionPane.showMessageDialog(rootPane, "Ingrese su password!");
+                textFieldPassword.requestFocus();
+                return;
+            }
+
+            String encryptedPSW = "";
+            encryptedPSW = Tools.encryptMD5(vPass);
+
+            System.out.println("Login.java 172 iniciarSesion CLAVE ENCRIPTADA: " + encryptedPSW);
+            try{        
+                conexion.Conectar();
+                tableModel mUser = new tableModel();
+                mUser.init("usuarios");
+
+                Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
+                Map<String, String> fields = new HashMap<>();     //Los campos que vamos a recuperar
+
+                fields.put("*", "*");
+                where.put("username", usuario);
+                where.put("userpassword", encryptedPSW);
+                ArrayList<Map<String, String>> alMapData = new ArrayList<>();
+                alMapData = mUser.readRegister(fields, where);
+                System.out.println("Login 186 IniciarSesion: cant. usuarios: "+alMapData.size());
+                if(!alMapData.isEmpty()){
+                    System.out.println("Login 88 IniciarSesion: user: "+alMapData.get(0).get("username"));
+                    //cargar datos de usuario a sesion
+                    Map<String, String> userData = new HashMap<>();
+                    userData = alMapData.get(0);
+                    int userId = Integer.parseInt(userData.get("id"));
+                    if(userId > 0){
+                        conexion.setUserId(userId);
+                        conexion.setUserName(userData.get("username"));
+                        conexion.setGrupoId(Integer.parseInt(userData.get("rolid")));
+                        conexion.setGrupoName(userData.get("rol"));
+                        //mostrar principal y esconder login luego return;
+                        principalView = new Principal();
+                        principalView.setVisible(true);
+                        this.dispose();
+                    }else{
+                        JOptionPane.showMessageDialog(null, "Usuario no valido", "Error", JOptionPane.OK_OPTION);
+                        }
+                }else{
+                    System.out.println("no se encontro usuario");
+                }
+                } catch (SQLException ex) {
+                System.out.println("AuthController 95 Iniciar sesion error" + ex);
+        }
+    }
 }

@@ -2,33 +2,44 @@
 package com.genesis.vistas;
 
 import com.genesis.controladores.RegistrosController;
+import com.genesis.model.conexion;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import util.Tools;
 
 /**
  *
  * @author eacks
  */
-public class RegistrosClientes extends javax.swing.JInternalFrame implements ActiveFrame {
+public class RegClientes extends javax.swing.JInternalFrame implements ActiveFrame {
     RegistrosController rc;
+    String menuName;
+    String opcion;
     /**
      * Creates new form RegistrosClientes
      */
-    public RegistrosClientes() {
+    public RegClientes(String menuName) {
         initComponents();
+        this.menuName = menuName;
         setTitle("Clientes");
+        
+        //Inicializar Controlador
         rc = new RegistrosController();
         rc.init("clientes", formPanel);
+        
+        //Establecer nombres de los componentes
         textFieldId.setName("textFieldId");
         textFieldNombre.setName("textFieldNombre");
         textFieldApellido.setName("textFieldApellido");
         textFieldCedula.setName("textFieldCedula");
         
         // Agregar ListSelectionListener al JTable
+        //Listener para seleccion de fila de la JTable
         tablaClientes.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -50,7 +61,6 @@ public class RegistrosClientes extends javax.swing.JInternalFrame implements Act
                         textFieldNombre.setText(rowData.get("nombre").toString());
                         textFieldApellido.setText(rowData.get("apellido").toString());
                         textFieldCedula.setText(rowData.get("cedula").toString());
-
                     }
                 }
             }
@@ -205,20 +215,30 @@ public class RegistrosClientes extends javax.swing.JInternalFrame implements Act
     }
     
     @Override
-    public void crearRegistro(){
+    public void crearRegistro(String operacion){
         textFieldId.setText("0");
         rc.ProcesarSolicitud("C");
     }
     
     @Override
-    public void modificarRegistro(){
+    public void modificarRegistro(String opcion){
+        this.opcion = opcion;
         rc.ProcesarSolicitud("U");
     }
 
     @Override
-    public void eliminarRegistro(){
-        rc.ProcesarSolicitud("D");
-        limpiarFormulario();
+    public void eliminarRegistro(String opcion){
+        this.opcion = opcion;
+        int validacion = Tools.validarPermiso(conexion.getGrupoId(), menuName, opcion);
+        if(validacion == 0){
+            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            return;
+        }
+        if(validacion == 1){
+            rc.ProcesarSolicitud("D");
+            limpiarFormulario();
+        }
     }
     
 }
