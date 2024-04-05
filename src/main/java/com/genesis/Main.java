@@ -1,6 +1,6 @@
 package com.genesis;
 
-import com.genesis.controladores.AuthController;
+import com.genesis.vistas.Login;
 /**
  *
  * @author Ezequiel Cristaldo
@@ -10,7 +10,8 @@ import com.genesis.controladores.AuthController;
 public class Main {
 
     public static void main(String[] args) {
-        AuthController.mostrarLoginView();
+        Login login = new Login();
+        login.setVisible(true);
         
     }
 }

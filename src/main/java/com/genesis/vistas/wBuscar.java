@@ -27,7 +27,7 @@ import javax.swing.table.TableColumn;
  *
  * @author User
  */
-public class w_buscar extends javax.swing.JInternalFrame{
+public class wBuscar extends javax.swing.JInternalFrame{
     
     private boolean DEBUG = false;
     private boolean ALLOW_COLUMN_SELECTION = false;
@@ -53,7 +53,7 @@ public class w_buscar extends javax.swing.JInternalFrame{
     public javax.swing.JTextField codigo;
     
     
-    public w_buscar(String sql, javax.swing.JTextField tf_codigo) {
+    public wBuscar(String sql, javax.swing.JTextField tf_codigo) {
         initComponents();
         this.is_sql = sql;
         codigo = tf_codigo;
@@ -156,7 +156,7 @@ public class w_buscar extends javax.swing.JInternalFrame{
     /**
      * Creates new form w_buscar
      */
-    public w_buscar() {
+    public wBuscar() {
         initComponents();   
     }
     private void printDebugData(JTable table) {
@@ -207,7 +207,7 @@ public class w_buscar extends javax.swing.JInternalFrame{
        sql = "";
        dtm.setRowCount(0);
        sql = is_sql + this.ps_condicion + "%' ORDER BY 1 ASC";
-       System.out.println(sql);
+       System.out.println("w_buscar 210 cargarDatos SQL:" + sql);
         try {
             rs = conexion.ejecuteSQL(sql);
             while (rs.next()) {

@@ -15,10 +15,21 @@ import javax.swing.JInternalFrame;
  */
 public interface ActiveFrame {
     
-    JInternalFrame getActive();
-    void limpiarFormulario();
-    void crearRegistro(String operacion); //default C
-    void modificarRegistro(String operacion); //default U
-    void eliminarRegistro(String operacion);  //default D
+    void imGrabar(String crud);
+    void imFiltrar();
+    void imActualizar(String crud);
+    void imBorrar(String crud);
+    void imNuevo();
+    void imBuscar();
+    void imPrimero();
+    void imSiguiente();
+    void imAnterior();
+    void imUltimo();
+    void imImprimir();
+    void imInsDet();
+    void imDelDet();
+    void imCerrar();
+    
+    
     
 }

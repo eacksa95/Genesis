@@ -47,7 +47,7 @@ public class RegistrosController {
     public void ProcesarSolicitud(String opcion) {
         int rows = 0;
         String msg = "";
-        paramsMap = Tools.paramsToMap(formPanel);
+        //paramsMap = Tools.paramsToMap(formPanel);
         opc = opcion;
         //System.out.println("operacion tipo:" + opc);
         switch(opc){

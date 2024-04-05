@@ -1,6 +1,5 @@
 package com.genesis.vistas;
 
-import com.genesis.controladores.AuthController;
 import com.genesis.model.conexion;
 import com.genesis.model.tableModel;
 import java.awt.event.KeyEvent;
@@ -16,7 +15,7 @@ import util.Tools;
  * @author Ezequiel Cristaldo
  */
 public class Login extends javax.swing.JFrame {
-    Principal principalView;
+    wPrincipal principalView;
     
     /**
      * Creates new form Login
@@ -221,7 +220,7 @@ public class Login extends javax.swing.JFrame {
 
                 fields.put("*", "*");
                 where.put("username", usuario);
-                where.put("userpassword", encryptedPSW);
+                where.put("password", encryptedPSW);
                 ArrayList<Map<String, String>> alMapData = new ArrayList<>();
                 alMapData = mUser.readRegister(fields, where);
                 System.out.println("Login 186 IniciarSesion: cant. usuarios: "+alMapData.size());
@@ -237,7 +236,7 @@ public class Login extends javax.swing.JFrame {
                         conexion.setGrupoId(Integer.parseInt(userData.get("rolid")));
                         conexion.setGrupoName(userData.get("rol"));
                         //mostrar principal y esconder login luego return;
-                        principalView = new Principal();
+                        principalView = new wPrincipal();
                         principalView.setVisible(true);
                         this.dispose();
                     }else{
