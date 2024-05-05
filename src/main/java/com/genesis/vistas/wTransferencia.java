@@ -13,7 +13,7 @@ import com.genesis.tabla.GestionCeldas;
 import com.genesis.tabla.GestionEncabezadoTabla;
 import com.genesis.tabla.ModeloTabla;
 import com.genesis.controladores.tableController;
-import util.cargaComboBox;
+import util.ComboBox;
 import util.Tools;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -95,8 +95,8 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         myData = new HashMap<String, String>();
         columnData = new ArrayList<Map<String, String>>();
 
-        cargaComboBox.pv_cargar(jcbDeposito, "depositos", " id, nombre ", "id", "");
-        cargaComboBox.pv_cargar(jcbDepositoo, "depositos", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(jcbDeposito, "depositos", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(jcbDepositoo, "depositos", " id, nombre ", "id", "");
 
         tc = new tableController();
         tc.init("transferencias_producto");
@@ -260,7 +260,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
 
         double iva, totaliva, total = 0, totalneto, totalbruto, base, preciobruto, precioneto = 0, impuesto = 0;
 
-        iddeposito = Tools.ExtraeCodigo(jcbDeposito.getSelectedItem().toString());
+        iddeposito = ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString());
 
          if (this.tfcodbarra.getText().equals("")) {
             codbar = this.jtDetalle.getModel().getValueAt(row, col).toString();
@@ -1054,8 +1054,8 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         myData.put("id", tfid.getText());
         myData.put("transferencia", Transferencia.getText());
         myData.put("nro_documento", documento.getText());
-        myData.put("depositoid_origen", Tools.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));
-        myData.put("depositoid_destino", Tools.ExtraeCodigo(jcbDepositoo.getSelectedItem().toString()));
+        myData.put("depositoid_origen", ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));
+        myData.put("depositoid_destino", ComboBox.ExtraeCodigo(jcbDepositoo.getSelectedItem().toString()));
 
         int estado = 0;
         myData.put("aprobado", estado + "");
@@ -1201,14 +1201,14 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
     }//end fill
   public void validarCombo(){
            int codigo = 0;
-            codigo = Integer.parseInt(Tools.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));            
+            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));            
             if (codigo == 0){
             this.jcbDeposito.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Depósito Origen!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
             }
             
-            codigo = Integer.parseInt(Tools.ExtraeCodigo(jcbDepositoo.getSelectedItem().toString()));
+            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbDepositoo.getSelectedItem().toString()));
             if (codigo == 0){
             this.jcbDepositoo.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Depósito Destino!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);

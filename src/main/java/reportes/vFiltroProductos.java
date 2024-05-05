@@ -1,11 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
- */
 package reportes;
 
 
-import util.cargaComboBox;
+import util.ComboBox;
 import util.Tools;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -44,8 +40,8 @@ private int returnStatus = RET_CANCEL;
 //   dateIns = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
 //        jdt_fechadesde.setDate(new Date());
 //        jdt_fechahasta.setDate(new Date());
-        cargaComboBox.pv_cargar(jcb_tipo, "sys_depositos", " id, nombre ", "id", "");
-        cargaComboBox.pv_cargar(jcb_cate, "sys_categorias", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(jcb_deposito, "depositos", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(jcb_categoria, "categorias", " id, nombre ", "id", "");
         InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
@@ -66,7 +62,7 @@ private int returnStatus = RET_CANCEL;
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        tf_produ = new javax.swing.JTextField();
+        tf_producto = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -74,14 +70,14 @@ private int returnStatus = RET_CANCEL;
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         ck_estado = new javax.swing.JCheckBox();
-        jcb_tipo = new javax.swing.JComboBox<>();
-        jcb_cate = new javax.swing.JComboBox<>();
+        jcb_deposito = new javax.swing.JComboBox<>();
+        jcb_categoria = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        tf_produ.addActionListener(new java.awt.event.ActionListener() {
+        tf_producto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tf_produActionPerformed(evt);
+                tf_productoActionPerformed(evt);
             }
         });
 
@@ -122,8 +118,8 @@ private int returnStatus = RET_CANCEL;
                                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGap(18, 18, 18)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(tf_produ)
-                                .addComponent(jcb_tipo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addComponent(tf_producto)
+                                .addComponent(jcb_deposito, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabel5)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -137,7 +133,7 @@ private int returnStatus = RET_CANCEL;
                                             .addComponent(jButton2))))
                                 .addGroup(layout.createSequentialGroup()
                                     .addGap(44, 44, 44)
-                                    .addComponent(jcb_cate, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                    .addComponent(jcb_categoria, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                 .addGap(46, 46, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -151,12 +147,12 @@ private int returnStatus = RET_CANCEL;
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
-                            .addComponent(jcb_tipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(tf_produ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jcb_deposito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(tf_producto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jcb_cate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jcb_categoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
@@ -171,9 +167,9 @@ private int returnStatus = RET_CANCEL;
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tf_produActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_produActionPerformed
+    private void tf_productoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_productoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_tf_produActionPerformed
+    }//GEN-LAST:event_tf_productoActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         doClose(RET_OK);
@@ -231,16 +227,16 @@ private void doClose (int retStatus){
         dispose();       
     }
     private void getParameters(){
-         String argpro = this.tf_produ.getText();
+         String argpro = this.tf_producto.getText();
         if (argpro.equals("")){
             argpro = "";
         }
-        String argtipo = Tools.ExtraeCodigo(jcb_tipo.getSelectedItem().toString());
+        String argtipo = ComboBox.ExtraeCodigo(jcb_deposito.getSelectedItem().toString());
         int deposito = Integer.parseInt(argtipo);
         if (argtipo.equals("")){
             deposito = 1;
         }
-        String argcate = Tools.ExtraeCodigo(jcb_cate.getSelectedItem().toString());
+        String argcate = ComboBox.ExtraeCodigo(jcb_categoria.getSelectedItem().toString());
         if (argcate.equals("")){
             argcate = "0";
         } 
@@ -252,7 +248,7 @@ private void doClose (int retStatus){
          
        
 
-        par.put("nombreproducto",argpro);
+        par.put("nombre",argpro);
         par.put("deposito",deposito);
         par.put("categoria",argcate);
         par.put("activo", argestado);
@@ -283,8 +279,8 @@ private void doClose (int retStatus){
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JComboBox<String> jcb_cate;
-    private javax.swing.JComboBox<String> jcb_tipo;
-    private javax.swing.JTextField tf_produ;
+    private javax.swing.JComboBox<String> jcb_categoria;
+    private javax.swing.JComboBox<String> jcb_deposito;
+    private javax.swing.JTextField tf_producto;
     // End of variables declaration//GEN-END:variables
 }

@@ -10,7 +10,7 @@ import com.genesis.model.tableModel;
 import com.genesis.tabla.ModeloTabla;
 import com.genesis.controladores.tableController;
 import util.Tools;
-import util.cargaComboBox;
+import util.ComboBox;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,25 +21,19 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author RC
- */
 public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame {
-
+    private boolean userSelectItem = false; // Variable para controlar si el usuario seleccionó un item de comboBox
     private Map<String, String> myData;
     private HashMap<String, String> myDet;
     private tableController tc;
     String Opcion = "";
     String CRUD = "";
-    /**
-     * Creates new form wPermisosgre
-     */
+
     public wPermisos(String Opcion) {
         initComponents();
         this.Opcion = Opcion;
         myData = new HashMap<String, String>();
-        cargaComboBox.pv_cargar(jcbRol, "roles", " id, rol ", "id", "");
+        ComboBox.pv_cargar(jcbRol, "roles", " id, rol ", "id", "");
         tc = new tableController();
         tc.init("permisos");
     }// fin constructor
@@ -132,7 +126,10 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void jcbRolItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbRolItemStateChanged
+    if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED && userSelectItem) {
         mostrarMenus();
+    }
+        userSelectItem = true; // Marcar que el usuario seleccionó un item
     }//GEN-LAST:event_jcbRolItemStateChanged
 
 
@@ -148,7 +145,7 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
         DefaultTableModel dtm = (DefaultTableModel) jtDetalle.getModel();
         int row = 0;
         int rolid = 0;
-        rolid = Integer.parseInt(Tools.ExtraeCodigo(jcbRol.getSelectedItem().toString()));
+        rolid = Integer.parseInt(ComboBox.ExtraeCodigo(jcbRol.getSelectedItem().toString()));
         if (rolid == 0) {
             JOptionPane.showMessageDialog(null, "Seleccione un Rol válido.");
             return;
@@ -156,11 +153,10 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
         String sql, menuid, menutext;
         Boolean showMenu, createReg, readReg, updateReg, deleteReg;
 
-        sql = "SELECT p.ver AS VER, p.C AS c, p.R AS r, p.U AS u, p.D AS d, p.menuid, m.menu AS menutext "
+        sql = "SELECT p.ver AS VER, p.c AS c, p.r AS r, p.u AS u, p.d AS d, p.menuid, m.menu AS menutext "
                 + " FROM permisos p INNER JOIN menus m ON m.id = p.menuid "
                 + "WHERE p.rolid = " + rolid;
 
-        Map<String, String> rtnnn = new HashMap<String, String>();
         ResultSet rsss;
         try {
             rsss = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
@@ -168,10 +164,10 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
                 menuid = rsss.getString("menuid");
                 menutext = rsss.getString("menutext");
                 showMenu = (rsss.getInt("ver") == 1) ? true : false;
-                createReg = (rsss.getInt("C") == 1) ? true : false;
-                readReg = (rsss.getInt("R") == 1) ? true : false;
-                updateReg = (rsss.getInt("U") == 1) ? true : false;
-                deleteReg = (rsss.getInt("D") == 1) ? true : false;
+                createReg = (rsss.getInt("c") == 1) ? true : false;
+                readReg = (rsss.getInt("r") == 1) ? true : false;
+                updateReg = (rsss.getInt("u") == 1) ? true : false;
+                deleteReg = (rsss.getInt("d") == 1) ? true : false;
 
                 dtm.addRow(new Object[]{menuid, menutext, showMenu, createReg,
                     readReg, updateReg, deleteReg});
@@ -195,20 +191,17 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
     @Override
     public void imGrabar(String crud) {
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
+        String msg;
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
-        String msg;
+        
         int rowsAffected = 0;
         //Sirve para poner en el map el nombre de la columna coincide con la estructura de la tabla
         String[] fields = {"menuid", "menutext", "ver", "C", "R", "U", "D"};
-        myData.put("rolid", Tools.ExtraeCodigo(jcbRol.getSelectedItem().toString())); //capturamos el id del rol
+        myData.put("rolid", ComboBox.ExtraeCodigo(jcbRol.getSelectedItem().toString()));
 
         DefaultTableModel dftm = (DefaultTableModel) jtDetalle.getModel();
         int numRows = jtDetalle.getRowCount();

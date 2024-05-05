@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
- */
 package com.genesis.vistas;
 
 import com.genesis.controladores.tableController;
@@ -12,24 +8,15 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import util.Tools;
-import util.cargaComboBox;
+import util.ComboBox;
 
-/**
- *
- * @author eacks
- */
 public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame {
-
     private tableController tc;
     private Map<String, String> myData;
     String currentField;
     String Opcion = "";
     String CRUD = "";
     
-    
-    /**
-     * Creates new form SegUsuarios
-     */
     public wUsuario(String menuName) {
         initComponents();
         this.Opcion = menuName;
@@ -37,21 +24,21 @@ public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame 
         tc.init("usuarios");
         this.currentField = "";
         myData = new HashMap<String, String>();
-        cargaComboBox.pv_cargar(jcbEmpleado, "empleados", " id, CONCAT(nombre, apellido) ", "id", "");
-        cargaComboBox.pv_cargar(jcbRol, "roles", " id, rol", "id", "");
+        ComboBox.pv_cargar(jcbEmpleado, "empleados", " id, CONCAT(nombre, apellido) ", "id", "");
+        ComboBox.pv_cargar(jcbRol, "roles", " id, rol", "id", "");
     }
 
     private void setData() {
         myData.put("id", tfId.getText());
         myData.put("email", tfEmail.getText());
         myData.put("username", tfUsuario.getText());
-        
+          
         if(!"".equals(tfPassword.getText())){
             myData.put("password", Tools.encryptMD5(tfPassword.getText()));
         }
         
-        myData.put("rolid", Tools.ExtraeCodigo(jcbRol.getSelectedItem().toString()));
-        myData.put("empleadoid", Tools.ExtraeCodigo(jcbEmpleado.getSelectedItem().toString()));
+        myData.put("rolid", ComboBox.ExtraeCodigo(jcbRol.getSelectedItem().toString()));
+        myData.put("empleadoid", ComboBox.ExtraeCodigo(jcbEmpleado.getSelectedItem().toString()));
         
         int estado = 0;
         if (jCheckActivo.isSelected()) {
@@ -125,6 +112,8 @@ public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame 
         lblPassword = new javax.swing.JLabel();
         tfPassword = new javax.swing.JTextField();
 
+        setClosable(true);
+
         jLabel1.setText("Id");
 
         lblEmpleado.setText("Empleado");
@@ -148,7 +137,10 @@ public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame 
 
         jCheckActivo.setText("Activo");
 
+        jcbEmpleado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Empleado" }));
         jcbEmpleado.setToolTipText("");
+
+        jcbRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Rol" }));
 
         lblPassword.setText("Password");
 
@@ -211,7 +203,7 @@ public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame 
                     .addComponent(tfEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jCheckActivo)
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addContainerGap(47, Short.MAX_VALUE))
         );
 
         pack();
@@ -224,8 +216,7 @@ public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame 
     private void tfIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfIdKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             imBuscar();
-        }        
-     
+        }
     }//GEN-LAST:event_tfIdKeyPressed
 
 
@@ -264,6 +255,12 @@ public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame 
             String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + tfId.getText();
             System.out.println(msg);
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+            return;
+        }
+        //si ID = 0 quiere crear usuario, pero verificar si pass tiene por lo menos 8 caracteres
+        if(tfPassword.getText().length() < 8){
+            String msg = "La contrasenha debe tener por lo menos 8 caracteres";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
         this.setData();
@@ -415,7 +412,8 @@ public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame 
 
     @Override
     public void imCerrar() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        setVisible(false);
+        dispose();
     }
     
 

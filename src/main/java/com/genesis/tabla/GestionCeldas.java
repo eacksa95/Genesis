@@ -114,7 +114,16 @@ public class GestionCeldas extends DefaultTableCellRenderer{
             decimalFormat.applyPattern(pattern);
             Number number;
             
-            String str = value.toString();
+            String str = "";
+            if (value != null && !value.toString().isEmpty()) {
+                str = value.toString();
+            }
+            else {
+                // Si el valor es nulo o una cadena vacía, asigna un valor predeterminado
+                // o realiza alguna acción apropiada
+                this.setValue("0.0");
+                return this;
+            }
             //System.out.println("El valor to string str "+str);
             try {
                 df.parse(str);

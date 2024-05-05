@@ -53,7 +53,7 @@ public class pojoProductoDetalle {
                 return this.tamanoid;
                 //break;
             case "disenoid" :
-                return this.tamanoid;
+                return this.disenoid;
                 //break;
             case "uxb" :
                 return this.uxb;

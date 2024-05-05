@@ -8,17 +8,10 @@ import javax.swing.JOptionPane;
 import reportes.Reporte;
 import util.Tools;
 
-/**
- *
- * @author Ezequiel Cristaldo
- */
 public class wPrincipal extends javax.swing.JFrame {
     private JInternalFrame[] w_abiertos;
     conexion con;
     
-    /**
-     * Creates new form Principal
-     */
     public wPrincipal() {
         initComponents();
         this.setTitle("Genesis - Sistema de Gestion Comercial. Usuario:" + conexion.getUserName());
@@ -77,18 +70,21 @@ public class wPrincipal extends javax.swing.JFrame {
         mitenCambioPassword = new javax.swing.JMenuItem();
         menuStock = new javax.swing.JMenu();
         menuStockFichas = new javax.swing.JMenu();
+        mitenProveedor = new javax.swing.JMenuItem();
         mitenCategoria = new javax.swing.JMenuItem();
         mitenProducto = new javax.swing.JMenuItem();
         mitenProductoDetalle = new javax.swing.JMenuItem();
         mitenDeposito = new javax.swing.JMenuItem();
+        mitenColor = new javax.swing.JMenuItem();
+        mitenDisenho = new javax.swing.JMenuItem();
+        mitenTamano = new javax.swing.JMenuItem();
+        mitenMarca = new javax.swing.JMenuItem();
         menuStockProcesos = new javax.swing.JMenu();
         menuStockInformes = new javax.swing.JMenu();
         mitenReporteProductos = new javax.swing.JMenuItem();
         menuCompra = new javax.swing.JMenu();
-        menuCompraFichas = new javax.swing.JMenu();
-        mitenProveedores = new javax.swing.JMenuItem();
         menuCompraProcesos = new javax.swing.JMenu();
-        menuCompraInformes = new javax.swing.JMenu();
+        mitenComprar = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -105,11 +101,6 @@ public class wPrincipal extends javax.swing.JFrame {
 
         menuArchivo.setText("Archivo");
         menuArchivo.setName("menuArchivo"); // NOI18N
-        menuArchivo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuArchivoActionPerformed(evt);
-            }
-        });
 
         mitenNuevo.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         mitenNuevo.setText("Nuevo");
@@ -166,9 +157,14 @@ public class wPrincipal extends javax.swing.JFrame {
         mitenImprimir.setName("mitenImprimir"); // NOI18N
         menuArchivo.add(mitenImprimir);
 
-        mitenCerrarVentana.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        mitenCerrarVentana.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         mitenCerrarVentana.setText("Cerrar Ventana");
         mitenCerrarVentana.setName("mitenCerrarVentana"); // NOI18N
+        mitenCerrarVentana.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenCerrarVentanaActionPerformed(evt);
+            }
+        });
         menuArchivo.add(mitenCerrarVentana);
         menuArchivo.add(separadorArchivo);
 
@@ -215,10 +211,20 @@ public class wPrincipal extends javax.swing.JFrame {
 
         mitenInsertarDetalle.setText("Ins. Detalle");
         mitenInsertarDetalle.setName("mitenInsertarDetalle"); // NOI18N
+        mitenInsertarDetalle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenInsertarDetalleActionPerformed(evt);
+            }
+        });
         menuEditar.add(mitenInsertarDetalle);
 
         mitenEliminarDetalle.setText("Del. Detalle");
         mitenEliminarDetalle.setName("mitenEliminarDetalle"); // NOI18N
+        mitenEliminarDetalle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenEliminarDetalleActionPerformed(evt);
+            }
+        });
         menuEditar.add(mitenEliminarDetalle);
 
         barraMenu.add(menuEditar);
@@ -240,6 +246,11 @@ public class wPrincipal extends javax.swing.JFrame {
 
         mitenCiudad.setText("Ciudad");
         mitenCiudad.setName("mitenCiudad"); // NOI18N
+        mitenCiudad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenCiudadActionPerformed(evt);
+            }
+        });
         menuLocalidades.add(mitenCiudad);
 
         menuFichas.add(menuLocalidades);
@@ -271,6 +282,11 @@ public class wPrincipal extends javax.swing.JFrame {
 
         mitenRol.setText("Rol");
         mitenRol.setName("mitenRol"); // NOI18N
+        mitenRol.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenRolActionPerformed(evt);
+            }
+        });
         menuSeguridad.add(mitenRol);
 
         mitenMenu.setText("Menu");
@@ -308,6 +324,15 @@ public class wPrincipal extends javax.swing.JFrame {
         menuStockFichas.setText("Fichas");
         menuStockFichas.setName("menuStockFichas"); // NOI18N
 
+        mitenProveedor.setText("Proveedor");
+        mitenProveedor.setName("mitenProveedor"); // NOI18N
+        mitenProveedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenProveedorActionPerformed(evt);
+            }
+        });
+        menuStockFichas.add(mitenProveedor);
+
         mitenCategoria.setText("Categoria");
         mitenCategoria.setName("mitenCategoria"); // NOI18N
         mitenCategoria.addActionListener(new java.awt.event.ActionListener() {
@@ -328,6 +353,11 @@ public class wPrincipal extends javax.swing.JFrame {
 
         mitenProductoDetalle.setText("Detalle Producto");
         mitenProductoDetalle.setName("mitenProductoDetalle"); // NOI18N
+        mitenProductoDetalle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenProductoDetalleActionPerformed(evt);
+            }
+        });
         menuStockFichas.add(mitenProductoDetalle);
 
         mitenDeposito.setText("Depósito");
@@ -339,9 +369,46 @@ public class wPrincipal extends javax.swing.JFrame {
         });
         menuStockFichas.add(mitenDeposito);
 
+        mitenColor.setText("Colores");
+        mitenColor.setName("mitenColores"); // NOI18N
+        mitenColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenColorActionPerformed(evt);
+            }
+        });
+        menuStockFichas.add(mitenColor);
+
+        mitenDisenho.setText("Diseños");
+        mitenDisenho.setName("mitenDiseno"); // NOI18N
+        mitenDisenho.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenDisenhoActionPerformed(evt);
+            }
+        });
+        menuStockFichas.add(mitenDisenho);
+
+        mitenTamano.setText("Tamaños");
+        mitenTamano.setName("mitenTamano"); // NOI18N
+        mitenTamano.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenTamanoActionPerformed(evt);
+            }
+        });
+        menuStockFichas.add(mitenTamano);
+
+        mitenMarca.setText("Marcas");
+        mitenMarca.setName("mitenMarca"); // NOI18N
+        mitenMarca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenMarcaActionPerformed(evt);
+            }
+        });
+        menuStockFichas.add(mitenMarca);
+
         menuStock.add(menuStockFichas);
 
         menuStockProcesos.setText("Procesos");
+        menuStockProcesos.setName("mitenStockProcesos"); // NOI18N
         menuStock.add(menuStockProcesos);
 
         menuStockInformes.setText("Informes");
@@ -361,25 +428,19 @@ public class wPrincipal extends javax.swing.JFrame {
         menuCompra.setText("Compra");
         menuCompra.setName("menuCompra"); // NOI18N
 
-        menuCompraFichas.setText("Fichas");
+        menuCompraProcesos.setText("Procesos");
+        menuCompraProcesos.setName("menuCompraProcesos"); // NOI18N
 
-        mitenProveedores.setText("Proveedores");
-        mitenProveedores.setName("mitenProveedores"); // NOI18N
-        mitenProveedores.addActionListener(new java.awt.event.ActionListener() {
+        mitenComprar.setText("Comprar");
+        mitenComprar.setName("mitenComprar"); // NOI18N
+        mitenComprar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mitenProveedoresActionPerformed(evt);
+                mitenComprarActionPerformed(evt);
             }
         });
-        menuCompraFichas.add(mitenProveedores);
-        mitenProveedores.getAccessibleContext().setAccessibleName("mitenProveedores");
+        menuCompraProcesos.add(mitenComprar);
 
-        menuCompra.add(menuCompraFichas);
-
-        menuCompraProcesos.setText("Procesos");
         menuCompra.add(menuCompraProcesos);
-
-        menuCompraInformes.setText("Informes");
-        menuCompra.add(menuCompraInformes);
 
         barraMenu.add(menuCompra);
 
@@ -390,12 +451,12 @@ public class wPrincipal extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(desktop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(desktop)
+                .addGap(0, 0, 0))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(desktop)
+            .addComponent(desktop, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
@@ -469,11 +530,9 @@ public class wPrincipal extends javax.swing.JFrame {
     private void mitenMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenMenuActionPerformed
         JMenuItem m = (JMenuItem) evt.getSource();
         wMenu view = new wMenu(m.getName());
-        // Verificar si ya existe una ventana abierta del mismo tipo
         if (encuentraVentana(view)) {
-            return; // Si ya existe, no hacemos nada más
+            return;
         }
-        // Si no existe, mostramos la ventana y la centramos
         mostrarVentana(view);
         centrar(view); 
     }//GEN-LAST:event_mitenMenuActionPerformed
@@ -481,11 +540,9 @@ public class wPrincipal extends javax.swing.JFrame {
     private void mitenUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenUsuarioActionPerformed
         JMenuItem m = (JMenuItem) evt.getSource();
         wUsuario v_usuario = new wUsuario(m.getName());
-        // Verificar si ya existe una ventana abierta del mismo tipo
         if (encuentraVentana(v_usuario)) {
-            return; // Si ya existe, no hacemos nada más
+            return;
         }
-        // Si no existe, mostramos la ventana y la centramos
         mostrarVentana(v_usuario);
         centrar(v_usuario);
     }//GEN-LAST:event_mitenUsuarioActionPerformed
@@ -500,16 +557,6 @@ public class wPrincipal extends javax.swing.JFrame {
         centrar(view);        // TODO add your handling code here:
     }//GEN-LAST:event_mitenPermisosActionPerformed
 
-    private void mitenProveedoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenProveedoresActionPerformed
-        JMenuItem m = (JMenuItem) evt.getSource();
-        wProveedor view = new wProveedor(m.getName());
-        if (encuentraVentana(view)){
-            return;
-        }
-        mostrarVentana(view);
-        centrar(view);
-    }//GEN-LAST:event_mitenProveedoresActionPerformed
-
     private void mitenCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenCategoriaActionPerformed
         JMenuItem m = (JMenuItem) evt.getSource();
         wCategoria view = new wCategoria(m.getName());
@@ -522,17 +569,13 @@ public class wPrincipal extends javax.swing.JFrame {
 
     private void mitenProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenProductoActionPerformed
         JMenuItem m = (JMenuItem) evt.getSource();
-        wProducto view = new wProducto(m.getName());
+        wProductoDet view = new wProductoDet(m.getName());
         if (encuentraVentana(view)){
             return;
         }
         mostrarVentana(view);
         centrar(view);
     }//GEN-LAST:event_mitenProductoActionPerformed
-
-    private void menuArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuArchivoActionPerformed
-
-    }//GEN-LAST:event_menuArchivoActionPerformed
 
     private void mitenSalirSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenSalirSistemaActionPerformed
         int respuesta = JOptionPane.showConfirmDialog(null, "Desea salir del sistema?");
@@ -579,6 +622,120 @@ public class wPrincipal extends javax.swing.JFrame {
         centrar(view);
     }//GEN-LAST:event_mitenDepartamentoActionPerformed
 
+    private void mitenCerrarVentanaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenCerrarVentanaActionPerformed
+        ActiveFrame ve = getActiveFrame();
+        if (ve == null) {
+            return;
+        }
+        ve.imCerrar();
+    }//GEN-LAST:event_mitenCerrarVentanaActionPerformed
+
+    private void mitenColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenColorActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wColor view = new wColor(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenColorActionPerformed
+
+    private void mitenDisenhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenDisenhoActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wDiseno view = new wDiseno(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenDisenhoActionPerformed
+
+    private void mitenMarcaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenMarcaActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wMarca view = new wMarca(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenMarcaActionPerformed
+
+    private void mitenProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenProveedorActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wProveedor view = new wProveedor(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenProveedorActionPerformed
+
+    private void mitenProductoDetalleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenProductoDetalleActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wProductoDet view = new wProductoDet(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenProductoDetalleActionPerformed
+
+    private void mitenCiudadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenCiudadActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wCiudad view = new wCiudad(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenCiudadActionPerformed
+
+    private void mitenTamanoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenTamanoActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wTamano view = new wTamano(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenTamanoActionPerformed
+
+    private void mitenComprarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenComprarActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wCompra view = new wCompra(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenComprarActionPerformed
+
+    private void mitenRolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenRolActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wRol view = new wRol(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenRolActionPerformed
+
+    private void mitenInsertarDetalleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenInsertarDetalleActionPerformed
+        ActiveFrame ve = getActiveFrame();
+        if (ve == null) {
+            return;
+        }
+        ve.imInsDet();
+    }//GEN-LAST:event_mitenInsertarDetalleActionPerformed
+
+    private void mitenEliminarDetalleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenEliminarDetalleActionPerformed
+        ActiveFrame ve = getActiveFrame();
+        if (ve == null) {
+            return;
+        }
+        ve.imDelDet();
+    }//GEN-LAST:event_mitenEliminarDetalleActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -620,8 +777,6 @@ public class wPrincipal extends javax.swing.JFrame {
     public static javax.swing.JDesktopPane desktop;
     public javax.swing.JMenu menuArchivo;
     private javax.swing.JMenu menuCompra;
-    private javax.swing.JMenu menuCompraFichas;
-    private javax.swing.JMenu menuCompraInformes;
     private javax.swing.JMenu menuCompraProcesos;
     private javax.swing.JMenu menuEditar;
     public javax.swing.JMenu menuFichas;
@@ -638,25 +793,30 @@ public class wPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mitenCategoria;
     private javax.swing.JMenuItem mitenCerrarVentana;
     private javax.swing.JMenuItem mitenCiudad;
+    private javax.swing.JMenuItem mitenColor;
+    private javax.swing.JMenuItem mitenComprar;
     private javax.swing.JMenuItem mitenDepartamento;
     private javax.swing.JMenuItem mitenDeposito;
+    private javax.swing.JMenuItem mitenDisenho;
     public javax.swing.JMenuItem mitenEliminar;
     private javax.swing.JMenuItem mitenEliminarDetalle;
     public javax.swing.JMenuItem mitenEmpleados;
     public javax.swing.JMenuItem mitenGuardar;
     private javax.swing.JMenuItem mitenImprimir;
     private javax.swing.JMenuItem mitenInsertarDetalle;
+    private javax.swing.JMenuItem mitenMarca;
     private javax.swing.JMenuItem mitenMenu;
     private javax.swing.JMenuItem mitenNuevo;
     private javax.swing.JMenuItem mitenPermisos;
     public javax.swing.JMenuItem mitenPrimero;
     private javax.swing.JMenuItem mitenProducto;
     private javax.swing.JMenuItem mitenProductoDetalle;
-    public javax.swing.JMenuItem mitenProveedores;
+    private javax.swing.JMenuItem mitenProveedor;
     private javax.swing.JMenuItem mitenReporteProductos;
     private javax.swing.JMenuItem mitenRol;
     private javax.swing.JMenuItem mitenSalirSistema;
     public javax.swing.JMenuItem mitenSiguiente;
+    private javax.swing.JMenuItem mitenTamano;
     public javax.swing.JMenuItem mitenUltimo;
     private javax.swing.JMenuItem mitenUsuario;
     private javax.swing.JPopupMenu.Separator separadorArchivo;
@@ -675,9 +835,8 @@ public class wPrincipal extends javax.swing.JFrame {
     public boolean encuentraVentana(JInternalFrame w){
         w_abiertos = desktop.getAllFrames();
         int len = w_abiertos.length;
-        int i;
         if (len > 0){
-            for(i = 0; i < len; i++){
+            for(int i = 0; i < len; i++){
                 if(w_abiertos[i].getTitle().equals(w.getTitle())){
                 return true;
                 }
@@ -686,10 +845,13 @@ public class wPrincipal extends javax.swing.JFrame {
         return false;
     }
     
+    /**
+     * Agrega JInternalFrame a desktop
+     * @param frame
+     */
     public void mostrarVentana(javax.swing.JInternalFrame frame){
-        w_abiertos = desktop.getAllFrames();
-        if(encuentraVentana(frame)){
-        return;
+        if(encuentraVentana(frame)){ //si ya esta abierta la ventana en desktop entonces return
+            return;
         }
         desktop.add(frame);
         frame.setVisible(true);
@@ -700,100 +862,97 @@ public class wPrincipal extends javax.swing.JFrame {
         }
     }
     
-    public void centrar(JInternalFrame internalFrame){
-        int x = (desktop.getWidth() / 2) - internalFrame.getWidth() / 2;
-        int y = (desktop.getHeight()/ 2) - internalFrame.getHeight() / 2;
+    /**
+     * Centrar la ventana en el escritorio
+     * Se ejecuta cada vez que una ventana nueva es abierta.
+     * @param frame
+    */
+    public void centrar(JInternalFrame frame){
+        int x = (desktop.getWidth() / 2) - frame.getWidth() / 2;
+        int y = (desktop.getHeight()/ 2) - frame.getHeight() / 2;
         
-        if (internalFrame.isShowing()){
-            internalFrame.setLocation(x, y);
+        if (frame.isShowing()){
+            frame.setLocation(x, y);
         } else{
-            desktop.add(internalFrame);
-            internalFrame.setLocation(x, y);
-            internalFrame.show();
+            desktop.add(frame);
+            frame.setLocation(x, y);
+            frame.show();
         }
     }
     
+    /**
+     * Muestra o Oculta JMenus y JMenuItems dependiendo de los permisos del usuario
+     */
     private void procesarMenus() {
         javax.swing.JMenu m_menu;
         javax.swing.JMenu m_submenu;
         javax.swing.JMenu m_item;
         javax.swing.JMenu m_subitem;
-        String s_nombre = "", s_text = "", s_menu = "";
-        int cantm = 0, cod = 0, cants = 0, canti = 0, cantj = 0, li_grabados = 0;
-        int li_grabar = 0, li_cm, li_csm, li_ci, li_csi; //utilizo para saber si 1-grabo o 0-modifico
+        String menuName;
+        int idRol = conexion.getGrupoId(); //id Rol de usuario
+        int cantMenus, cants = 0, canti = 0, cantj;
+        int li_csm, li_ci;
 
-        cantm = (int) barraMenu.getMenuCount();
-        cod = 0;
-        if (cantm > 0) {
-            li_cm = 0;
-            for (int m = 0; m < cantm; m++) {
-                s_nombre = "";
-                li_cm++;
-
-                if (barraMenu.getMenu(m) instanceof javax.swing.JMenu) {
-                    cod++;
-                    m_menu = barraMenu.getMenu(m);
-                    s_nombre = m_menu.getName(); // Obtener el texto visible del menú
-                    System.out.println("nombreMenu:"+s_nombre);
-                    if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
-                        System.out.println("validarpermiso == 0");
+        cantMenus = (int) barraMenu.getMenuCount();
+        if (cantMenus > 0) {
+            for (int menuIndex = 0; menuIndex < cantMenus; menuIndex++) {
+                menuName = ""; //limpiar menuName
+                //nivel 1
+                if (barraMenu.getMenu(menuIndex) instanceof javax.swing.JMenu) {
+                    m_menu = barraMenu.getMenu(menuIndex);
+                    menuName = m_menu.getName(); // Obtener el Name del menu
+                    if (Tools.validarPermiso(idRol, menuName, "ver") == 0) {
                         m_menu.setVisible(false);
                         cants = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
+                                    //si cants = 0 entonces no puede tener accceso a los menus internos de este Menu
                     } else {
-                        System.out.println("validarPermiso == 1");
+                        //System.out.println("validarPermiso == 1");
                         m_menu.setVisible(true);
-                        cants = m_menu.getItemCount();
+                        cants = m_menu.getItemCount(); //cantidad de menus internos a este menu
                     }
                 }
-
-                if (cants > 0) {
+                //nivel 2
+                if (cants > 0) { //entonces Usuario tiene acceso a los menus y/o miten de este menu
                     li_csm = 1;
-                    m_menu = barraMenu.getMenu(m);
+                    m_menu = barraMenu.getMenu(menuIndex);
                     for (int s = 0; s < cants; s++) {
-                        s_nombre = "";
+                        menuName = ""; //limpiamos menuName para utilizarlo con el miten
                         if (m_menu.getItem(s) instanceof javax.swing.JMenu) {
-                            cod++;
                             m_submenu = (javax.swing.JMenu) m_menu.getItem(s);
-                            s_nombre = m_submenu.getName();
-                            if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
-                                System.out.println("miten == 0");
+                            menuName = m_submenu.getName();
+                            if (Tools.validarPermiso(idRol, menuName, "ver") == 0) {
                                 m_submenu.setVisible(false);
                                 cants = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
                             } else {
-                                System.out.println("miten == 1");
                                 m_submenu.setVisible(true);
                                 canti = m_submenu.getItemCount();
                                 li_csm++;
                             }                            
                         } else {
                             if (m_menu.getItem(s) instanceof javax.swing.JMenuItem) {
-                                cod++;
-                                s_nombre = m_menu.getItem(s).getName();
-                                if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
-                                    System.out.println("mitenhijo == 0");
+                                menuName = m_menu.getItem(s).getName();
+                                if (Tools.validarPermiso(idRol, menuName, "ver") == 0) {
                                     m_menu.getItem(s).setVisible(false);
-                                    canti = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
+                                    canti = 0; //Tenemos que prevenir que busque dentro porque es miten
                                 } else {
-                                    System.out.println("mitenhijo == 1");
                                     m_menu.getItem(s).setVisible(true);
-                                    canti = 0;
+                                    canti = 0; //Tenemos que prevenir que busque dentro porque es miten
                                     li_csm++;
                                 }
                             } else {
                                 canti = 0;
                             }
                         }
-                        
-                        if (canti > 0) {
+                        //nivel 3 Menu>Menu>aqui
+                        if (canti > 0) { //entonces el subMenu es JMenu y tiene elementos dentro
                             li_ci = 1;
                             m_submenu = (javax.swing.JMenu) m_menu.getItem(s);
                             for (int i = 0; i < canti; i++) {
-                                s_nombre = "";
+                                menuName = "";
                                 if (m_submenu.getItem(i) instanceof javax.swing.JMenu) {
-                                    cod++;
                                     m_item = (javax.swing.JMenu) m_submenu.getItem(i);
-                                    s_nombre = m_item.getName();
-                                    if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
+                                    menuName = m_item.getName();
+                                    if (Tools.validarPermiso(conexion.getGrupoId(), menuName, "ver") == 0) {
                                         m_item.setVisible(false);
                                         cantj = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
                                     } else {
@@ -803,9 +962,8 @@ public class wPrincipal extends javax.swing.JFrame {
                                     }
                                 } else {
                                     if (m_submenu.getItem(i) instanceof javax.swing.JMenuItem) {
-                                        cod++;
-                                        s_nombre = m_submenu.getItem(i).getName();
-                                        if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
+                                        menuName = m_submenu.getItem(i).getName();
+                                        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, "ver") == 0) {
                                             m_submenu.getItem(i).setVisible(false);
                                             cantj = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
                                         } else {
@@ -817,15 +975,10 @@ public class wPrincipal extends javax.swing.JFrame {
                                         cantj = 0;
                                     }
                                 }
-                                //System.out.println(s_nombre+" con "+cantj+" subitems");
                                 if (cantj > 0) {
-                                    li_csi = 0;
                                     for (int j = 0; j < cantj; j++) {
-                                        cod++;
-                                        s_nombre = "";
-                                        s_text = "";
+                                        menuName = "";
                                         m_subitem = (javax.swing.JMenu) m_menu.getItem(i);
-                                        li_csi++;
                                     }
                                 }
                             }

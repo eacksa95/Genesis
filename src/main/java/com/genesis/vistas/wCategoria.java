@@ -9,6 +9,7 @@ import com.genesis.model.conexion;
 import com.genesis.controladores.tableController;
 import util.Tools;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,21 +21,23 @@ import javax.swing.JOptionPane;
  */
 public class wCategoria extends javax.swing.JInternalFrame implements ActiveFrame {
 
-    private tableController tc;
+    private final tableController tc;
     private Map<String, String> myData;
     String currentField;
-    String Opcion = "";
+    int userRolId = conexion.getGrupoId();
+    String menuName = "";
     String CRUD = "";
     /**
      * Creates new form wCategoria
+     * @param menuName es el JMenu.name de wPrincipal para entrar a esta vista
      */
-    public wCategoria(String Opcion) {
+    public wCategoria(String menuName) {
         initComponents();
-        this.Opcion = Opcion;
+        this.menuName = menuName;
         tc = new tableController();
         tc.init("categorias");
         this.currentField = "";
-        myData = new HashMap<String, String>();
+        myData = new HashMap<>();
     }
 
     /**
@@ -64,11 +67,6 @@ public class wCategoria extends javax.swing.JInternalFrame implements ActiveFram
                 tf_idFocusGained(evt);
             }
         });
-        tf_id.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tf_idActionPerformed(evt);
-            }
-        });
         tf_id.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 tf_idKeyPressed(evt);
@@ -78,12 +76,6 @@ public class wCategoria extends javax.swing.JInternalFrame implements ActiveFram
         jLabel1.setText("Id");
 
         jLabel2.setText("Nombre ");
-
-        tf_descripcion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tf_descripcionActionPerformed(evt);
-            }
-        });
 
         jLabel3.setText("Descripción");
 
@@ -128,14 +120,6 @@ public class wCategoria extends javax.swing.JInternalFrame implements ActiveFram
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tf_idActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_idActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tf_idActionPerformed
-
-    private void tf_descripcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_descripcionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tf_descripcionActionPerformed
-
     private void tf_idKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_idKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             imBuscar();
@@ -143,7 +127,7 @@ public class wCategoria extends javax.swing.JInternalFrame implements ActiveFram
     }//GEN-LAST:event_tf_idKeyPressed
 
     private void tf_idFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tf_idFocusGained
-        this.currentField = "id";          // TODO add your handling code here:
+        this.currentField = "id";
     }//GEN-LAST:event_tf_idFocusGained
 
 
@@ -158,92 +142,73 @@ public class wCategoria extends javax.swing.JInternalFrame implements ActiveFram
 
     @Override
     public void imGrabar(String crud) {
-         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
-        if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+        this.CRUD = crud;
+        String msg;
+        if (Tools.validarPermiso(userRolId, menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        int id, rows = 0;
+        int id, rows;
+        this.setData();
         id = Integer.parseInt(tf_id.getText());
         if (id > 0) {
-            this.imActualizar("C");
-            String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + tf_id.getText();
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-             resetData();
+            this.imActualizar("u");
             return;
-            
         }
-        this.setData();
         rows = this.tc.createReg(this.myData);
-        this.fillView(myData);
-        String msg = "SE CREÓ EL NUEVO REGISTRO: " + tf_id.getText();
-        resetData();
-        System.out.println(msg);
-        JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-        imNuevo();
+        if(rows > 0){       
+            msg = "SE CREÓ EL NUEVO REGISTRO: " + tf_id.getText();
+            resetData();
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     @Override
     public void imActualizar(String crud) {
          this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
-        if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+         String msg;
+        if (Tools.validarPermiso(userRolId, menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        System.out.println("V imActualizar");
         this.setData();
         ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
+        alCabecera = new ArrayList<>(); //Instancia array
         alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
         int rowsAffected = this.tc.updateReg(alCabecera); //Está guardando igual si en el detalle hay error
+        if(rowsAffected > 0) {
+            msg = "Registro Actualizado";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     @Override
     public void imBorrar(String crud) {
          this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
-        if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+         String msg;
+        if (Tools.validarPermiso(userRolId, menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
             return;
         }
         this.setData();
-        ArrayList<Map<String, String>> alRegister;              //Declara un Array de Map
-        alRegister = new ArrayList<Map<String, String>>();      //Instancia el array
-        alRegister.add(myData);                                //Agregamos el map en el array
-        int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array
-        if (b <= 0) {
-            String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + tf_id.getText();
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+        ArrayList<Map<String, String>> alRegister;
+        alRegister = new ArrayList<>();
+        alRegister.add(myData);
+        int rows = this.tc.deleteReg(alRegister);
+        if (rows <= 0) {
+            msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + myData.get("id");
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (b > 0) {
-            String msg = "EL REGISTRO: " + tf_id.getText() + " SE HA ELIMINADO CORRECTAMENTE";
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+        if (rows > 0) {
+            msg = "EL REGISTRO: " + myData.get("id") + " SE HA ELIMINADO CORRECTAMENTE";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
         }
         imNuevo();
     }
-
-    @Override
-    public void imNuevo() {
-        this.resetData();
-        this.fillView(myData);    }
 
     @Override
     public void imBuscar() {
@@ -252,12 +217,20 @@ public class wCategoria extends javax.swing.JInternalFrame implements ActiveFram
         if (this.myData.size() <= 0) {
             String msg = "NO SE HA PODIDO RECUPERAR EL REGISTRO: " + tf_id.getText();
             this.resetData();
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
+            return;
         }
         this.fillView(myData);
         System.out.println("V imBuscar myData: " + myData.toString());
     }
 
+    @Override
+    public void imNuevo() {
+        this.resetData();
+        this.fillView(myData);
+        tf_id.requestFocus();
+    }
+    
     @Override
     public void imPrimero() {
         this.setData();
@@ -340,9 +313,7 @@ public class wCategoria extends javax.swing.JInternalFrame implements ActiveFram
 
     @Override
     public void imFiltrar() {
-        String sql;
-        sql = "";
-
+        String sql = "";
         if (currentField.equals("")) {
             return;
         }
@@ -351,7 +322,7 @@ public class wCategoria extends javax.swing.JInternalFrame implements ActiveFram
                 sql = "SELECT id AS codigo ,"
                         + "CONCAT(nombre, ' - ',descripcion) AS descripcion "
                         + "FROM categorias "
-                        + "WHERE LOWER(CONCAT(id, nombre, descripcion)) LIKE '%";
+                        + "WHERE LOWER(CONCAT(id, nombre)) LIKE '%";
                 break;
             case "idOtro":
 
@@ -363,9 +334,9 @@ public class wCategoria extends javax.swing.JInternalFrame implements ActiveFram
         wPrincipal.desktop.add(frame);
         try {
             frame.setSelected(true);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.OK_OPTION);
+        } catch (PropertyVetoException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-
     }//end imFiltrar
+    
 }// END CLASS

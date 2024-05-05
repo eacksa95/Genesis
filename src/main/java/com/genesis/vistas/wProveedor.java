@@ -1,37 +1,37 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.genesis.vistas;
 
 import com.genesis.model.conexion;
 import com.genesis.controladores.tableController;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
+import util.Tools;
+import util.ComboBox;
 
-/**
- *
- * @author RC
- */
 public class wProveedor extends javax.swing.JInternalFrame implements ActiveFrame {
-
-    private tableController tc;
+    int userRolId = conexion.getGrupoId();
+    String menuName = "";
+    
+    private boolean userSelectItem = false; // jcbDepartamento selecteditem?
+    private final tableController tc;
     private Map<String, String> myData;
-    String currentField;
+    String currentField = "";
 
     /**
      * Creates new form wProveedor
+     * @param  menuName JMenu.name de wPrincipal para ver esta vista
      */
-    public wProveedor(String Opcion) {
+    public wProveedor(String menuName) {
         initComponents();
+        this.menuName = menuName;
         tc = new tableController();
         tc.init("proveedores");
-        this.currentField = "";
-        myData = new HashMap<String, String>();
+        myData = new HashMap<>();
+        ComboBox.pv_cargar(jcbDepartamento, "departamentos", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(jcbCiudad, "ciudades", " id, nombre ", "id", "");
     }
 
     /**
@@ -49,9 +49,8 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
         jLabel3 = new javax.swing.JLabel();
         tf_nombre = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        tf_direccion = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        tf_ciudad = new javax.swing.JTextField();
+        tf_direccion = new javax.swing.JTextField();
         tf_celular = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -59,6 +58,9 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
         jLabel8 = new javax.swing.JLabel();
         tf_correo = new javax.swing.JTextField();
         tf_id = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jcbDepartamento = new javax.swing.JComboBox<>();
+        jcbCiudad = new javax.swing.JComboBox<>();
 
         setClosable(true);
         setIconifiable(true);
@@ -69,17 +71,11 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
 
         jLabel2.setText("RUC ");
 
-        tf_ruc.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                tf_rucFocusGained(evt);
-            }
-        });
-
         jLabel3.setText("NOMBRE");
 
-        jLabel4.setText("DIRECCION");
+        jLabel4.setText("CIUDAD");
 
-        jLabel5.setText("CIUDAD");
+        jLabel5.setText("DIRECCION");
 
         jLabel6.setText("CELULAR");
 
@@ -93,14 +89,17 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
                 tf_idFocusGained(evt);
             }
         });
-        tf_id.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tf_idActionPerformed(evt);
-            }
-        });
         tf_id.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 tf_idKeyPressed(evt);
+            }
+        });
+
+        jLabel9.setText("DEPARTAMENTO");
+
+        jcbDepartamento.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbDepartamentoItemStateChanged(evt);
             }
         });
 
@@ -109,57 +108,66 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel4)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                            .addContainerGap()
+                            .addGap(16, 16, 16)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(jLabel3)
                                 .addComponent(jLabel1)))
                         .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel7)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(10, 10, 10)
-                            .addComponent(jLabel8))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel4)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel7)
+                                .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(10, 10, 10)
+                                    .addComponent(jLabel8))))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(tf_celular)
                     .addComponent(tf_ruc)
                     .addComponent(tf_nombre)
                     .addComponent(tf_direccion)
-                    .addComponent(tf_ciudad)
                     .addComponent(tf_telefono)
                     .addComponent(tf_correo)
-                    .addComponent(tf_id, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))
-                .addContainerGap(50, Short.MAX_VALUE))
+                    .addComponent(tf_id)
+                    .addComponent(jcbDepartamento, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jcbCiudad, 0, 167, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(tf_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(tf_ruc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(9, 9, 9)
+                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(tf_nombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(10, 10, 10)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jcbDepartamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9))
+                .addGap(7, 7, 7)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(tf_direccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jcbCiudad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(tf_ciudad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tf_direccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tf_celular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -172,29 +180,30 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(tf_correo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tf_idActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_idActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tf_idActionPerformed
-
     private void tf_idKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_idKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             imBuscar();
-        }        // TODO add your handling code here:
+        }
     }//GEN-LAST:event_tf_idKeyPressed
 
     private void tf_idFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tf_idFocusGained
         this.currentField = "id";
     }//GEN-LAST:event_tf_idFocusGained
 
-    private void tf_rucFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tf_rucFocusGained
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tf_rucFocusGained
+    private void jcbDepartamentoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbDepartamentoItemStateChanged
+        if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED && userSelectItem) {
+                // Llamar a la función para filtrar las ciudades solo cuando se selecciona un nuevo ítem
+                filtrarCiudades();
+                System.out.println("Se ha filtrado jcbCiudades en wProveedor");
+            }
+        userSelectItem = true; // Marcar que el usuario seleccionó un item
+    }//GEN-LAST:event_jcbDepartamentoItemStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -206,8 +215,10 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JComboBox<String> jcbCiudad;
+    private javax.swing.JComboBox<String> jcbDepartamento;
     private javax.swing.JTextField tf_celular;
-    private javax.swing.JTextField tf_ciudad;
     private javax.swing.JTextField tf_correo;
     private javax.swing.JTextField tf_direccion;
     public javax.swing.JTextField tf_id;
@@ -219,52 +230,70 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
 
     @Override
     public void imGrabar(String crud) {
-        int id, rows = 0;
+        int id, rows;
+        String msg;
+        if (Tools.validarPermiso(userRolId, menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         id = Integer.parseInt(tf_id.getText());
         if (id > 0) {
-            this.imActualizar("C");
-            String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + tf_id.getText();
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+            this.imActualizar("u");
             return;
         }
         this.setData();
         rows = this.tc.createReg(this.myData);
-        this.fillView(myData);
-        String msg = "SE CREÓ EL NUEVO REGISTRO: " + tf_id.getText();
-        System.out.println(msg);
-        JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-        imNuevo();
+        if(rows > 0) {
+            this.fillView(myData);
+            msg = "SE CREÓ NUEVO REGISTRO";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+            imNuevo();
+        }
     }
 
     @Override
     public void imActualizar(String crud) {
+        String msg;
+        if (Tools.validarPermiso(userRolId, menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         System.out.println("V imActualizar");
         this.setData();
-        ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
-        alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
-        int rowsAffected = this.tc.updateReg(alCabecera); //Está guardando igual si en el detalle hay error
+        ArrayList<Map<String, String>> alCabecera;
+        alCabecera = new ArrayList<>();
+        alCabecera.add(myData);
+        int rowsAffected = this.tc.updateReg(alCabecera);
+        if(rowsAffected > 0) {
+            msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + myData.get("id");
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     @Override
     public void imBorrar(String crud) {
-        this.setData();
-        ArrayList<Map<String, String>> alRegister;              //Declara un Array de Map
-        alRegister = new ArrayList<Map<String, String>>();      //Instancia el array
-        alRegister.add(myData);                                //Agregamos el map en el array
-        int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array 
-        //int b =   this.tc.deleteReg(tf_id.getText());
-        if (b <= 0) {
-            String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + tf_id.getText();
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+        String msg;
+        if (Tools.validarPermiso(userRolId, menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (b > 0) {
-            String msg = "EL REGISTRO: " + tf_id.getText() + " SE HA ELIMINADO CORRECTAMENTE";
+        this.setData();
+        ArrayList<Map<String, String>> alRegister;
+        alRegister = new ArrayList<>();
+        alRegister.add(myData);
+        int rows = this.tc.deleteReg(alRegister);
+        if (rows <= 0) {
+            msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + tf_id.getText();
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (rows > 0) {
+            msg = "EL REGISTRO: " + tf_id.getText() + " SE HA ELIMINADO CORRECTAMENTE";
             System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
         }
         imNuevo();
     }
@@ -273,13 +302,14 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
     public void imNuevo() {
         this.resetData();
         this.fillView(myData);    
+        tf_id.requestFocus();
     }
 
     @Override
     public void imBuscar() {
         this.setData();
         myData = tc.searchById(this.myData);
-        if (this.myData.size() <= 0) {
+        if (this.myData.size() < 1) {
             String msg = "NO SE HA PODIDO RECUPERAR EL REGISTRO: " + tf_id.getText();
             this.resetData();
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
@@ -333,31 +363,39 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
 
     @Override
     public void imCerrar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        setVisible(false);
+        dispose();
     }
 
     private void setData() {
         myData.put("id", tf_id.getText());
         myData.put("ruc", tf_ruc.getText());
         myData.put("nombre", tf_nombre.getText());
+        myData.put("departamentoid", ComboBox.ExtraeCodigo(jcbDepartamento.getSelectedItem().toString()));
+        myData.put("ciudadid", ComboBox.ExtraeCodigo(jcbCiudad.getSelectedItem().toString()));
         myData.put("direccion", tf_direccion.getText());
-        myData.put("ciudad", tf_ciudad.getText());
         myData.put("celular", tf_celular.getText());
         myData.put("telefono", tf_telefono.getText());
         myData.put("correo", tf_correo.getText());
-
     }//fin setData
 
     private void resetData() {
         myData.put("id", "0");
         myData.put("ruc", "");
         myData.put("nombre", "");
+        myData.put("categoriaid", "0");
+        myData.put("departamentoid", "0");
+        myData.put("ciudadid", "0");
         myData.put("direccion", "");
-        myData.put("ciudad", "");
         myData.put("celular", "");
         myData.put("telefono", "");
         myData.put("correo", "");
         fillView(myData);
+    }
+    
+    private void filtrarCiudades() {
+        String whereClause = "departamentoid = " + ComboBox.ExtraeCodigo(jcbDepartamento.getSelectedItem().toString());
+        ComboBox.pv_cargar(jcbCiudad, "ciudades", "id, nombre", "id", whereClause);
     }
 
     private void fillView(Map<String, String> data) {
@@ -374,11 +412,14 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
                 case "nombre":
                     tf_nombre.setText(value);
                     break;
+                case "departamentoid":
+                    Tools.E_estado(jcbDepartamento, "departamentos", "id=" + value);
+                    break;  
+                case "ciudadid":
+                    Tools.E_estado(jcbCiudad, "ciudades", "id=" + value);
+                    break;                
                 case "direccion":
                     tf_direccion.setText(value);
-                    break;
-                case "ciudad":
-                    tf_ciudad.setText(value);
                     break;
                 case "celular":
                     tf_celular.setText(value);
@@ -395,16 +436,14 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
 
     @Override
     public void imFiltrar() {
-        String sql;
-        sql = "";
-
+        String sql = "";
         if (currentField.equals("")) {
             return;
         }
         switch (currentField) {
-            case "proveedor":
+            case "id":
                 sql = "SELECT id AS codigo ,"
-                        + "CONCAT(ruc, ' - ',nombre) AS descripcion "
+                        + "CONCAT(ruc, ' - ', nombre) AS descripcion "
                         + "FROM proveedores "
                         + "WHERE LOWER(CONCAT(id, ruc, nombre)) LIKE '%";
                 break;
@@ -412,16 +451,13 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
 
                 break;
         }
-
         wBuscar frame = new wBuscar(sql, this.tf_id);
         frame.setVisible(true);
         wPrincipal.desktop.add(frame);
         try {
             frame.setSelected(true);
-        } catch (Exception e) {
+        } catch (PropertyVetoException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.OK_OPTION);
         }
-
     }//end imFiltrar
 }//end class
-

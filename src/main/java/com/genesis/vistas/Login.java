@@ -209,7 +209,7 @@ public class Login extends javax.swing.JFrame {
             String encryptedPSW = "";
             encryptedPSW = Tools.encryptMD5(vPass);
 
-            System.out.println("Login.java 172 iniciarSesion CLAVE ENCRIPTADA: " + encryptedPSW);
+            //System.out.println("Login.java 172 iniciarSesion CLAVE ENCRIPTADA: " + encryptedPSW);
             try{        
                 conexion.Conectar();
                 tableModel mUser = new tableModel();
@@ -223,9 +223,9 @@ public class Login extends javax.swing.JFrame {
                 where.put("password", encryptedPSW);
                 ArrayList<Map<String, String>> alMapData = new ArrayList<>();
                 alMapData = mUser.readRegister(fields, where);
-                System.out.println("Login 186 IniciarSesion: cant. usuarios: "+alMapData.size());
+                //System.out.println("Login 186 IniciarSesion: cant. usuarios: "+alMapData.size());
                 if(!alMapData.isEmpty()){
-                    System.out.println("Login 88 IniciarSesion: user: "+alMapData.get(0).get("username"));
+                    //System.out.println("Login 88 IniciarSesion: user: "+alMapData.get(0).get("username"));
                     //cargar datos de usuario a sesion
                     Map<String, String> userData = new HashMap<>();
                     userData = alMapData.get(0);

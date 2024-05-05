@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.genesis.tabla;
 
 import java.util.ArrayList;
@@ -38,18 +34,12 @@ public class ModeloTabla extends DefaultTableModel{
 
     public boolean isCellEditable (int row, int column){
         //Definimos si una celda puede ser o no editable
-       /* if (column!=Utilidades.PERFIL && column!=Utilidades.EVENTO && column!=Utilidades.NOTA1 && column!=Utilidades.NOTA2 && column!=Utilidades.NOTA3){   
-           return false; 
-        }else{
-           return true;
-        }*/
         boolean rtn = true;
         for(int i = 0; i < this.noEditable.size(); i++){
             if(column == this.noEditable.get(i)){
                 rtn = false;
             }
         }
-        
         return rtn;
     }
     

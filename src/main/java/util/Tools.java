@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package util;
 
 import java.sql.Connection;
@@ -21,10 +16,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- *
- * @author RC
- */
 public class Tools {
 public static javax.swing.JMenuBar barra;
     private static ResultSet rs_suc;
@@ -61,7 +52,8 @@ public static javax.swing.JMenuBar barra;
             JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. - ERROR: " + erro);
         }
     }
-  public static boolean validatePsw(char passArray[]){
+    
+    public static boolean validatePsw(char passArray[]){
         boolean rtn = false;
         int li_valido = 0;
         for (int i = 0; i < passArray.length; i++) {
@@ -71,33 +63,13 @@ public static javax.swing.JMenuBar barra;
             }
         }
         if (li_valido == 0) {
-            //JOptionPane.showMessageDialog(parent, "La contrase\u00F1a tiene carcteres inválidos!");
+            JOptionPane.showMessageDialog(null, "La contrase\u00F1a tiene carcteres inválidos!", "Atencion", JOptionPane.ERROR_MESSAGE);
             rtn = true;
         }
-        
-        //String vPass = new String(passArray);
         return rtn;
     }
 
-    public static String ExtraeCodigo(String args) {
-        String codigo = "";
-        String caracter;
-        for (int i = 0; i < args.length(); i++) {
-            caracter = args.substring(i, i + 1);
-            if (caracter.equals("-")) {
-                break;
-            } else {
-                codigo = codigo + caracter;
-            }
-        }
-        if (codigo.length() <= 0) {
-            codigo = "0";
-        }
-        return codigo;
-    }
-
     public boolean fechaCorrecta(String fecha) {
-
         if ((fecha.substring(2, 3)).compareTo("/") == 0) {
             int año = Integer.parseInt(fecha.substring(6));
             int mes = Integer.parseInt(fecha.substring(3, 5));
@@ -236,14 +208,13 @@ public static javax.swing.JMenuBar barra;
         return dateEditor.getDate();
     }
 
-    public static int validarPermiso(int idrol, String menu, String opcion) {
+    public static int validarPermiso(int idrol, String menuName, String opcion) {
         ResultSet sql;
         int valor = 0;
         try {
-            //Viste que tenemos dos niveles superiores, superuser y admin
             sql = conexion.ejecuteSQL("SELECT " + opcion
                     + " FROM permisos WHERE rolid = " + idrol
-                    + " AND menu = '" + menu + "'");
+                    + " AND menu = '" + menuName + "'");
             if (!sql.next()) {
                 valor = 0;
             } else {

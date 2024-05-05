@@ -47,7 +47,7 @@ public class tableController {
         //Recibe todos los campos de la vista viewRegister
         //Limpiar el Map dejando sólo los campos de la tabla  
         int rtn, id;
-        rtn = 0;   
+        rtn = 0;
         int size;
         tableMap = this.tm.justTableFields(viewRegister, false); 
         //Primero hay que decidir si se crea o se actualiza si es que ya existe

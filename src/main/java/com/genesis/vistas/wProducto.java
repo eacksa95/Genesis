@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import util.Tools;
-import util.cargaComboBox;
+import util.ComboBox;
 
 
 /**
@@ -34,7 +34,7 @@ private tableController tc;
         tc.init("productos");
         opcion = menuName;
         myData = new HashMap<String, String>();
-        cargaComboBox.pv_cargar(jcbCategoria, "categorias", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(jcbCategoria, "categorias", " id, nombre ", "id", "");
         this.currentField = "";
       
     }
@@ -141,7 +141,7 @@ private tableController tc;
                     .addComponent(tf_estado)
                     .addComponent(tf_marca)
                     .addComponent(jcbCategoria, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -182,10 +182,8 @@ private tableController tc;
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
                     .addComponent(jcbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
-
-        getAccessibleContext().setAccessibleName("ABM Producto");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -354,7 +352,7 @@ private tableController tc;
         myData.put("estado", tf_estado.getText());
         myData.put("marca", tf_marca.getText());
         myData.put("proveedor", tf_proveedor.getText());
-        myData.put("categoriaid", Tools.ExtraeCodigo(jcbCategoria.getSelectedItem().toString()));
+        myData.put("categoriaid", ComboBox.ExtraeCodigo(jcbCategoria.getSelectedItem().toString()));
     }//fin setData
     
     private void resetData(){

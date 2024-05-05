@@ -122,7 +122,7 @@ public class Reporte extends javax.swing.JInternalFrame {
 
         try {
  
-            jr = JasperCompileManager.compileReport(new File("").getAbsolutePath() +"/src/reportes/"+this.rp+".jrxml");
+            jr = JasperCompileManager.compileReport(new File("").getAbsolutePath() +"/src/main/java/reportes/"+this.rp+".jrxml");
             if(jr != null){
                 System.out.println("El reporte fue compilado satisfactoriamente");
             }

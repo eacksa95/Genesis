@@ -10,7 +10,6 @@ import com.genesis.controladores.tableController;
 import util.Tools;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
@@ -19,7 +18,7 @@ import javax.swing.JOptionPane;
  *
  * @author RC
  */
-public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame {
+public class wDiseno extends javax.swing.JInternalFrame implements ActiveFrame {
 
     private tableController tc;
     private Map<String, String> myData;
@@ -28,14 +27,14 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
     String CRUD = "";
 
     /**
-     * Creates new form wDeposito
+     * Creates new form wDiseño
      */
-    public wDeposito(String Opcion) {
+    public wDiseno(String Opcion) {
         initComponents();
-        this.Opcion = Opcion;
+         this.Opcion = Opcion;
         tc = new tableController();
-        tc.init("depositos");
-        this.currentField = "";
+        tc.init("disenos");
+
         myData = new HashMap<String, String>();
     }
 
@@ -51,30 +50,29 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jCactivo = new javax.swing.JCheckBox();
         tfid = new javax.swing.JTextField();
         tfnombre = new javax.swing.JTextField();
-        tfdescripcion = new javax.swing.JTextField();
+        tfabreviatura = new javax.swing.JTextField();
 
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
-        setTitle("ABM Depósito");
+        setResizable(true);
+        setTitle("ABM Diseños");
 
-        jLabel1.setText("Id");
+        jLabel1.setText("ID");
 
-        jLabel2.setText("Nombre");
+        jLabel2.setText("Diseño");
 
-        jLabel3.setText("Descripción");
+        jLabel3.setText("Abreviatura");
+
+        jCactivo.setText("Activo");
 
         tfid.setText("0");
         tfid.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 tfidFocusGained(evt);
-            }
-        });
-        tfid.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfidActionPerformed(evt);
             }
         });
         tfid.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -88,34 +86,44 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(tfid)
-                    .addComponent(tfnombre)
-                    .addComponent(tfdescripcion, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
-                .addContainerGap(40, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(42, 42, 42)
+                                .addComponent(jLabel1))
+                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tfnombre)
+                            .addComponent(tfid)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCactivo)
+                            .addComponent(tfabreviatura, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(32, 32, 32)
+                .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(tfid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(tfnombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(tfdescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(43, Short.MAX_VALUE))
+                    .addComponent(tfabreviatura, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jCactivo)
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         pack();
@@ -127,28 +135,70 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
 
     private void tfidKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfidKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.imBuscar();
-        }// TODO add your handling code here:        // TODO add your handling code here:
+            imBuscar();         // TODO add your handling code here:
+        }           // TODO add your handling code here:
     }//GEN-LAST:event_tfidKeyPressed
-
-    private void tfidActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfidActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfidActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox jCactivo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JTextField tfdescripcion;
+    private javax.swing.JTextField tfabreviatura;
     private javax.swing.JTextField tfid;
     private javax.swing.JTextField tfnombre;
     // End of variables declaration//GEN-END:variables
 
+    private void setData() {
+        myData.put("id", tfid.getText());
+        myData.put("diseno", tfnombre.getText());
+        myData.put("abreviatura", tfabreviatura.getText());
+        int estado = 0;
+        if (jCactivo.isSelected()) {
+            estado = 1;
+        }
+        myData.put("activo", estado + "");
+    }//fin setData
+
+    private void resetData() {
+        myData.put("id", "0");
+        myData.put("diseno", "");
+        myData.put("abreviatura", "");
+        myData.put("activo", "0");
+        fillView(myData);
+    }
+
+    private void fillView(Map<String, String> data) {
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            switch (key) {
+                case "id":
+                    tfid.setText(value);
+                    break;
+                case "diseno":
+                    tfnombre.setText(value);
+                    break;
+                case "abreviatura":
+                    tfabreviatura.setText(value);
+                    break;
+
+                case "activo":
+                    if (Integer.parseInt(value) == 0) {
+                        jCactivo.setSelected(false);
+                    } else {
+                        jCactivo.setSelected(true);
+                    }
+                    break;
+
+            }//end switch
+        }//end for
+    }
 
     @Override
     public void imGrabar(String crud) {
-          this.CRUD = crud;
+         this.CRUD = crud;
         int metodo = 3;
         System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
         metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
@@ -187,9 +237,9 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
         switch (currentField) {
             case "id":
                 sql = "SELECT id AS codigo ,"
-                        + "CONCAT(nombre, ' - ',descripcion) AS descripcion "
-                        + "FROM depositos "
-                        + "WHERE LOWER(CONCAT(id, nombre, descripcion)) LIKE '%";
+                        + "CONCAT(diseno, ' - ',abreviatura) AS descripcion "
+                        + "FROM disenos "
+                        + "WHERE LOWER(CONCAT(id, diseno, abreviatura)) LIKE '%";
                 break;
         }
 
@@ -205,7 +255,7 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
 
     @Override
     public void imActualizar(String crud) {
-          this.CRUD = crud;
+         this.CRUD = crud;
         int metodo = 3;
         System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
         metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
@@ -225,7 +275,7 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
 
     @Override
     public void imBorrar(String crud) {
-          this.CRUD = crud;
+         this.CRUD = crud;
         int metodo = 3;
         System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
         metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
@@ -239,8 +289,8 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
         ArrayList<Map<String, String>> alRegister;              //Declara un Array de Map
         alRegister = new ArrayList<Map<String, String>>();      //Instancia el array
         alRegister.add(myData);                                //Agregamos el map en el array
-        int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array 
-        //int b =   this.tc.deleteReg(tf_id.getText());
+        int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array
+        //int b =   this.tc.deleteReg(tf_id_marca.getText());
         if (b <= 0) {
             String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + tfid.getText();
             System.out.println(msg);
@@ -258,7 +308,7 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
     @Override
     public void imNuevo() {
         this.resetData();
-        this.fillView(myData);    
+        this.fillView(myData);
     }
 
     @Override
@@ -323,41 +373,4 @@ public class wDeposito extends javax.swing.JInternalFrame implements ActiveFrame
         dispose();
     }
 
-    private void setData() {
-
-        myData.put("id", tfid.getText());
-        myData.put("nombre", tfnombre.getText());
-        myData.put("descripcion", tfdescripcion.getText());
-
-        System.out.println("Intersamos: " + myData.toString());
-
-    }//fin setData
-
-    private void resetData() {
-
-        myData.put("id", "0");
-        myData.put("nombre", "");
-        myData.put("descripcion", "");
-
-        //fillView(myData);
-    }
-
-    private void fillView(Map<String, String> data) {
-
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            switch (key) {
-                case "id":
-                    tfid.setText(value);
-                    break;
-                case "nombre":
-                    tfnombre.setText(value);
-                    break;
-                case "descripcion":
-                    tfdescripcion.setText(value);
-                    break;
-            }//end switch
-        }//end for
-    }//end fill
 }

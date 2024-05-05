@@ -26,7 +26,7 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
     
     /**
      * Creates new form RegistrosEmpleados
-     * @params opcion 
+     * @params menuName
      */
     public wEmpleados(String menuName) {
         initComponents();
@@ -37,12 +37,9 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
         myData = new HashMap<String, String>();
         textFieldId.setText("0");
         dateFieldFechaNacimiento.setDateFormatString("yyyy-MM-dd");
-        
         dateFieldFechaIngreso.setDateFormatString("yyyy-MM-dd");
         dateFieldFechaIngreso.setDate(new Date());
-        
         dateFieldFechaBaja.setDateFormatString("yyyy-MM-dd");
-        
     }
     
     private void setData(){
@@ -68,7 +65,6 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
         myData.put("fecha_baja", fechaBaja);
         } else myData.put("fecha_baja", "");
 
-        
         myData.put("cargo", textFieldCargo.getText());
         myData.put("sueldo", textFieldSueldo.getText());
         myData.put("observacion", textFieldObservacion.getText());

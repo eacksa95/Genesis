@@ -4,7 +4,7 @@
  */
 package reportes;
 
-import util.cargaComboBox;
+import util.ComboBox;
 import util.Tools;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -43,7 +43,7 @@ private int returnStatus = RET_CANCEL;
 //   dateIns = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
 //        jdt_fechadesde.setDate(new Date());
 //        jdt_fechahasta.setDate(new Date());
-         cargaComboBox.pv_cargar(jcbMoneda, "sys_monedas", " id, moneda ", "id", "");
+         ComboBox.pv_cargar(jcbMoneda, "monedas", " id, moneda ", "id", "");
         InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
@@ -246,7 +246,7 @@ private void doClose (int retStatus){
           argid = Integer.parseInt(tf_id.getText());
         }
         
-           String argtipomoneda = Tools.ExtraeCodigo(jcbMoneda.getSelectedItem().toString());
+           String argtipomoneda = ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString());
         if (argtipomoneda.equals("")){
             argtipomoneda = "0";
         } 

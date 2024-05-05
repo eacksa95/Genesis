@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.genesis.tabla;
 
 /**
@@ -34,7 +30,7 @@ public class GestionEncabezadoTabla  implements TableCellRenderer {
         if( value instanceof String ) {
             jcomponent = new JLabel((String) value);
             ((JLabel)jcomponent).setHorizontalAlignment( SwingConstants.CENTER );
-            ((JLabel)jcomponent).setSize( 30, jcomponent.getWidth() );   
+            ((JLabel)jcomponent).setSize( 25, jcomponent.getWidth() );   
             ((JLabel)jcomponent).setPreferredSize( new Dimension(6, jcomponent.getWidth())  );
         }         
    

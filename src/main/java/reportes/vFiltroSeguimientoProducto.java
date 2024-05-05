@@ -4,7 +4,7 @@
  */
 package reportes;
 
-import util.cargaComboBox;
+import util.ComboBox;
 import util.Tools;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -43,7 +43,7 @@ private int returnStatus = RET_CANCEL;
 //   dateIns = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
 //        jdt_fechadesde.setDate(new Date());
 //        jdt_fechahasta.setDate(new Date());
-        cargaComboBox.pv_cargar(cbx_deposito, "sys_depositos", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(cbx_deposito, "depositos", " id, nombre ", "id", "");
         InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
@@ -215,7 +215,7 @@ private void doClose (int retStatus){
         }else{
           argcodbarra = tf_codbarra.getText();
         }
-        String argdepositoo = Tools.ExtraeCodigo(cbx_deposito.getSelectedItem().toString());
+        String argdepositoo = ComboBox.ExtraeCodigo(cbx_deposito.getSelectedItem().toString());
         argdeposito = Integer.parseInt(argdepositoo);
         if (argdepositoo.equals("")){
             argdepositoo = "0";

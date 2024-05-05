@@ -9,24 +9,21 @@ import com.genesis.model.conexion;
  * @author Ezequiel Cristaldo
  * Clase Util que sirve para manejar ComboBox
  */
-public class cargaComboBox {
-    public static int x = 400, y = 400;
+public class ComboBox {
     public static String ls_sql = "";
-    public static ResultSet rs_tabla;
-    public static int li_cant, li_ind = 0;
+    public static ResultSet rs;
+    public static int li_cant, li_index;
     public static int grupo[]; //Lista
     public static javax.swing.JComboBox cb_carga;
-    public static String codigo = "";
-    public static char caracter;
     public ResultSet rs_suc;
 
     public static void pv_cargar(javax.swing.JComboBox cb, String aTabla, String fields, String aCampoId, String aWhere) {
+
+        cb.removeAllItems();
         
-        //cb.removeAllItems();
-        try {
+        try { //construimos el SQL Query y resultSet se carga en cb
             cb_carga = cb;
-           
-            li_ind = 0;
+            li_index = 0;
             ls_sql = "SELECT "+fields+" FROM " + aTabla;
             if (aWhere.length() > 0) {
                 ls_sql = ls_sql + " WHERE " + aWhere;
@@ -34,25 +31,22 @@ public class cargaComboBox {
             if (aCampoId.length() > 0){
             ls_sql = ls_sql + " ORDER BY " + aCampoId;
             }
-            rs_tabla = conexion.ejecuteSQL(ls_sql);
-            rs_tabla.last();
-            li_cant = rs_tabla.getRow();
+            rs = conexion.ejecuteSQL(ls_sql);
+            rs.last();
+            li_cant = rs.getRow(); //número total de filas
             grupo = new int[li_cant];
-            if (li_cant < 1) {
+            if (li_cant < 1) { // no hay registros
                 return;
             }
-           
-            //System.out.println(nTabla);
-            rs_tabla.first();
-            grupo[li_ind] = rs_tabla.getInt(1);
+            rs.first();
+            grupo[li_index] = rs.getInt(1);
             
-            cb.addItem(rs_tabla.getString(1) + "-" + rs_tabla.getString(2));
+            cb.addItem(rs.getString(1) + "-" + rs.getString(2));
             
-            while (rs_tabla.next()) {
-                grupo[li_ind] = rs_tabla.getInt(1);
-               
-                cb.addItem(rs_tabla.getString(1) + "-" + rs_tabla.getString(2));
-                li_ind = li_ind + 1;
+            while (rs.next()) {
+                grupo[li_index] = rs.getInt(1);
+                cb.addItem(rs.getString(1) + "-" + rs.getString(2));
+                li_index = li_index + 1;
             }
         } catch (SQLException erro) {
             JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. \n\r ERROR: " + erro);
@@ -62,15 +56,19 @@ public class cargaComboBox {
         //System.out.println(aTabla);
     }
 
-    public static String extraeCodigoComboBox(String args) {
-        codigo = "";
+    public static String ExtraeCodigo(String args) {
+        String codigo = "";
+        String caracter;
         for (int i = 0; i < args.length(); i++) {
-            caracter = args.charAt(i);
-            if (caracter != '-') {
-                codigo = codigo + caracter;
-            } else {
+            caracter = args.substring(i, i + 1);
+            if (caracter.equals("-")) {
                 break;
+            } else {
+                codigo = codigo + caracter;
             }
+        }
+        if (codigo.length() <= 0) {
+            codigo = "0";
         }
         return codigo;
     }

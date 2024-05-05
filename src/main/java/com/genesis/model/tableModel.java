@@ -74,7 +74,7 @@ public class tableModel {
         int rtn = 0;
         String sql;
         sql = "";
-        sql += "SELECT * FROM "+this.tableName + " WHERE ";     
+        sql += "SELECT * FROM "+this.tableName + " WHERE ";
         sql += this.createPKKeyValueList(viewRegister, "AND");
         ResultSet rs = conexion.ejecuteSQL(sql); //Retorna canitdad de filas afectadas
         try {
@@ -84,8 +84,9 @@ public class tableModel {
         } catch (SQLException ex) {
             Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return rtn; 
-    }//fin saveRegister
+        return rtn;
+    }//fin existAny
+    
     /**
      * Método que construye y ejecuta la sentencia sql de INSERT.
      * @param viewRegister Map de pares campo-valor enviado desde la vista

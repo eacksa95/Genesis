@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.genesis.vistas;
 
 import com.genesis.model.conexion;
@@ -8,9 +13,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
-import util.ComboBox;
 
-public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
+/**
+ *
+ * @author RC
+ */
+public class wTamano extends javax.swing.JInternalFrame implements ActiveFrame {
 
     private tableController tc;
     private Map<String, String> myData;
@@ -18,46 +26,17 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     String Opcion = "";
     String CRUD = "";
 
-    public wCiudad(String Opcion) {
+    /**
+     * Creates new form wTamaño
+     */
+    public wTamano(String Opcion) {
         initComponents();
         this.Opcion = Opcion;
-        myData = new HashMap<String, String>();
         tc = new tableController();
-        tc.init("ciudades");
-        this.currentField = "";
-        ComboBox.pv_cargar(jcbDepartamento, "departamentos", " id, nombre ", "id", "");
+        tc.init("tamanos");
+
+        myData = new HashMap<String, String>();
     }
-
-    private void setData() {
-        myData.put("id", tf_id.getText());
-        myData.put("nombre", tf_nombre.getText());
-        myData.put("departamentoid", ComboBox.ExtraeCodigo(jcbDepartamento.getSelectedItem().toString()));
-    }//fin setData
-
-    private void resetData() {
-        myData.put("id", "0");
-        myData.put("nombre", "");
-        myData.put("departamentoid", "0");
-        fillView(myData);
-    }
-
-    private void fillView(Map<String, String> data) {
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            switch (key) {
-                case "id":
-                    tf_id.setText(value);
-                    break;
-                case "nombre":
-                    tf_nombre.setText(value);
-                    break;
-                case "departamentoid":
-                    Tools.E_estado(jcbDepartamento, "departamentos", "id=" + value);
-                    break;
-            }//end switch
-        }//end for
-    }//end fill
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -68,97 +47,155 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        tf_id = new javax.swing.JTextField();
-        tf_nombre = new javax.swing.JTextField();
-        lblId = new javax.swing.JLabel();
-        lblCiudad = new javax.swing.JLabel();
-        lblDepartamento = new javax.swing.JLabel();
-        jcbDepartamento = new javax.swing.JComboBox<>();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        tfid = new javax.swing.JTextField();
+        tfnombre = new javax.swing.JTextField();
+        tforigen = new javax.swing.JTextField();
+        jCactivo = new javax.swing.JCheckBox();
 
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
-        setTitle("ABM CIUDAD");
+        setResizable(true);
+        setTitle("Abm Tamaños");
 
-        tf_id.setText("0");
-        tf_id.addFocusListener(new java.awt.event.FocusAdapter() {
+        jLabel1.setText("ID");
+
+        jLabel2.setText("Tamaño");
+
+        jLabel3.setText("Origen");
+
+        tfid.setText("0");
+        tfid.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                tf_idFocusGained(evt);
+                tfidFocusGained(evt);
             }
         });
-        tf_id.addKeyListener(new java.awt.event.KeyAdapter() {
+        tfid.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                tf_idKeyPressed(evt);
+                tfidKeyPressed(evt);
             }
         });
 
-        lblId.setText("ID CIUDAD");
-
-        lblCiudad.setText("CIUDAD");
-
-        lblDepartamento.setText("DPTO.");
+        jCactivo.setText("Activo");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblId)
-                    .addComponent(lblCiudad)
-                    .addComponent(lblDepartamento))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(25, 25, 25)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1)))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jcbDepartamento, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tf_id, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
-                    .addComponent(tf_nombre, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCactivo)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(tforigen)
+                        .addComponent(tfnombre)
+                        .addComponent(tfid, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(31, 31, 31)
+                .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tf_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblId))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                    .addComponent(jLabel1)
+                    .addComponent(tfid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblDepartamento)
-                    .addComponent(jcbDepartamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10, 10, 10)
+                    .addComponent(jLabel2)
+                    .addComponent(tfnombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tf_nombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCiudad))
-                .addGap(25, 25, 25))
+                    .addComponent(jLabel3)
+                    .addComponent(tforigen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jCactivo)
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tf_idKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_idKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.imBuscar();
-        }             // TODO add your handling code here:
-    }//GEN-LAST:event_tf_idKeyPressed
+    private void tfidFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfidFocusGained
+        this.currentField = "tamano";          // TODO add your handling code here:
+    }//GEN-LAST:event_tfidFocusGained
 
-    private void tf_idFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tf_idFocusGained
-        this.currentField = "id";        // TODO add your handling code here:
-    }//GEN-LAST:event_tf_idFocusGained
+    private void tfidKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfidKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            imBuscar();         // TODO add your handling code here:
+        }          // TODO add your handling code here:
+    }//GEN-LAST:event_tfidKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> jcbDepartamento;
-    private javax.swing.JLabel lblCiudad;
-    private javax.swing.JLabel lblDepartamento;
-    private javax.swing.JLabel lblId;
-    private javax.swing.JTextField tf_id;
-    private javax.swing.JTextField tf_nombre;
+    private javax.swing.JCheckBox jCactivo;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JTextField tfid;
+    private javax.swing.JTextField tfnombre;
+    private javax.swing.JTextField tforigen;
     // End of variables declaration//GEN-END:variables
+private void setData() {
+        myData.put("id", tfid.getText());
+        myData.put("tamano", tfnombre.getText());
+        myData.put("origen", tforigen.getText());
+        int estado = 0;
+        if (jCactivo.isSelected()) {
+            estado = 1;
+        }
+        myData.put("activo", estado + "");
+    }//fin setData
+
+    private void resetData() {
+        myData.put("id", "0");
+        myData.put("tamano", "");
+        myData.put("origen", "");
+        myData.put("activo", "0");
+        fillView(myData);
+    }
+
+    private void fillView(Map<String, String> data) {
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            switch (key) {
+                case "id":
+                    tfid.setText(value);
+                    break;
+                case "tamano":
+                    tfnombre.setText(value);
+                    break;
+                case "origen":
+                    tforigen.setText(value);
+                    break;
+
+                case "activo":
+                    if (Integer.parseInt(value) == 0) {
+                        jCactivo.setSelected(false);
+                    } else {
+                        jCactivo.setSelected(true);
+                    }
+                    break;
+
+            }//end switch
+        }//end for
+    }
 
     @Override
     public void imGrabar(String crud) {
-        this.CRUD = crud;
+         this.CRUD = crud;
         int metodo = 3;
         System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
         metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
@@ -169,10 +206,10 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
             return;
         }
         int id, rows = 0;
-        id = Integer.parseInt(tf_id.getText());
+        id = Integer.parseInt(tfid.getText());
         if (id > 0) {
             this.imActualizar("C");
-            String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + tf_id.getText();
+            String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + tfid.getText();
             System.out.println(msg);
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
             return;
@@ -180,15 +217,45 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         this.setData();
         rows = this.tc.createReg(this.myData);
         this.fillView(myData);
-        String msg = "SE CREÓ EL NUEVO REGISTRO: " + tf_id.getText();
+        String msg = "SE CREÓ EL NUEVO REGISTRO: " + tfid.getText();
         System.out.println(msg);
         JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
         imNuevo();
     }
 
     @Override
+    public void imFiltrar() {
+        String sql;
+        sql = "";
+
+        if (currentField.equals("")) {
+            return;
+        }
+        switch (currentField) {
+            case "tamano":
+                sql = "SELECT id AS codigo ,"
+                        + "CONCAT(tamano, ' - ',origen) AS descripcion "
+                        + "FROM tamanos "
+                        + "WHERE LOWER(CONCAT(id, tamano, origen)) LIKE '%";
+                break;
+            case "idOtro":
+
+                break;
+        }
+
+        wBuscar frame = new wBuscar(sql, this.tfid);
+        frame.setVisible(true);
+        wPrincipal.desktop.add(frame);
+        try {
+            frame.setSelected(true);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.OK_OPTION);
+        }
+    }
+
+    @Override
     public void imActualizar(String crud) {
-        this.CRUD = crud;
+         this.CRUD = crud;
         int metodo = 3;
         System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
         metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
@@ -208,7 +275,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
 
     @Override
     public void imBorrar(String crud) {
-        this.CRUD = crud;
+         this.CRUD = crud;
         int metodo = 3;
         System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
         metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
@@ -223,25 +290,25 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         alRegister = new ArrayList<Map<String, String>>();      //Instancia el array
         alRegister.add(myData);                                //Agregamos el map en el array
         int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array
-        //int b =   this.tc.deleteReg(tf_id_ciudad.getText());
+        //int b =   this.tc.deleteReg(tf_id_marca.getText());
         if (b <= 0) {
-            String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + tf_id.getText();
+            String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + tfid.getText();
             System.out.println(msg);
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
         if (b > 0) {
-            String msg = "EL REGISTRO: " + tf_id.getText() + " SE HA ELIMINADO CORRECTAMENTE";
+            String msg = "EL REGISTRO: " + tfid.getText() + " SE HA ELIMINADO CORRECTAMENTE";
             System.out.println(msg);
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
         }
-        imNuevo();
+       imNuevo(); 
     }
 
     @Override
     public void imNuevo() {
-         this.resetData();  
-        this.fillView(myData);
+        this.resetData();
+        this.fillView(myData);   
     }
 
     @Override
@@ -249,9 +316,9 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         this.setData();
         myData = tc.searchById(this.myData);
         if (this.myData.size() <= 0) {
-            String msg = "NO SE HA PODIDO RECUPERAR EL REGISTRO: " + tf_id.getText();
+            String msg = "NO SE HA PODIDO RECUPERAR EL REGISTRO: " + tfid.getText();
             this.resetData();
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
         }
         this.fillView(myData);
         System.out.println("V imBuscar myData: " + myData.toString());
@@ -260,28 +327,28 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     @Override
     public void imPrimero() {
         this.setData();
-        this.myData = this.tc.navegationReg(tf_id.getText(), "FIRST");
+        this.myData = this.tc.navegationReg(tfid.getText(), "FIRST");
         this.fillView(this.myData);
     }
 
     @Override
     public void imSiguiente() {
         this.setData();
-        this.myData = this.tc.navegationReg(tf_id.getText(), "NEXT");
+        this.myData = this.tc.navegationReg(tfid.getText(), "NEXT");
         this.fillView(this.myData);
     }
 
     @Override
     public void imAnterior() {
         this.setData();
-        this.myData = this.tc.navegationReg(tf_id.getText(), "PRIOR");
+        this.myData = this.tc.navegationReg(tfid.getText(), "PRIOR");
         this.fillView(this.myData);
     }
 
     @Override
     public void imUltimo() {
         this.setData();
-        this.myData = this.tc.navegationReg(tf_id.getText(), "LAST");
+        this.myData = this.tc.navegationReg(tfid.getText(), "LAST");
         this.fillView(this.myData);
     }
 
@@ -306,34 +373,4 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         dispose();
     }
 
-    @Override
-    public void imFiltrar() {
-        String sql;
-        sql = "";
-
-        if (currentField.equals("")) {
-            return;
-        }
-        switch (currentField) {
-            case "id":
-                sql = "SELECT id AS codigo ,"
-                        + "nombre AS descripcion "
-                        + "FROM ciudades "
-                        + "WHERE LOWER(CONCAT(id, nombre)) LIKE '%";
-                break;
-            case "idOtro":
-
-                break;
-        }
-
-        wBuscar frame = new wBuscar(sql, this.tf_id);
-        frame.setVisible(true);
-        wPrincipal.desktop.add(frame);
-        try {
-            frame.setSelected(true);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.DEFAULT_OPTION);
-        }
-
-    }//END IMFLITRAR
-}//END CLASS
+}

@@ -10,7 +10,7 @@ import com.genesis.model.pojoTransferenciaDetalle;
 import com.genesis.model.tableModel;
 import com.genesis.tabla.ModeloTabla;
 import com.genesis.controladores.tableController;
-import util.cargaComboBox;
+import util.ComboBox;
 import util.Tools;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -78,8 +78,8 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
         myData = new HashMap<String, String>();
         columnData = new ArrayList<Map<String, String>>();
 
-        cargaComboBox.pv_cargar(jcbDeposito, "depositos", " id, nombre ", "id", "");
-        cargaComboBox.pv_cargar(jcbDepositoo, "depositos", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(jcbDeposito, "depositos", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(jcbDepositoo, "depositos", " id, nombre ", "id", "");
 
         tc = new tableController();
         tc.init("transferencias_producto");
@@ -480,8 +480,8 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
         myData.put("id", tfid.getText());
         myData.put("transferencia", Transferencia.getText());
         myData.put("nro_documento", documento.getText());
-        myData.put("depositoid_origen", Tools.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));
-        myData.put("depositoid_destino", Tools.ExtraeCodigo(jcbDepositoo.getSelectedItem().toString()));
+        myData.put("depositoid_origen", ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));
+        myData.put("depositoid_destino", ComboBox.ExtraeCodigo(jcbDepositoo.getSelectedItem().toString()));
 
         int estado = 0;
         if (jCRecibido.isSelected()) {
