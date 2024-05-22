@@ -21,7 +21,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     public wCiudad(String Opcion) {
         initComponents();
         this.Opcion = Opcion;
-        myData = new HashMap<String, String>();
+        myData = new HashMap<>();
         tc = new tableController();
         tc.init("ciudades");
         this.currentField = "";
@@ -53,7 +53,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
                     tf_nombre.setText(value);
                     break;
                 case "departamentoid":
-                    Tools.E_estado(jcbDepartamento, "departamentos", "id=" + value);
+                    ComboBox.E_estado(jcbDepartamento, "departamentos", "id, nombre", "id=" + value);
                     break;
             }//end switch
         }//end for
@@ -159,16 +159,12 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     @Override
     public void imGrabar(String crud) {
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
-        int id, rows = 0;
+        int id, rows;
         id = Integer.parseInt(tf_id.getText());
         if (id > 0) {
             this.imActualizar("C");
@@ -189,10 +185,6 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     @Override
     public void imActualizar(String crud) {
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
@@ -201,7 +193,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         System.out.println("V imActualizar");
         this.setData();
         ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
+        alCabecera = new ArrayList<>(); //Instancia array
         alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
         int rowsAffected = this.tc.updateReg(alCabecera); //Está guardando igual si en el detalle hay error
     }
@@ -209,10 +201,6 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     @Override
     public void imBorrar(String crud) {
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
@@ -220,7 +208,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         }
         this.setData();
         ArrayList<Map<String, String>> alRegister;              //Declara un Array de Map
-        alRegister = new ArrayList<Map<String, String>>();      //Instancia el array
+        alRegister = new ArrayList<>();      //Instancia el array
         alRegister.add(myData);                                //Agregamos el map en el array
         int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array
         //int b =   this.tc.deleteReg(tf_id_ciudad.getText());

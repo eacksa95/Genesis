@@ -16,13 +16,15 @@
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[SELECT p.id, p.nombre, p.descripcion, p.impuesto, p.servicio, p.estado, p.marca, p.proveedor, p.categoria, s.depositoid FROM sys_productos p, sys_producto_det t, sys_stock s 
-WHERE CONCAT(p.nombre, p.descripcion) LIKE CONCAT('%',$P{arid},'%')
-AND p.id = t.productoid
-AND t.cod_barra = s.cod_barra
-AND ((s.depositoid = $P{depositoid}) || ($P{depositoid} = 0))
-AND ((p.estado = $P{estado}) ||($P{estado}  = 0))
-AND (p.categoria = $P{categoria} || $P{categoria} = 0);]]>
+		<![CDATA[SELECT p.id, p.nombre, p.descripcion, p.impuesto, p.servicio, p.estado, p.marca, 
+        p.proveedorid, p.categoriaid, s.depositoid 
+        FROM productos p, producto_detalle t, stock s 
+        WHERE CONCAT(p.nombre, p.descripcion) LIKE CONCAT('%',$P{arid},'%') 
+        AND p.id = t.productoid 
+        AND t.cod_barra = s.cod_barra 
+        AND ((s.depositoid = $P{depositoid})) 
+        AND ((p.estado = $P{estado}))
+        AND (p.categoria = $P{categoria}]]>
 	</queryString>
 	<field name="id" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>

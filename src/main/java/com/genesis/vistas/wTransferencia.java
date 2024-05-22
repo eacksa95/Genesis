@@ -1164,10 +1164,10 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
                     Transferencia.setText(value);
                     break;
                 case "depositoid_origen":
-                    Tools.E_estado(jcbDeposito, "sys_depositos", "id=" + value);
+                    ComboBox.E_estado(jcbDeposito, "depositos", "id, nombre", "id=" + value);
                     break;
                 case "depositoid_destino":
-                    Tools.E_estado(jcbDepositoo, "sys_depositos", "id=" + value);
+                    ComboBox.E_estado(jcbDepositoo, "depositos", "id, nombre", "id=" + value);
                     break;
                 case "fecha_envio":
                     dateLong = Long.parseLong(value) * 1000L;

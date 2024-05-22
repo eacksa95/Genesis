@@ -1,10 +1,4 @@
 package reportes;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 
 import com.genesis.model.conexion;
 import java.awt.BorderLayout;
@@ -16,20 +10,15 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.swing.JRViewer;
 
-
-/**
- *
- * @author RC
- */
 public class Reporte extends javax.swing.JInternalFrame {
     String rp, vf;
  
     javax.swing.JFrame padre; 
     /**
      * Creates new form Reporte
-     * @param String r: es un tipo texto con el nombre del reporte sin la extenxi�n .jrxml
-     * @param String f: es el nombre de la ventana de filtrado del reporte asociada al mismo 
-     * @param String c: es el objeto conexion que se le pasa desde la ventana principal.
+     * @param r: es un tipo texto con el nombre del reporte sin la extenxi�n .jrxml
+     * @param f: es el nombre de la ventana de filtrado del reporte asociada al mismo 
+     * @param c: es el objeto conexion que se le pasa desde la ventana principal.
      */
     public Reporte(String r, String f, javax.swing.JFrame p) {
         initComponents();
@@ -123,7 +112,7 @@ public class Reporte extends javax.swing.JInternalFrame {
         try {
  
             jr = JasperCompileManager.compileReport(new File("").getAbsolutePath() +"/src/main/java/reportes/"+this.rp+".jrxml");
-            if(jr != null){
+            if(jr != null){ 
                 System.out.println("El reporte fue compilado satisfactoriamente");
             }
             

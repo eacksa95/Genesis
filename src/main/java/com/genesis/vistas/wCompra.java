@@ -16,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
@@ -38,33 +39,29 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-/**
- *
- * @author user
- */
 public class wCompra extends javax.swing.JInternalFrame implements MouseListener, KeyListener, ActiveFrame {
 
     //Controladores
     private tableController tc;
     private tableController tcdet;
-    String Opcion = "";
+    String menuName = "";
     String CRUD = "";
     private tableModel tmMoneda;
-    Map<String, String> mapMoneda;// = new HashMap<String, String>();
+    Map<String, String> mapMoneda;
     private String currentField;
     private String currentTable;
 
-    private tableModel tmProducto;
-    Map<String, String> mapProducto;// = new HashMap<String, String>();
+    private final tableModel tmProducto;
+    Map<String, String> mapProducto;
 
-    private tableModel tmProductoDet;
-    Map<String, String> mapProductoDet;// = new HashMap<String, String>();
+    private final tableModel tmProductoDet;
+    Map<String, String> mapProductoDet;
 
-    ArrayList<pojoCompraDetalle> lista;// = new ArrayList<>();
-    public static int filaSeleccionada;
-    ArrayList<pojoCompraDetalle> listaDetalles;//lista que simula la información de la BD
+    ArrayList<pojoCompraDetalle> lista;
+    public int filaSeleccionada;
+    ArrayList<pojoCompraDetalle> listaDetalles;
 
-    //
+    
     private Map<String, String> myData;
     private HashMap<String, String> myDet, dataDet; 
     private ArrayList<Map<String, String>> columnData, colData, colDat;
@@ -78,31 +75,31 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
     /**
      * Creates new form wCompra
+     * @param menuName
      */
-    public wCompra(String Opcion) {
+    public wCompra(String menuName) {
         initComponents();
-        this.Opcion = Opcion;
+        this.menuName = menuName;
         System.out.println("formato: " + decimalFormat(650.75));
-        listaDetalles = new ArrayList<pojoCompraDetalle>();
+        listaDetalles = new ArrayList<>();
         lista = new ArrayList<>();
-        myData = new HashMap<String, String>();
-        columnData = new ArrayList<Map<String, String>>();
-        colData = new ArrayList<Map<String, String>>();
+        myData = new HashMap<>();
+        columnData = new ArrayList<>();
+        colData = new ArrayList<>();
         //Para menejo de Monedas
-        mapMoneda = new HashMap<String, String>();
+        mapMoneda = new HashMap<>();
         tmMoneda = new tableModel();
         tmMoneda.init("monedas");
         construirTabla();
 
         //PARA EL DETALLE
-        mapProducto = new HashMap<String, String>();
+        mapProducto = new HashMap<>();
         tmProducto = new tableModel();
         tmProducto.init("productos");
 
-        mapProductoDet = new HashMap<String, String>();
+        mapProductoDet = new HashMap<>();
         tmProductoDet = new tableModel();
         tmProductoDet.init("producto_detalle");
-        //setLocationRelativeTo(null);
         //Prepara la tabla con los valores iniciales
         //Estos son lísteners, es decir, esta misma clase implementa 
         //las interfaces línener para mouse y key y por tanto, la clase se escucha a sí misma
@@ -121,11 +118,12 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         UIManager.put("Table.font", font);
         UIManager.put("Table.foreground", Color.RED);
 
-        // COMBO BOX DESPLEGABLES DE LAS TABLAS//
-        ComboBox.pv_cargar(jcbPlazo, "plazo_pago", " id, plazo ", "id", "");
-        ComboBox.pv_cargar(jcbMoneda, "monedas", " id, moneda ", "id", "");
-        ComboBox.pv_cargar(jcbProveedor, "proveedores", "cod_proveedor, nombre_proveedor", "cod_proveedor", "");
-        ComboBox.pv_cargar(jcbDeposito, "depositos", "id, nombre", "descripcion", "");
+        // COMBOBOX DESPLEGABLES//
+        ComboBox.pv_cargar(jcbPlazo, "plazo_pago", " id, plazo", "id", "");
+        ComboBox.pv_cargar(jcbMoneda, "monedas", " id, moneda", "id", "");
+        ComboBox.pv_cargar(jcbProveedor, "proveedores", "id, nombre", "id", "");
+        ComboBox.pv_cargar(jcbDeposito, "depositos", "id, nombre", "id", "");
+        ComboBox.pv_cargar(jcbMoneda, "monedas", "id, moneda", "id", "");
 
         // Inicializamos las fechas
         dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -135,7 +133,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         jdcProceso.setDate(new Date());
         jdcFactura.setDate(new Date());
         jdcVence.setDate(new Date());
-        getMoneda();
 
         tc = new tableController();
         tc.init("compras");
@@ -236,7 +233,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
      * @param data
      */
     private void construirTabla(String[] titulos, Object[][] data) {
-        ArrayList<Integer> noEditable = new ArrayList<Integer>();
+        ArrayList<Integer> noEditable = new ArrayList<>();
         noEditable.add(1);
         noEditable.add(6);
         modelo = new ModeloTabla(data, titulos, noEditable);
@@ -479,6 +476,11 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         });
 
         jtfId.setText("0");
+        jtfId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfIdActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -790,10 +792,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jcbProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbProveedorActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jcbProveedorActionPerformed
-
     private void jtfTimbradoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfTimbradoFocusGained
         jtfTimbrado.selectAll();
     }//GEN-LAST:event_jtfTimbradoFocusGained
@@ -844,12 +842,20 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     }//GEN-LAST:event_tfcodbarraKeyReleased
 
     private void jcbMonedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbMonedaActionPerformed
-        this.getMoneda();
+        //this.getMoneda();
     }//GEN-LAST:event_jcbMonedaActionPerformed
 
     private void jftfCotizacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jftfCotizacionFocusGained
         jftfCotizacion.selectAll();
     }//GEN-LAST:event_jftfCotizacionFocusGained
+
+    private void jcbProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbProveedorActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jcbProveedorActionPerformed
+
+    private void jtfIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfIdActionPerformed
+        currentField = "id";
+    }//GEN-LAST:event_jtfIdActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1028,11 +1034,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     @Override
     public void imGrabar(String crud) {
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
-        if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
+        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
@@ -1043,64 +1045,86 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             return;
         }
         this.setData();
-        ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
+        ArrayList<Map<String, String>> alCabecera;
+        alCabecera = new ArrayList<>(); //Instancia array
         int id, rows = 0;
         id = Integer.parseInt(this.jtfId.getText());
         if (id > 0) {
-            alCabecera.add(this.myData);                      //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
+            alCabecera.add(this.myData);
             int rowsAffected = this.tc.updateReg(alCabecera);
             //si rowsaffected < 1 return
             if (rowsAffected < 1) {
                 msg = "Error al intentar actualizar el registro: " + this.jtfId.getText();
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
+                return; // si tfId > 0 y no grabo cambios, entonces return
             } else {
                 msg = "Se ha actualizado exitosamente el registro: " + this.jtfId.getText();
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
             }
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
         } else {
             rows = this.tc.createReg(this.myData);
             id = this.tc.getMaxId();
             if (rows < 1) {
                 msg = "Error al intentar crear el registro";
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
+                return; // si tfId > 0 y no grabo cambios, entonces return
             } else {
                 msg = "Se ha creado exitosamente el registro: " + id;
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+                this.jtfId.requestFocus();
             }
-            id = rows;
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-            //si rows es menor 1 entonces no grabo return
+            
         }
 
         //DETALLES
         //si pasó quiere decir que tenemos cabecera y recorremos el detalle
-        Map<String, String> where = new HashMap<String, String>();      //Por qué campo buscar los registros
-        Map<String, String> fields = new HashMap<String, String>();     //Los campos que vamos a recuperar
-        ArrayList<Map<String, String>> alDetalle;                      //Declara array de Map, cada Map es para un registro
-
+        Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
+        Map<String, String> fields = new HashMap<>();     //Los campos que vamos a recuperar
+        ArrayList<Map<String, String>> alDetalle;    //Declara array de Map, cada Map es para un registro
         fields.put("*", "*");
-
+        
         for (Map<String, String> myRow : columnData) {
             where.put("compraid", id + "");
             where.put("cod_barra", myRow.get("cod_barra"));
-
+            this.colDat = this.tcdet.searchListById(fields, where);
+            
             myRow.put("compraid", id + "");
-
-            this.colDat = this.tcdet.searchListById(fields, where);//verificar tablaModel 407 cuando no existe el reg
-
-            if (this.colDat.isEmpty()) {
+            
+            if (this.colDat.isEmpty()) { // si no existe un detalle con este cod_barra para esta compra
+                myRow.put("id", "0");
                 rows = this.tcdet.createReg(myRow);
-                //if rows < 1 no creo debes hacer el control aquí
-            } else {
-                alDetalle = new ArrayList<Map<String, String>>();
-                //myRow.put("ventaid", id+"");      //asignamos el id de la cabecera como el fk del detalle
+                if(rows < 1){
+                    msg = "No se ha podido grabar el Detalle Codigo:" + myRow.get("cod_barra");
+                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+                } else {
+                    msg = "Se ha creado el Detalle:" + myRow.get("cod_barra") + "para este producto";
+                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+                }
+                
+            } else { //si ya existe un detalle con este cod_barra para esta compra
+                myRow.put("id", colDat.get(0).get("id"));
+                alDetalle = new ArrayList<>(); //necesitamos el alDetalle por la estructura de la funcion tcdet.updateReg
                 alDetalle.add(myRow);
-                int affected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-                //controlar affected, no olvidar
+                int rowsAffected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
+                if(rowsAffected < 1){
+                    msg = "No se ha podido actualizar el detalle: " + myRow.get("cod_barra") + " del producto. Por favor verifique";
+                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+                    return;
+                } else {
+                    msg = "Ya existe un Detalle con este codigo de barra:" + myRow.get("cod_barra") + "para este producto";
+                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+                }
             }
         }
         this.imInsDet();
         this.imNuevo();
-    }
+        // this.fillView(myData, columnData);
+    } //Fin imGrabar
 
+    public void limpiarCelda(JTable tabla) {
+        tabla.setValueAt("", tabla.getSelectedRow(), tabla.getSelectedColumn());
+    }
+    
     @Override
     public void imFiltrar() {
         String sql;
@@ -1134,7 +1158,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         wPrincipal.desktop.add(frame);
         try {
             frame.setSelected(true);
-        } catch (Exception e) {
+        } catch (PropertyVetoException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.DEFAULT_OPTION);
         }
     }
@@ -1142,23 +1166,19 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     @Override
     public void imActualizar(String crud) {
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
-        if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
+        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
         this.setData();
         ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
+        alCabecera = new ArrayList<>(); //Instancia array
         alCabecera.add(this.myData);                      //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
         int rowsAffected = this.tc.updateReg(alCabecera); //Está guardando igual si en el detalle hay error
         //Para el DETALLE
         ArrayList<Map<String, String>> alDetalle;         //Declara array de Map, cada Map es para un registro
-        alDetalle = new ArrayList<Map<String, String>>(); //Instancia array
+        alDetalle = new ArrayList<>(); //Instancia array
 
         for (Map<String, String> myRow : columnData) {       //hay que recorrer el detalle y envira de a uno.
             System.out.println("ENVIAMOS " + myData.get("id"));
@@ -1178,11 +1198,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     @Override
     public void imBorrar(String crud) {
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
-        if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
+        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
@@ -1190,7 +1206,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         this.setData();
         //Para el DETALLE
         ArrayList<Map<String, String>> alDetalle;         //Declara array de Map, cada Map es para un registro
-        alDetalle = new ArrayList<Map<String, String>>(); //Instancia array
+        alDetalle = new ArrayList<>(); //Instancia array
 
         for (Map<String, String> myRow : columnData) {       //hay que recorrer el detalle y envira de a uno.
             myRow.put("compraid", myData.get("id"));      //asignamos el id de la cabecera como el fk del detalle
@@ -1198,7 +1214,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         }
         int affected = this.tcdet.deleteReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
         ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
+        alCabecera = new ArrayList<>(); //Instancia array
         alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
         int rowsAffected = this.tc.deleteReg(alCabecera); //Está guardando igual si en el detalle hay error
         //Invocamos el método deleteReg del Modelo que procesa un array
@@ -1215,7 +1231,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
         }
         imNuevo();
-    }
+    } //Fin imBorrar
 
     @Override
     public void imNuevo() {
@@ -1237,10 +1253,10 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             this.fillView(myData, columnData);
             return;
         }
-        Map<String, String> where = new HashMap<String, String>();      //Por qué campo buscar los registros
+        Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
         where.put("compraid", this.myData.get("id"));
         //Los campos que vamos a recuperar
-        Map<String, String> fields = new HashMap<String, String>();
+        Map<String, String> fields = new HashMap<>();
         fields.put("*", "*");
         //verificar tablaModel 407 cuando no existe el reg
         this.columnData = this.tcdet.searchListById(fields, where);
@@ -1253,7 +1269,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
     @Override
     public void imPrimero() {
-
         this.myData = this.tc.navegationReg(jtfId.getText(), "FIRST");
         this.fillView(this.myData, columnData);
         this.setData();
@@ -1358,7 +1373,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     public void imCerrar() {
         setVisible(false);
         dispose();
-//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     public int getProducto(int row, int col) {
@@ -1386,7 +1400,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                 + "AND d.tamanoid = t.id "
                 + "AND d.disenoid = s.id "
                 + "AND d.cod_barra = '" + codbar + "'";
-        Map<String, String> rtn = new HashMap<String, String>();
+        Map<String, String> rtn = new HashMap<>();
         ResultSet rs;
 
         //System.out.println("sql "+sql);
@@ -1405,16 +1419,14 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                 this.jtDetalle.getModel().setValueAt("0", row, 0);
                 this.jtDetalle.getModel().setValueAt("", row, 1);
             }
-        } //fin deleteRegister
+        }
         catch (SQLException ex) {
             Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
         }
         return 0;
     }
 
-    public void limpiarCelda(JTable tabla) {
-        tabla.setValueAt("", tabla.getSelectedRow(), tabla.getSelectedColumn());
-    }
+
 
     /**
      * Calucula el total para una fila específica
@@ -1430,7 +1442,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         descuento = Tools.sGetDecimalStringAnyLocaleAsDouble(this.jtDetalle.getModel().getValueAt(row, 4).toString());
         bonificado = Tools.sGetDecimalStringAnyLocaleAsDouble(this.jtDetalle.getModel().getValueAt(row, 5).toString());
 
-        //System.out.println("");
         if (precio <= 0 || cantidad <= 0) {
             return rtn;
         }
@@ -1474,9 +1485,9 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
 //        monedaDecimal = Integer.parseInt(mapMoneda.get("decimales"));
 
-        Map<String, String> rtn = new HashMap<String, String>();
-        Map<String, String> select = new HashMap<String, String>();
-        Map<String, String> where = new HashMap<String, String>();
+        Map<String, String> rtn = new HashMap<>();
+        Map<String, String> select = new HashMap<>();
+        Map<String, String> where = new HashMap<>();
         columnData.clear();
         for (int row = 0; row < rows; row++) {
             codbar = this.jtDetalle.getModel().getValueAt(row, 0).toString();
@@ -1521,7 +1532,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             totiva = totiva + (impuesto * cantidad);
             totExenta = totExenta + ((exenta - descuento) * (cantidad - bonificado));
 
-            myDet = new HashMap<String, String>();
+            myDet = new HashMap<>();
             String id = jtfId.getText();
             //System.out.println("el facking id "+id);
             myDet.put("compraid", id);
@@ -1584,20 +1595,18 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
     /**
      * Recupera los datos de la moneda que se usa en el proceso
-     *
-     * @return int rtn estado del proceso de recuperación, falta completar
      */
-    public int getMoneda() {
-        int rtn = 0;
-        Map<String, String> where = new HashMap<String, String>();
-        String idMoneda;
-        idMoneda = "";
-        idMoneda = ComboBox.ExtraeCodigo(this.jcbMoneda.getSelectedItem().toString());
-        this.mapMoneda.clear();
-        this.mapMoneda.put("*", "*");
-        where.put("id", idMoneda);
-        this.mapMoneda = tmMoneda.readRegisterById(this.mapMoneda, where);
-        return rtn;
+    public void getMoneda() {
+        String idMoneda = ComboBox.ExtraeCodigo(this.jcbMoneda.getSelectedItem().toString());
+        if(Integer.parseInt(idMoneda) > 0){
+            this.mapMoneda.clear();
+            Map<String, String> fields = new HashMap<>();
+            Map<String, String> where = new HashMap<>();
+            fields.put("*", "*");
+            where.put("id", idMoneda);
+            this.mapMoneda = tmMoneda.readRegisterById(this.mapMoneda, where);
+        }
+
     }
 
     /**
@@ -1618,7 +1627,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         fecha = (jdcLlega.getDate().getTime() / 1000L) + "";
         myData.put("fecha_llegada", fecha);
 
-        myData.put("nro_documento", jftfFactura.getText());
+        myData.put("numero_factura", jftfFactura.getText());
         myData.put("serie", jftfSerie.getText());
         myData.put("timbrado", jtfTimbrado.getText());
 
@@ -1656,13 +1665,13 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
      * Limpia
      */
     private void resetData() {
-        this.myData = new HashMap<String, String>();
+        this.myData = new HashMap<>();
         java.util.Date df = new java.util.Date();
         this.myData.put("id", "0");
         //  this.myData.put("fecha_proceso", df.getTime()+"");
         // this.myData.put("fecha_factura", df.getTime()+"");
         // this.myData.put("fecha_llegada", df.getTime()+"");
-        this.myData.put("nro_documento", "0");
+        this.myData.put("numero_factura", "0");
         this.myData.put("serie", "001001");
         this.myData.put("timbrado", "0");
        // this.myData.put("vence", df.getTime() + "");
@@ -1685,7 +1694,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         jcbDeposito.setSelectedIndex(0); 
         jcbProveedor.setSelectedIndex(0); 
         jcbTipo.setSelectedIndex(0); 
-        this.myDet = new HashMap<String, String>();
+        this.myDet = new HashMap<>();
 
         this.myDet.put("compraid", "0");
         this.myDet.put("cod_barra", "0");
@@ -1709,13 +1718,12 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
      * @param data Map con los valores de los campos de la cabecera
      * @param colData List cuyos valores son del tipo Map myDet
      */
-    private void fillView(Map<String, String> data, List<Map<String, String>> colData) {
+    private void fillView(Map<String, String> data, List<Map<String, String>> columnData) {
         Date df;
         long dateLong;
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            String key = entry.getKey(); //end for
+        for (Map.Entry<String, String> entry : data.entrySet()) { //Cabecera
+            String key = entry.getKey();
             String value = entry.getValue();
-//            System.out.println("fecha "+dateTimeFormat.format(value.toString()));
             switch (key) {
                 case "id":
                     jtfId.setText(value);
@@ -1764,9 +1772,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                 case "tot_impuesto":
                     jftfImpuesto.setText(Tools.decimalFormat(Double.parseDouble(value)));
                     break;
-                case "tot_costo":
-                    //tfcosto.setText(value);
-                    break;
                 case "cotizacion":
                     jftfCotizacion.setText(Tools.decimalFormat(Double.parseDouble(value)));
                     break;
@@ -1777,26 +1782,24 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                      jcbTipo.setSelectedItem(Integer.parseInt(value));
                     break;
                 case "plazoid":
-                    Tools.E_estado(jcbPlazo, "sys_plazo_pago", "id=" + value);
+                    ComboBox.E_estado(jcbPlazo, "plazo_pago", "id, plazo", "id=" + value);
                     break;
                 case "proveedorid":
-                    Tools.E_estado(jcbProveedor, "sys_proveedores", "cod_proveedor=" + value);
+                    ComboBox.E_estado(jcbProveedor, "proveedores", "id, nombre", "id=" + value);
                     break;
                 case "monedaid":
-                    Tools.E_estado(jcbMoneda, "sys_monedas", "id=" + value);
+                    ComboBox.E_estado(jcbMoneda, "monedas", "id, nombre", "id=" + value);
                     break;
                 case "depositoid":
-                    Tools.E_estado(jcbDeposito, "sys_depositos", "id=" + value);
+                    ComboBox.E_estado(jcbDeposito, "depositos", "id, nombre", "id=" + value);
                     break;
             }//end switch
-        }//end for 1    
+        }//end for Cabecera  
 
         int row;
         row = 0;
-        for (Map<String, String> myRow : columnData) {
-
-            this.modelo.addRow(new Object[]{"0", "", 0.0, 0.0, 0.0, 0.0});
-
+        for (Map<String, String> myRow : columnData) { //Detalles
+            //this.modelo.addRow(new Object[]{"0", "", 0.0, 0.0, 0.0, 0.0});
             this.jtDetalle.setValueAt(myRow.get("cod_barra"), row, 0);
             this.jtDetalle.setValueAt(myRow.get("descripcion"), row, 1);
             //this.getProducto(row, 1);
@@ -1805,15 +1808,14 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             this.jtDetalle.setValueAt(myRow.get("precio_bruto"), row, 2);
             this.jtDetalle.setValueAt(myRow.get("cantidad"), row, 3);
             this.jtDetalle.setValueAt(myRow.get("descuento"), row, 4);
-            //  this.jtDetalle.setValueAt(myRow.get("cantbonificado"), row, 5);
+            this.jtDetalle.setValueAt(myRow.get("cantbonificado"), row, 5);
             this.jtDetalle.setValueAt(myRow.get("total"), row, 6);
 
-            this.jtDetalle.setValueAt(decimalFormat(650.75), row, 5);
-
-            int exist = this.getProducto(row, 0);
+            //this.jtDetalle.setValueAt(decimalFormat(650.75), row, 5);
+            //int exist = this.getProducto(row, 0);
             row++;
-        }//end for 2
-    }//end fill
+        }//end for Detalles
+    }//end fillView
 
     public void limpiarTabla() {
         this.columnData.clear();
@@ -1827,55 +1829,53 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             JOptionPane.showMessageDialog(null, "Error al limpiar la tabla.");
         }
     }//fin limpiarTabla
+    
     public void validarCombo(){
-           int codigo = 0;
-           int condicion = 0;
-           codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbPlazo.getSelectedItem().toString()));
-            System.out.println("codigooo:"+codigo);
-            if (codigo == 0){
+        int codigo = 0;
+        int condicion = 0;
+        //Plazo
+        codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbPlazo.getSelectedItem().toString()));
+        if (codigo == 0){
             this.jcbPlazo.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Plazo!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
-            }
-            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString()));
-            System.out.println("codigooo:"+codigo);
-            if (codigo == 0){
+        }
+        //Moneda
+        codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString()));
+        if (codigo == 0){
             this.jcbMoneda.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Moneda!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
-            }
-            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbTipo.getSelectedItem().toString()));
-            System.out.println("codigooo:"+codigo);
-            if (codigo == 0){
-             this.jcbTipo.requestFocus();
+        }
+        //TipoCompra
+        codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbTipo.getSelectedItem().toString()));
+        if (codigo == 0){
+            this.jcbTipo.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione tipo de Operacion!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
-            }
-            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));
-            System.out.println("codigooo:"+codigo);
-            if (codigo == 0){
+        }
+        //Deposito
+        codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));
+        if (codigo == 0){
             this.jcbDeposito.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Depósito!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
-            }
-            
-            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbProveedor.getSelectedItem().toString()));
-            System.out.println("codigooo:"+codigo);
-            if (codigo == 0){
+        }
+        //Proveedor
+        codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbProveedor.getSelectedItem().toString()));
+        if (codigo == 0){
             this.jcbProveedor.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Proveedor!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
-            }
-            
-          condicion = Integer.parseInt(ComboBox.ExtraeCodigo(jcbTipo.getSelectedItem().toString()));
-          int plazo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbPlazo.getSelectedItem().toString()));
-//          System.out.println("codigo" +codigo);
-          if (condicion == 1 && plazo > 1 || plazo == 1 && condicion == 2) {
-              this.jcbDeposito.requestFocus();
+        }
+        //Validacion Condicion y Plazo
+        condicion = Integer.parseInt(ComboBox.ExtraeCodigo(jcbTipo.getSelectedItem().toString()));
+        int plazo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbPlazo.getSelectedItem().toString()));
+        if (condicion == 1 && plazo > 1 || plazo == 1 && condicion == 2) {
+            this.jcbDeposito.requestFocus();
             String msg = "CONDICIÓN Y PLAZO NO COMPATIBLE";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-            return;
-            }
+        }
            
      }
 }//FIN DE LA CLASE

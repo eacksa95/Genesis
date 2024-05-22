@@ -26,17 +26,19 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
     private Map<String, String> myData;
     private HashMap<String, String> myDet;
     private tableController tc;
-    String Opcion = "";
+    
+    int idRol = conexion.getGrupoId();
+    String menuName = "";
     String CRUD = "";
 
-    public wPermisos(String Opcion) {
+    public wPermisos(String menuName) {
         initComponents();
-        this.Opcion = Opcion;
-        myData = new HashMap<String, String>();
+        this.menuName = menuName;
+        myData = new HashMap<>();
         ComboBox.pv_cargar(jcbRol, "roles", " id, rol ", "id", "");
         tc = new tableController();
         tc.init("permisos");
-    }// fin constructor
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -62,11 +64,11 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
 
             },
             new String [] {
-                "Menu Id", "Menu", "VER", "CREATE", "READ", "UPDATE", "DELETE"
+                "id", "Menu Id", "Menu", "VER", "CREATE", "READ", "UPDATE", "DELETE"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -75,8 +77,6 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
         });
         scrlTabla.setViewportView(jtDetalle);
         if (jtDetalle.getColumnModel().getColumnCount() > 0) {
-            jtDetalle.getColumnModel().getColumn(2).setPreferredWidth(60);
-            jtDetalle.getColumnModel().getColumn(2).setMaxWidth(60);
             jtDetalle.getColumnModel().getColumn(3).setPreferredWidth(60);
             jtDetalle.getColumnModel().getColumn(3).setMaxWidth(60);
             jtDetalle.getColumnModel().getColumn(4).setPreferredWidth(60);
@@ -85,6 +85,8 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
             jtDetalle.getColumnModel().getColumn(5).setMaxWidth(60);
             jtDetalle.getColumnModel().getColumn(6).setPreferredWidth(60);
             jtDetalle.getColumnModel().getColumn(6).setMaxWidth(60);
+            jtDetalle.getColumnModel().getColumn(7).setPreferredWidth(60);
+            jtDetalle.getColumnModel().getColumn(7).setMaxWidth(60);
         }
 
         jcbRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Rol" }));
@@ -144,36 +146,36 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
         limpiarTabla();
         DefaultTableModel dtm = (DefaultTableModel) jtDetalle.getModel();
         int row = 0;
-        int rolid = 0;
-        rolid = Integer.parseInt(ComboBox.ExtraeCodigo(jcbRol.getSelectedItem().toString()));
+        int rolid = Integer.parseInt(ComboBox.ExtraeCodigo(jcbRol.getSelectedItem().toString()));
         if (rolid == 0) {
             JOptionPane.showMessageDialog(null, "Seleccione un Rol válido.");
             return;
         }
-        String sql, menuid, menutext;
+        String sql, id, menuid, menu;
         Boolean showMenu, createReg, readReg, updateReg, deleteReg;
 
-        sql = "SELECT p.ver AS VER, p.c AS c, p.r AS r, p.u AS u, p.d AS d, p.menuid, m.menu AS menutext "
+        sql = "SELECT p.id, p.menuid, m.menu, p.ver, p.c, p.r, p.u, p.d"
                 + " FROM permisos p INNER JOIN menus m ON m.id = p.menuid "
                 + "WHERE p.rolid = " + rolid;
 
-        ResultSet rsss;
+        ResultSet rs;
         try {
-            rsss = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
-            while (rsss.next()) {
-                menuid = rsss.getString("menuid");
-                menutext = rsss.getString("menutext");
-                showMenu = (rsss.getInt("ver") == 1) ? true : false;
-                createReg = (rsss.getInt("c") == 1) ? true : false;
-                readReg = (rsss.getInt("r") == 1) ? true : false;
-                updateReg = (rsss.getInt("u") == 1) ? true : false;
-                deleteReg = (rsss.getInt("d") == 1) ? true : false;
+            rs = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
+            while (rs.next()) {
+                id = rs.getString("id");
+                menuid = rs.getString("menuid");
+                menu = rs.getString("menu");
+                showMenu = (rs.getInt("ver") == 1) ? true : false;
+                createReg = (rs.getInt("c") == 1) ? true : false;
+                readReg = (rs.getInt("r") == 1) ? true : false;
+                updateReg = (rs.getInt("u") == 1) ? true : false;
+                deleteReg = (rs.getInt("d") == 1) ? true : false;
 
-                dtm.addRow(new Object[]{menuid, menutext, showMenu, createReg,
+                dtm.addRow(new Object[]{id, menuid, menu, showMenu, createReg,
                     readReg, updateReg, deleteReg});
                 row++;
-            }//end while
-        } //fin deleteRegister
+            }//Fin while
+        } //Fin TRY
         catch (SQLException ex) {
             Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -192,23 +194,25 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
     public void imGrabar(String crud) {
         this.CRUD = crud;
         String msg;
-        if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
+        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
             msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
         
         int rowsAffected = 0;
+        ArrayList<Map<String, String>> alPermisos = new ArrayList<>();
         //Sirve para poner en el map el nombre de la columna coincide con la estructura de la tabla
-        String[] fields = {"menuid", "menutext", "ver", "C", "R", "U", "D"};
+        String[] fields = {"id", "menuid", "menu", "ver", "c", "r", "u", "d"};
         myData.put("rolid", ComboBox.ExtraeCodigo(jcbRol.getSelectedItem().toString()));
 
         DefaultTableModel dftm = (DefaultTableModel) jtDetalle.getModel();
         int numRows = jtDetalle.getRowCount();
         int numCols = jtDetalle.getColumnCount();
         //rolid, ver, C, R, U, D, menuid
-        Object fieldValue = null;  //Como las columnas almancenan datos distintos se tomo com Objetos
+        Object fieldValue = null;  //Como las columnas almancenan datos distintos se tomo como Objetos
         for (int i = 0; i < numRows; i++) {
+            alPermisos.clear();
             for (int j = 0; j < numCols; j++) {
                 fieldValue = jtDetalle.getValueAt(i, j);
                 if (fieldValue instanceof Boolean) {
@@ -222,7 +226,9 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
                     myData.put(fields[j], (String) fieldValue);
                 }
             }
-            rowsAffected = this.tc.createReg(myData); //El controlador se encargará de ver si guarda o actualiza
+
+            alPermisos.add(myData);
+            rowsAffected = this.tc.updateReg(alPermisos);
 
         }
         if (rowsAffected < 1) {
@@ -298,5 +304,24 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
         setVisible(false);
         dispose();
     }
+    
+    private void setData() {
+        myData.put("id", title);
+        myData.put("rolid", title);
+        myData.put("rol", title);
+        myData.put("menuid", title);
+        myData.put("menu", title);
+        myData.put("ver", title);
+        myData.put("c", title);
+        myData.put("r", title);
+        myData.put("u", title);
+        myData.put("d", title);
+    }
+    
+    private void resetData() {
+    
+    }
+    
+    private void fillView(){}
 
 }//fin ventana

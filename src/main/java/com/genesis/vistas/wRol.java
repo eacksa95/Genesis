@@ -5,6 +5,7 @@ import com.genesis.controladores.tableController;
 import com.genesis.model.tableModel;
 import util.Tools;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyVetoException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -147,7 +148,7 @@ public class wRol extends javax.swing.JInternalFrame implements ActiveFrame {
 
     
     /**
-     * Grabar Rol. Leeme
+     * Funcion que Registra un Nuevo Rol o Actualiza Rol actual dependiendo de param.
      * si se crea un nuevo Rol entonces se crean los permisos basicos para el rol.
      * si es admin se otorgan permiso a los menuNames para admin
      * @param crud 
@@ -204,35 +205,38 @@ public class wRol extends javax.swing.JInternalFrame implements ActiveFrame {
             case "idOtro":
                 break;
         }
-
         wBuscar frame = new wBuscar(sql, this.tfid);
         frame.setVisible(true);
         wPrincipal.desktop.add(frame);
         try {
             frame.setSelected(true);
-        } catch (Exception e) {
+        } catch (PropertyVetoException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.OK_OPTION);
         }
     }
 
     @Override
     public void imActualizar(String crud) {
+        String msg;
         this.CRUD = crud;
         if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
         System.out.println("V imActualizar");
         this.setData();
-        ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
-        alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
+        ArrayList<Map<String, String>> alCabecera;
+        alCabecera = new ArrayList<>();
+        alCabecera.add(myData);
         int rowsAffected = this.tc.updateReg(alCabecera);
         if (rowsAffected > 0){
-            String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + tfid.getText();
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-        }
+            msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + tfid.getText();
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+        } else if (rowsAffected < 1) {
+            msg = "No se ha podido actualizar el registro";
+            JOptionPane.showMessageDialog(this, msg, "ATENCION...", JOptionPane.ERROR_MESSAGE);
+            }
     }
 
     @Override
@@ -244,20 +248,19 @@ public class wRol extends javax.swing.JInternalFrame implements ActiveFrame {
             return;
         }
         this.setData();
-        ArrayList<Map<String, String>> alRegister;              //Declara un Array de Map
-        alRegister = new ArrayList<Map<String, String>>();      //Instancia el array
-        alRegister.add(myData);                                //Agregamos el map en el array
-        int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array
-        if (b <= 0) {
+        ArrayList<Map<String, String>> alRegister;
+        alRegister = new ArrayList<>();
+        alRegister.add(myData);
+        int rows = this.tc.deleteReg(alRegister);
+        if (rows < 1) {
             String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + tfid.getText();
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (b > 0) {
+        if (rows > 0) {
             String msg = "EL REGISTRO: " + tfid.getText() + " SE HA ELIMINADO CORRECTAMENTE";
             System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
         }
        imNuevo();
     }
@@ -275,7 +278,7 @@ public class wRol extends javax.swing.JInternalFrame implements ActiveFrame {
         if (this.myData.size() <= 0) {
             String msg = "NO SE HA PODIDO RECUPERAR EL REGISTRO: " + tfid.getText();
             this.resetData();
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
         }
         this.fillView(myData);
         System.out.println("V imBuscar myData: " + myData.toString());
@@ -388,6 +391,7 @@ public class wRol extends javax.swing.JInternalFrame implements ActiveFrame {
     }//end fill
 
     private void setPermisos(String isAdmin, int idRol){
+        //inicializando variables y recopilando datos necesarios
         int maxMenuId = this.tcMenu.getMaxId();
         String menu;
         int idNuevoRol = idRol;
@@ -395,9 +399,8 @@ public class wRol extends javax.swing.JInternalFrame implements ActiveFrame {
         Map<String, String> myPermisos = new HashMap<>();
         String sql = "";
         ResultSet rs;
-        // Como minimo el Rol de un usuario debe permitir ver los menus Basicos del sistema que son Archivo y Editar
-        //el ultimo miten de Editar actualmente es menuId 16
-        for (int menuIndex = 0; menuIndex <= maxMenuId; menuIndex++){
+        //Recorrer MenuIndex para crear permisos para Nuevo Rol
+        for (int menuIndex = 1; menuIndex <= maxMenuId; menuIndex++){
             sql = "SELECT m.menu FROM menus m "
                 + "WHERE m.id = " + menuIndex;
             try {
@@ -409,7 +412,7 @@ public class wRol extends javax.swing.JInternalFrame implements ActiveFrame {
             catch (SQLException ex) {
                     Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+            //Preparando Map para crear Permiso
             myPermisos.put("id", "0");
             myPermisos.put("rolid", idNuevoRol + "");
             myPermisos.put("rol", rolName);

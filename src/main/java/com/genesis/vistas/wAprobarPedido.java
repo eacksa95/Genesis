@@ -75,8 +75,8 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
         initComponents();
         this.tipoopcion = tipoopcion;
         this.Opcion = Opcion;
-        myData = new HashMap<String, String>();
-        columnData = new ArrayList<Map<String, String>>();
+        myData = new HashMap<>();
+        columnData = new ArrayList<>();
 
         ComboBox.pv_cargar(jcbDeposito, "depositos", " id, nombre ", "id", "");
         ComboBox.pv_cargar(jcbDepositoo, "depositos", " id, nombre ", "id", "");
@@ -87,15 +87,15 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
         tcdet.init("transferencias_producto_det");
 
         //PARA EL DETALLE
-        mapProducto = new HashMap<String, String>();
+        mapProducto = new HashMap<>();
         tmProducto = new tableModel();
         tmProducto.init("productos");
 
-        mapProductoDet = new HashMap<String, String>();
+        mapProductoDet = new HashMap<>();
         tmProductoDet = new tableModel();
         tmProductoDet.init("producto_det");
 
-        mapAjusteDet = new HashMap<String, String>();
+        mapAjusteDet = new HashMap<>();
         tmAjusteDet = new tableModel();
         tmAjusteDet.init("transferencias_producto_det");
 
@@ -276,10 +276,6 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
     public void imGrabar(String crud) {
         
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
@@ -292,7 +288,7 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
         }
         this.setData();
         ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
+        alCabecera = new ArrayList<>(); //Instancia array
         int id, rows = 0;
         id = Integer.parseInt(this.tfid.getText());
         if (id > 0) {
@@ -343,10 +339,6 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
     @Override
     public void imActualizar(String crud) {
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
@@ -355,7 +347,7 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
         System.out.println("V imActualizar");
         this.setData();
         ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
+        alCabecera = new ArrayList<>(); //Instancia array
         alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
         int rowsAffected = this.tc.updateReg(alCabecera); //Está guardando igual si en el detalle hay error
     }
@@ -363,10 +355,6 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
     @Override
     public void imBorrar(String crud) {
         this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION DE LA VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        System.out.println("METODOOO; " + metodo);
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
@@ -374,7 +362,7 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
         }
         this.setData();
         ArrayList<Map<String, String>> alRegister;              //Declara un Array de Map
-        alRegister = new ArrayList<Map<String, String>>();      //Instancia el array
+        alRegister = new ArrayList<>();      //Instancia el array
         alRegister.add(myData);                                //Agregamos el map en el array
         int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array
         //int b =   this.tc.deleteReg(tf_id_cliente.getText());
@@ -498,7 +486,7 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
     }
 
     private void resetData() {
-        this.myData = new HashMap<String, String>();
+        this.myData = new HashMap<>();
         java.util.Date df = new java.util.Date();
         this.myData.put("id", "0");
         this.myData.put("transferencia", "");
@@ -526,10 +514,10 @@ public class wAprobarPedido extends javax.swing.JInternalFrame implements Active
                     documento.setText(value);
                     break;
                 case "depositoid_origen":
-                    Tools.E_estado(jcbDeposito, "sys_depositos", "id=" + value);
+                    ComboBox.E_estado(jcbDeposito, "depositos", "id, nombre", "id=" + value);
                     break;
                 case "depositoid_destino":
-                    Tools.E_estado(jcbDepositoo, "sys_depositos", "id=" + value);
+                    ComboBox.E_estado(jcbDepositoo, "depositos", "id, nombre", "id=" + value);
                     break;
                 case "fecha_envio":
                     dateLong = Long.parseLong(value) * 1000L;

@@ -21,37 +21,23 @@ public static javax.swing.JMenuBar barra;
     private static ResultSet rs_suc;
     protected IDateEditor dateEditor;
 
-    public static void E_estado(javax.swing.JComboBox cb, String aTabla, String arg) {
-        try {
-            //javax.swing.JComboBox cb_carga;
-            //cb_carga = cb;
-            rs_suc = conexion.ejecuteSQL("SELECT * FROM " + aTabla + " WHERE " + arg + " ORDER BY 1");
-            if (!rs_suc.first()) {
-                return;
-            }
-
-            cb.setSelectedItem(rs_suc.getString(1) + "-" + rs_suc.getString(2));
-
-        } catch (SQLException erro) {
-            JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. - ERROR: " + erro);
-        }
-    }
+//    public static void E_estado(javax.swing.JComboBox cb, String aTabla, String arg) {
+//        try {
+//            //javax.swing.JComboBox cb_carga;
+//            //cb_carga = cb;
+//            rs_suc = conexion.ejecuteSQL("SELECT * FROM " + aTabla + " WHERE " + arg + " ORDER BY 1");
+//            if (!rs_suc.first()) {
+//                return;
+//            }
+//
+//            cb.setSelectedItem(rs_suc.getString(1) + "-" + rs_suc.getString(2));
+//
+//        } catch (SQLException erro) {
+//            JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. - ERROR: " + erro);
+//        }
+//    }
     
-    public static void E_estado(javax.swing.JComboBox cb, String fields, String aTabla, String arg) {
-        try {
-            //javax.swing.JComboBox cb_carga;
-            //cb_carga = cb;
-            rs_suc = conexion.ejecuteSQL("SELECT "+fields+" FROM " + aTabla + " WHERE " + arg + " ORDER BY 1");
-            if (!rs_suc.first()) {
-                return;
-            }
 
-            cb.setSelectedItem(rs_suc.getString(1) + "-" + rs_suc.getString(2));
-
-        } catch (SQLException erro) {
-            JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. - ERROR: " + erro);
-        }
-    }
     
     public static boolean validatePsw(char passArray[]){
         boolean rtn = false;

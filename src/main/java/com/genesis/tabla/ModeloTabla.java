@@ -22,9 +22,9 @@ public class ModeloTabla extends DefaultTableModel{
         this.titulos = titulos;
         this.datos = datos;
         this.noEditable = noEditable;
-        //new ArrayList<Integer>();
-       // this.noEditable.add(1);
-       // this.noEditable.add(6);
+        // new ArrayList<Integer>();
+        // this.noEditable.add(1);
+        // this.noEditable.add(6);
         setDataVector(datos, titulos);
     }
 

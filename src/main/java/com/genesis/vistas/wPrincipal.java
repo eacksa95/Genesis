@@ -605,7 +605,7 @@ public class wPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_mitenDepositoActionPerformed
 
     private void mitenReporteProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenReporteProductosActionPerformed
-        Reporte r = new Reporte("productosreport", "vFiltroProductos", this);
+        Reporte r = new Reporte("Productos2", "vFiltroSeguimientoProducto", this);
         r.setTitle("Reporte de Productos");
         r.setClosable(true);
         mostrarVentana(r);

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 9.0.0.final using JasperReports Library version 6.21.0-4f56c4f36cd19e17675219a9ac4692d5f0f13b06  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Empleados" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4af99247-ea67-43df-94a0-874ca16c5ac0">
+	<property name="com.jaspersoft.studio.data.sql.tables">
+		<![CDATA[ZGJfZ2VuZXNpcy5lbXBsZWFkb3MgQVMgLDgwLDI3LGExM2E5MjA2LTQyNjgtNDIzMi05M2JlLWU2
+NjQ4NjBmMjNiODs=]]>
+	</property>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="db_genesis"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT id,
+	nombre,
+	apellido,
+	cedula,
+	cargo,
+	sueldo
+FROM db_genesis.empleados]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="id"/>
+		<property name="com.jaspersoft.studio.field.label" value="id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="empleados"/>
+	</field>
+	<field name="nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="empleados"/>
+	</field>
+	<field name="apellido" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="apellido"/>
+		<property name="com.jaspersoft.studio.field.label" value="apellido"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="empleados"/>
+	</field>
+	<field name="cedula" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="cedula"/>
+		<property name="com.jaspersoft.studio.field.label" value="cedula"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="empleados"/>
+	</field>
+	<field name="cargo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="cargo"/>
+		<property name="com.jaspersoft.studio.field.label" value="cargo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="empleados"/>
+	</field>
+	<field name="sueldo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="sueldo"/>
+		<property name="com.jaspersoft.studio.field.label" value="sueldo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="empleados"/>
+	</field>
+	<group name="cargo">
+		<groupExpression><![CDATA[$F{cargo}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="65" splitType="Stretch">
+			<image onErrorType="Blank">
+				<reportElement x="0" y="0" width="60" height="51" uuid="708d0dbf-461a-485c-8be8-121d9346a506"/>
+				<imageExpression><![CDATA[""]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="65" y="5" width="100" height="15" uuid="7a7f1c9f-25cb-493f-baca-09392bb87ef3">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<text><![CDATA[Distribuidora Genesis]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="25" width="115" height="15" uuid="306850cd-ab1c-4667-b9cf-f131560bb685">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[San Juan Nepomuceno]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="51" splitType="Stretch">
+			<rectangle>
+				<reportElement x="-3" y="10" width="563" height="30" forecolor="#FFFFFF" backcolor="#66AAD1" uuid="4e27b6d4-7470-414c-9a57-a07f72bc73bc"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="10" width="560" height="25" uuid="7b302861-dcf2-4249-b4fe-b31bb1bf2d33">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reporte de Empleados]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<staticText>
+				<reportElement x="110" y="-1" width="100" height="30" printWhenGroupChanges="cargo" uuid="75671bb6-6eb8-47b7-848d-56fb92299d11">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2dcb568a-7812-4010-aaae-8183edfb2ced"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOMBRE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="229" y="-1" width="100" height="30" printWhenGroupChanges="cargo" uuid="a5a5ffff-3e01-4630-916a-d20cd13f9b80">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e9944555-63e7-4933-8f46-8111d0ae6b5c"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[APELLIDO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="-1" width="70" height="30" printWhenGroupChanges="cargo" uuid="b2bc186b-05b7-42fa-a57d-3e7b18d0b7d6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9bfb9267-46e4-4ddf-852c-04795b69e4ca"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CEDULA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="0" width="70" height="30" printWhenGroupChanges="cargo" uuid="3b82ba1a-aa9a-4df2-9e14-1a4b54d68a13">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a8e23926-f46e-407d-a042-950ab1f8941a"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CARGO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="0" width="80" height="30" printWhenGroupChanges="cargo" uuid="6faaed7c-5842-4e9e-9598-f98193073bbc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="17a26076-7539-4731-8e20-858ceb3723cd"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SALARIO]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="31" width="559" height="1" forecolor="#7851ED" uuid="556d42f4-5fee-4998-994f-6f81ba485068">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement x="110" y="9" width="100" height="30" uuid="df8ac3cd-6c31-4ec3-b86a-5179afa90f15">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2dcb568a-7812-4010-aaae-8183edfb2ced"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="10" width="100" height="30" uuid="1a410eea-16e6-4b19-b27d-e3f0bc740f93">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e9944555-63e7-4933-8f46-8111d0ae6b5c"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{apellido}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="30" y="10" width="70" height="30" uuid="5d4985f0-9fcb-473b-9b8f-97cbefb11e59">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9bfb9267-46e4-4ddf-852c-04795b69e4ca"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{cedula}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="10" width="70" height="30" uuid="cb454364-69fd-4a72-ad7e-921546159cdd">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a8e23926-f46e-407d-a042-950ab1f8941a"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{cargo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="10" width="80" height="30" uuid="1e1f5a94-c5c2-4d98-98d2-793bebc9e9dd">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="17a26076-7539-4731-8e20-858ceb3723cd"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{sueldo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="59" splitType="Stretch">
+			<textField>
+				<reportElement x="480" y="20" width="70" height="20" uuid="f502571c-7d48-4f78-b875-f04841e8d7e0"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

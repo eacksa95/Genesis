@@ -23,7 +23,7 @@ public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame 
         tc = new tableController();
         tc.init("usuarios");
         this.currentField = "";
-        myData = new HashMap<String, String>();
+        myData = new HashMap<>();
         ComboBox.pv_cargar(jcbEmpleado, "empleados", " id, CONCAT(nombre, apellido) ", "id", "");
         ComboBox.pv_cargar(jcbRol, "roles", " id, rol", "id", "");
     }
@@ -73,10 +73,10 @@ public class wUsuario extends javax.swing.JInternalFrame implements ActiveFrame 
                     tfUsuario.setText(value);
                     break;
                 case "rolid":
-                    Tools.E_estado(jcbRol, "roles", "id=" + value);
+                    ComboBox.E_estado(jcbRol, "roles", "id, rol", "id=" + value);
                     break;
                 case "empleadoid":
-                    Tools.E_estado(jcbEmpleado, "empleados", "id=" + value);
+                    ComboBox.E_estado(jcbEmpleado, "empleados", "id, CONCAT(nombre, apellido)", "id=" + value);
                     break;
                 case "activo":
                     if (Integer.parseInt(value) == 0) {

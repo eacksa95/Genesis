@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.genesis.vistas;
 
 import com.genesis.model.conexion;
@@ -23,8 +18,8 @@ import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableColumn;
+
 /**
- *
  * @author User
  */
 public class wBuscar extends javax.swing.JInternalFrame{

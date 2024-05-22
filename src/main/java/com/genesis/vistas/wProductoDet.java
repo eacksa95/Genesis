@@ -27,7 +27,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 public class wProductoDet extends javax.swing.JInternalFrame implements MouseListener, KeyListener, ActiveFrame {
-    private boolean userSelectItem = false; // Variable para controlar si el usuario seleccionó un item de comboBox
     private Map<String, String> myData;
     private HashMap<String, String> myDet;
 
@@ -135,6 +134,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
     }
     
     /**
+     * Este método simula una consulta a la base de datos y devuelve una lista de pojoProductoDetalle.
      *@return lista
      */
     private ArrayList<pojoProductoDetalle> consultarListaDetalles() {
@@ -144,12 +144,9 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         return lista;
     }
 
-
     /**
-     * Llena la información de la tabla usando la lista de personas trabajada
-     * anteriormente, guardandola en una matriz que se retorna con toda la
-     * información para luego ser asignada al modelo
-     *
+     * Este método convierte la lista de pojoProductoDetalle
+     * en una matriz de objetos para ser usada por la tabla.
      * @param titulosList
      * @return
      */
@@ -291,11 +288,6 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         jcbProveedor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Proveedor" }));
 
         jcbCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Categoria" }));
-        jcbCategoria.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbCategoriaItemStateChanged(evt);
-            }
-        });
 
         jLabel7.setText("%");
 
@@ -463,15 +455,6 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         }
     }//GEN-LAST:event_tfIdKeyPressed
 
-    private void jcbCategoriaItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbCategoriaItemStateChanged
-        if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED && userSelectItem) {
-                // Llamar a la función para filtrar las ciudades solo cuando se selecciona un nuevo ítem
-                filtrarProveedores();
-                System.out.println("JCBEVT Ejecutado");
-            }
-        userSelectItem = true; // Marcar que el usuario seleccionó un item
-    }//GEN-LAST:event_jcbCategoriaItemStateChanged
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCEstado;
@@ -541,13 +524,11 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
     public void imGrabar(String crud) {
         this.CRUD = crud;        
         String msg;
-        
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
-
         //validacion de campos del Formulario Cabecera
            //validar id
         if (tfId.getText().isEmpty() || "".equals(tfId.getText())) {
@@ -574,13 +555,13 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         
         if (idProducto > 0) { 
             //Actualizar Registro Producto Cabecera
-            alCabecera.add(this.myData);                      //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
+            alCabecera.add(this.myData); 
             int rowsAffected = this.tc.updateReg(alCabecera);
             //si rowsAffected < 1 return
             if (rowsAffected < 1) {
                 msg = "Error al intentar actualizar el registro: " + this.tfId.getText();
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-                return; // si tfId > 0 y no grabo cambios, entonces return
+                return; // si tfId < 0 y no grabo cambios, entonces return
             } else {
                 msg = "Se ha actualizado exitosamente el registro: " + this.tfId.getText();
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
@@ -604,19 +585,20 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         //si pasó quiere decir que tenemos cabecera y recorremos Detalles
         Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
         Map<String, String> fields = new HashMap<>();     //Los campos que vamos a recuperar
-        ArrayList<Map<String, String>> alDetalle;                      //Declara array de Map, cada Map es para un registro
+        ArrayList<Map<String, String>> alDetalle;        //Declara array de Map, cada Map es para un registro
         fields.put("*", "*");
 
         for (Map<String, String> myRow : columnData) {
-            myRow.put("productoid", idProducto + ""); 
-            
             where.put("productoid", idProducto + "");
             where.put("cod_barra", myRow.get("cod_barra"));
             this.colDat = this.tcdet.searchListById(fields, where);
+            
+            myRow.put("productoid", idProducto + ""); 
 
             if (this.colDat.isEmpty()) { // si no existe un detalle con este cod_barra para este producto
                 myRow.put("id", "0");
                 rows = this.tcdet.createReg(myRow);
+                //crear registro en la tabla Stock para el nuevo ProductoDetalle
                 if(rows < 1){
                     msg = "No se ha podido grabar el Detalle Codigo:" + myRow.get("cod_barra");
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
@@ -689,8 +671,11 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
             myRow.put("productoid", myData.get("id"));      //asignamos el id de la cabecera como el fk del detalle
             alDetalle.add(myRow);
         }
-        // int affected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-
+        int affected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
+        if (affected <= 0) {                               //Si no guardó la cabecera, no se procesa detalle
+            System.out.println("No se ha podido actualizar el detalle");
+            return;
+        }
         this.resetData();
         this.fillView(myData, columnData);
     }
@@ -776,7 +761,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
 
     @Override
     public void imSiguiente() {
-        this.myData = this.tc.navegationReg(tfId.getText(), "PRIOR");
+        this.myData = this.tc.navegationReg(tfId.getText(), "NEXT");
         this.fillView(this.myData, columnData);
         this.setData();
         imBuscar();
@@ -792,7 +777,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
 
     @Override
     public void imUltimo() {
-        this.myData = this.tc.navegationReg(tfId.getText(), "PRIOR");
+        this.myData = this.tc.navegationReg(tfId.getText(), "LAST");
         this.fillView(this.myData, columnData);
         this.setData();
         imBuscar();
@@ -811,15 +796,14 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
             modelo.addRow(new Object[]{"0", "0", "0", "0", "0", "0"});
             return;
         }
+        
         String cod = this.jtDetalle.getValueAt(currentRow, 0).toString();
-
-        //System.out.println("Codigo "+cod);
         if (cod.equals("0") || cod.equals("")) {
-            /*  String msg = "POR FAVOR INGRESE UN PRODUCTO ";
+            String msg = "POR FAVOR INGRESE UN PRODUCTO ";
             System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION); */
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
         } else {
-            //System.out.println("entro en imInsDet");
+            System.out.println("entro en imInsDet");
             modelo.addRow(new Object[]{"0", "0", "0", "0", "0", "0"});
             /**
              * LUEGO DE CARGAR LA INFORMACIÓN DE LA SOLICITUD EN LA VISTA NOS
@@ -970,18 +954,18 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
                     tfNombre.setText(value);
                     break;
                 case "colorid":
-                    Tools.E_estado(jcbColor, "colores", "id=" + value);
+                    ComboBox.E_estado(jcbColor, "colores", "id, color", "id=" + value);
                     break;
                 case "marca":
-                    Tools.E_estado(jcbMarca, "marcas", "id=" + value);
+                    ComboBox.E_estado(jcbMarca, "marcas", "id, nombre", "id=" + value);
                     //jcbMarca.setSelectedItem(Integer.parseInt(value));
                     break;
                 case "proveedorid":
-                    Tools.E_estado(jcbProveedor, "proveedores", "id=" + value);
+                    ComboBox.E_estado(jcbProveedor, "proveedores", "id, nombre", "id=" + value);
                     // jcbProveedor.setSelectedItem(Integer.parseInt(value));
                     break;
                 case "categoriaid":
-                    Tools.E_estado(jcbCategoria, "categorias", "id=" + value);
+                    ComboBox.E_estado(jcbCategoria, "categorias", "id, nombre", "id=" + value);
                     //jcbCategoria.setSelectedItem(Integer.parseInt(value));
                     break;
                 case "impuesto":
@@ -1011,13 +995,13 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         for (Map<String, String> myRow : columnData) {
 
             JComboBox cbColor = (JComboBox) jtDetalle.getCellEditor(row, 1).getTableCellEditorComponent(jtDetalle, "0-Seleccionar", true, row, 1);
-            Tools.E_estado(cbColor, "colores", "id=" + myRow.get("colorid"));
+            ComboBox.E_estado(cbColor, "colores", "id, color", "id=" + myRow.get("colorid"));
 
             JComboBox cbTamano = (JComboBox) jtDetalle.getCellEditor(row, 2).getTableCellEditorComponent(jtDetalle, "0-Seleccionar", true, row, 2);
-            Tools.E_estado(cbTamano, "tamanos", "id=" + myRow.get("tamanoid"));
+            ComboBox.E_estado(cbTamano, "tamanos", "id, tamano", "id=" + myRow.get("tamanoid"));
 
             JComboBox cbDiseno = (JComboBox) jtDetalle.getCellEditor(row, 3).getTableCellEditorComponent(jtDetalle, "0-Seleccionar", true, row, 3);
-            Tools.E_estado(cbDiseno, "disenos", "id=" + myRow.get("disenoid"));
+            ComboBox.E_estado(cbDiseno, "disenos", "id, diseno", "id=" + myRow.get("disenoid"));
 
             this.modelo.addRow(new Object[]{
                 myRow.get("cod_barra"),
@@ -1048,11 +1032,6 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         }
     }//fin limpiarTabla
     
-    private void filtrarProveedores() {
-        String whereClause = "categoriaid = " + ComboBox.ExtraeCodigo(jcbCategoria.getSelectedItem().toString());
-        ComboBox.pv_cargar(jcbProveedor, "proveedores", "id, nombre", "id", whereClause);
-    }
-
     @Override
     public void keyPressed(KeyEvent e) {
         //System.out.print("\n Estoy en el keyListener, keyPressed");

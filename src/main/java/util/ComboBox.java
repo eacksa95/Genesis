@@ -15,7 +15,7 @@ public class ComboBox {
     public static int li_cant, li_index;
     public static int grupo[]; //Lista
     public static javax.swing.JComboBox cb_carga;
-    public ResultSet rs_suc;
+    public static ResultSet rs_suc;
 
     public static void pv_cargar(javax.swing.JComboBox cb, String aTabla, String fields, String aCampoId, String aWhere) {
 
@@ -32,7 +32,7 @@ public class ComboBox {
             ls_sql = ls_sql + " ORDER BY " + aCampoId;
             }
             rs = conexion.ejecuteSQL(ls_sql);
-            rs.last();
+            rs.last(); //posiciona resultSet en ultimo elemento
             li_cant = rs.getRow(); //número total de filas
             grupo = new int[li_cant];
             if (li_cant < 1) { // no hay registros
@@ -41,11 +41,11 @@ public class ComboBox {
             rs.first();
             grupo[li_index] = rs.getInt(1);
             
-            cb.addItem(rs.getString(1) + "-" + rs.getString(2));
+            cb.addItem(rs.getInt(1) + "-" + rs.getString(2));
             
             while (rs.next()) {
                 grupo[li_index] = rs.getInt(1);
-                cb.addItem(rs.getString(1) + "-" + rs.getString(2));
+                cb.addItem(rs.getInt(1) + "-" + rs.getString(2));
                 li_index = li_index + 1;
             }
         } catch (SQLException erro) {
@@ -54,6 +54,22 @@ public class ComboBox {
             JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro de " + aTabla + " \n\r ERROR: " + e);
         }
         //System.out.println(aTabla);
+    }
+    
+    public static void E_estado(javax.swing.JComboBox cb, String aTabla, String fields, String arg) {
+        try {
+            //javax.swing.JComboBox cb_carga;
+            //cb_carga = cb;
+            rs_suc = conexion.ejecuteSQL("SELECT "+fields+" FROM " + aTabla + " WHERE " + arg + " ORDER BY 1");
+            if (!rs_suc.first()) {
+                return;
+            }
+
+            cb.setSelectedItem(rs_suc.getInt(1) + "-" + rs_suc.getString(2));
+
+        } catch (SQLException erro) {
+            JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. - ERROR: " + erro);
+        }
     }
 
     public static String ExtraeCodigo(String args) {

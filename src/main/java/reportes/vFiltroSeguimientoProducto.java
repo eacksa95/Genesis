@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
- */
 package reportes;
 
 import util.ComboBox;
@@ -207,6 +203,7 @@ private void doClose (int retStatus){
         setVisible(false);
         dispose();       
     }
+
     private void getParameters(){
          int argdeposito;
          String argcodbarra = "";
@@ -216,24 +213,15 @@ private void doClose (int retStatus){
           argcodbarra = tf_codbarra.getText();
         }
         String argdepositoo = ComboBox.ExtraeCodigo(cbx_deposito.getSelectedItem().toString());
-        argdeposito = Integer.parseInt(argdepositoo);
         if (argdepositoo.equals("")){
             argdepositoo = "0";
         } 
+        argdeposito = Integer.parseInt(argdepositoo);
         
         par.put("codbarra",argcodbarra);
         par.put("depositoid",argdeposito);
-
-//      
-//        par.put("fechadesderecep",argfechadesde);
-//        par.put("fechahastarecep",argfechahasta);
-        
-        //par.put("arid", 0);  
-        System.out.println("CODBARRA: " +argcodbarra);
-        System.out.println("DEPOSITO: " +argdeposito);
-//        System.out.println("tipoventa: " +argtipoventa);
-       
-    }
+    } //Fin getParameters
+    
     public void setParams(HashMap p){
         this.par = p;
     }

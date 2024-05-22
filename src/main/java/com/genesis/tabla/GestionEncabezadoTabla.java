@@ -31,14 +31,17 @@ public class GestionEncabezadoTabla  implements TableCellRenderer {
             jcomponent = new JLabel((String) value);
             ((JLabel)jcomponent).setHorizontalAlignment( SwingConstants.CENTER );
             ((JLabel)jcomponent).setSize( 25, jcomponent.getWidth() );   
-            ((JLabel)jcomponent).setPreferredSize( new Dimension(6, jcomponent.getWidth())  );
+            ((JLabel)jcomponent).setPreferredSize( new Dimension(6, jcomponent.getWidth()));
         }         
    
         //jcomponent.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 1, new java.awt.Color(221, 211, 211)));
         jcomponent.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 1, new java.awt.Color(255, 255, 255)));
         jcomponent.setOpaque(true);
         //jcomponent.setBackground( new Color(236,234,219) );
-        jcomponent.setBackground( new Color(65,65,65) );
+        //jcomponent.setBackground( new Color(65,65,65) );
+        String hexColor = "#336B87";
+        Color color = Color.decode(hexColor);
+        jcomponent.setBackground(color);
         jcomponent.setToolTipText("Tabla Detalle");
         jcomponent.setForeground(Color.white);
         

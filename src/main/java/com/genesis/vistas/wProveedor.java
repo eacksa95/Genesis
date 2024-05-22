@@ -30,8 +30,8 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
         tc = new tableController();
         tc.init("proveedores");
         myData = new HashMap<>();
-        ComboBox.pv_cargar(jcbDepartamento, "departamentos", " id, nombre ", "id", "");
-        ComboBox.pv_cargar(jcbCiudad, "ciudades", " id, nombre ", "id", "");
+        ComboBox.pv_cargar(jcbDepartamento, "departamentos", "id, nombre", "id", "");
+        ComboBox.pv_cargar(jcbCiudad, "ciudades", "id, nombre", "id", "");
     }
 
     /**
@@ -249,6 +249,9 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
             msg = "SE CREÓ NUEVO REGISTRO";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
             imNuevo();
+        } else if(rows < 1){
+            msg = "No se pudo Crear el Registro";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -413,10 +416,10 @@ public class wProveedor extends javax.swing.JInternalFrame implements ActiveFram
                     tf_nombre.setText(value);
                     break;
                 case "departamentoid":
-                    Tools.E_estado(jcbDepartamento, "departamentos", "id=" + value);
+                    ComboBox.E_estado(jcbDepartamento, "departamentos", "id, nombre", "id=" + value);
                     break;  
                 case "ciudadid":
-                    Tools.E_estado(jcbCiudad, "ciudades", "id=" + value);
+                    ComboBox.E_estado(jcbCiudad, "ciudades", "id, nombre", "id=" + value);
                     break;                
                 case "direccion":
                     tf_direccion.setText(value);

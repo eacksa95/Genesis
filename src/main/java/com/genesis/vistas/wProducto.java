@@ -397,7 +397,7 @@ private tableController tc;
                   tf_proveedor.setText(value);
                   break;
                 case "categoriaid":
-                  Tools.E_estado(jcbCategoria, "categorias", "id=" + value);
+                  ComboBox.E_estado(jcbCategoria, "categorias", "id, nombre", "id=" + value);
                   break;
             }//end switch
         }//end for
