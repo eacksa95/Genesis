@@ -198,15 +198,13 @@ public class wBuscar extends javax.swing.JInternalFrame{
 
 
     private void cargarDatos() {
-       String sql;
-       sql = "";
        dtm.setRowCount(0);
        sql = is_sql + this.ps_condicion + "%' ORDER BY 1 ASC";
-       System.out.println("w_buscar 210 cargarDatos SQL:" + sql);
+       System.out.println("w_buscar 203 cargarDatos SQL:" + sql);
         try {
             rs = conexion.ejecuteSQL(sql);
             while (rs.next()) {
-                Object[] newRow = {rs.getString("codigo"), rs.getString("descripcion")};
+                Object[] newRow = {rs.getInt("codigo"), rs.getString("descripcion")};
                 dtm.addRow(newRow);
             }
         } catch (SQLException e) {
@@ -236,7 +234,8 @@ public class wBuscar extends javax.swing.JInternalFrame{
         setVisible(false);
         dispose();
     }
-//esto es para el buscar por la condición dada, para que cuando al dar enter busque
+    
+    //Esto es para el buscar por la condición dada, para que cuando al dar enter busque
     private void jtfbuscarKeyPressed(java.awt.event.KeyEvent evt) {
         if (evt.getKeyCode() == evt.VK_ENTER) {
             ps_condicion = this.jtfbuscar.getText().replaceAll("\'","''").toLowerCase();

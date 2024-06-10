@@ -39,7 +39,7 @@ public class GestionEncabezadoTabla  implements TableCellRenderer {
         jcomponent.setOpaque(true);
         //jcomponent.setBackground( new Color(236,234,219) );
         //jcomponent.setBackground( new Color(65,65,65) );
-        String hexColor = "#336B87";
+        String hexColor = "#336B87"; //Azul Marino
         Color color = Color.decode(hexColor);
         jcomponent.setBackground(color);
         jcomponent.setToolTipText("Tabla Detalle");

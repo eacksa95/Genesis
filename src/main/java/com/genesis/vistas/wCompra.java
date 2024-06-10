@@ -42,14 +42,14 @@ import javax.swing.table.JTableHeader;
 public class wCompra extends javax.swing.JInternalFrame implements MouseListener, KeyListener, ActiveFrame {
 
     //Controladores
-    private tableController tc;
-    private tableController tcdet;
+    private final tableController tc;
+    private final tableController tcdet;
     String menuName = "";
     String CRUD = "";
-    private tableModel tmMoneda;
+    private final tableModel tmMoneda;
     Map<String, String> mapMoneda;
     private String currentField;
-    private String currentTable;
+    private String currentTable = "";
 
     private final tableModel tmProducto;
     Map<String, String> mapProducto;
@@ -61,9 +61,8 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     public int filaSeleccionada;
     ArrayList<pojoCompraDetalle> listaDetalles;
 
-    
     private Map<String, String> myData;
-    private HashMap<String, String> myDet, dataDet; 
+    private HashMap<String, String> myDet, dataDet;
     private ArrayList<Map<String, String>> columnData, colData, colDat;
 
     ModeloTabla modelo;//modelo de la JTable
@@ -75,6 +74,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
     /**
      * Creates new form wCompra
+     *
      * @param menuName
      */
     public wCompra(String menuName) {
@@ -116,14 +116,13 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         //Unificamos tipo y tamaño de fuente
         FontUIResource font = new FontUIResource("Times New Roman", Font.PLAIN, 12);
         UIManager.put("Table.font", font);
-        UIManager.put("Table.foreground", Color.RED);
+        //UIManager.put("Table.foreground", Color.RED);
 
         // COMBOBOX DESPLEGABLES//
         ComboBox.pv_cargar(jcbPlazo, "plazo_pago", " id, plazo", "id", "");
         ComboBox.pv_cargar(jcbMoneda, "monedas", " id, moneda", "id", "");
         ComboBox.pv_cargar(jcbProveedor, "proveedores", "id, nombre", "id", "");
         ComboBox.pv_cargar(jcbDeposito, "depositos", "id, nombre", "id", "");
-        ComboBox.pv_cargar(jcbMoneda, "monedas", "id, moneda", "id", "");
 
         // Inicializamos las fechas
         dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -138,11 +137,13 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         tc.init("compras");
         tcdet = new tableController();
         tcdet.init("compra_detalle");
+        
+        this.getMoneda(); //para evitar error en totalGeneral cargar datos en mapMoneda
     }//fin constructor wCompra
 
     /**
-     * Metodo que permite construir la tabla para el detalle se crean primero
-     * las columnas y luego se asigna la información
+     * Metodo que permite construir la tabla para el detalle.
+     * se crean primero las columnas y luego se asigna la información
      */
     private void construirTabla() {
         /**
@@ -151,11 +152,8 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
          */
         listaDetalles.clear();
         listaDetalles = consultarListaDetalles();
-        //Este array cambiará de valores según la tabla que querramos representar
-        //en este caso nuestro detalle tiene esa estructura de columnas
 
         ArrayList<String> titulosList = new ArrayList<>();
-//7 
         titulosList.add("Cod Barra");
         titulosList.add("Descripcion");
         titulosList.add("Precio");
@@ -168,7 +166,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         //Esto es porque la tabla recibe arreglo [] y no un ArrayList, bien se pudo ya contruir de esa manera 
         //System.out.println("lista titulos "+titulosList.toString());
         String titulos[] = new String[titulosList.size()];
-
         for (int i = 0; i < titulos.length; i++) {
             titulos[i] = titulosList.get(i);
         }
@@ -181,8 +178,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     }
 
     /**
-     * Permite simular el llenado de personas en una lista que posteriormente
-     * alimentará la tabla
+     * Permite el llenado de una lista que posteriormente alimentará la tabla
      *
      * @return
      */
@@ -211,7 +207,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         String informacion[][] = new String[listaDetalles.size()][titulosList.size()];
 
         for (int x = 0; x < informacion.length; x++) {
-            //Poner los nombres de los campos de la tabla de la bd  //7 
+            //Poner los nombres de los campos de la tabla de la bd
             informacion[x][0] = listaDetalles.get(x).getString("cod_barra");
             informacion[x][1] = listaDetalles.get(x).getString("descripcion");
             informacion[x][2] = listaDetalles.get(x).getDouble("precio") + "";
@@ -219,7 +215,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             informacion[x][4] = listaDetalles.get(x).getDouble("descuento") + "";
             informacion[x][5] = listaDetalles.get(x).getDouble("bonificado") + "";
             informacion[x][6] = listaDetalles.get(x).getDouble("total") + "";
-
         }
         return informacion;
     }
@@ -262,13 +257,13 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         jtDetalle.setRowHeight(25);//tamaño de las celdas
         jtDetalle.setGridColor(new java.awt.Color(0, 0, 0));
         //Se define el tamaño de largo para cada columna y su contenido
-        jtDetalle.getColumnModel().getColumn(0).setPreferredWidth(150);//cod_barra
-        jtDetalle.getColumnModel().getColumn(1).setPreferredWidth(200);//descripcion
-        jtDetalle.getColumnModel().getColumn(2).setPreferredWidth(150);//precio
+        jtDetalle.getColumnModel().getColumn(0).setPreferredWidth(100);//cod_barra
+        jtDetalle.getColumnModel().getColumn(1).setPreferredWidth(350);//descripcion
+        jtDetalle.getColumnModel().getColumn(2).setPreferredWidth(100);//precio
         jtDetalle.getColumnModel().getColumn(3).setPreferredWidth(100);//cantidad
         jtDetalle.getColumnModel().getColumn(4).setPreferredWidth(100);//descuento
         jtDetalle.getColumnModel().getColumn(5).setPreferredWidth(100);//bonificado
-        jtDetalle.getColumnModel().getColumn(6).setPreferredWidth(200);//total
+        jtDetalle.getColumnModel().getColumn(6).setPreferredWidth(150);//total
 
         //personaliza el encabezado
         JTableHeader jtableHeader = jtDetalle.getTableHeader();
@@ -276,7 +271,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         jtDetalle.setTableHeader(jtableHeader);
 
         //se asigna la tabla al scrollPane
-        //scrollPaneTabla.setViewportView(jtDetalle);
+        jScrollPane1.setViewportView(jtDetalle);
     }
 
     /**
@@ -385,9 +380,9 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         jcbPlazo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Plazo" }));
 
         jcbMoneda.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Moneda" }));
-        jcbMoneda.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jcbMonedaActionPerformed(evt);
+        jcbMoneda.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jcbMonedaFocusGained(evt);
             }
         });
 
@@ -397,29 +392,14 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                 jcbProveedorFocusGained(evt);
             }
         });
-        jcbProveedor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jcbProveedorActionPerformed(evt);
-            }
-        });
 
         jftfCotizacion.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0.00"))));
         jftfCotizacion.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jftfCotizacion.setText("0.0");
-        jftfCotizacion.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                jftfCotizacionFocusGained(evt);
-            }
-        });
 
         jftfAdelanto.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0.00"))));
         jftfAdelanto.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jftfAdelanto.setText("0.0");
-        jftfAdelanto.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                jftfAdelantoFocusGained(evt);
-            }
-        });
 
         try {
             jftfSerie.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###-###-")));
@@ -428,27 +408,12 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         }
         jftfSerie.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jftfSerie.setText("001-001-");
-        jftfSerie.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                jftfSerieFocusGained(evt);
-            }
-        });
 
         jcbTipo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1-Contado", "2-Crédito" }));
 
         jtfTimbrado.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jtfTimbrado.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                jtfTimbradoFocusGained(evt);
-            }
-        });
 
         jftfFactura.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jftfFactura.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                jftfFacturaFocusGained(evt);
-            }
-        });
 
         jLabel19.setText("OBS:");
 
@@ -456,29 +421,10 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
         jcbDeposito.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Depósito" }));
 
-        tfcodbarra.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                tfcodbarraFocusGained(evt);
-            }
-        });
-        tfcodbarra.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfcodbarraActionPerformed(evt);
-            }
-        });
-        tfcodbarra.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                tfcodbarraKeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                tfcodbarraKeyReleased(evt);
-            }
-        });
-
         jtfId.setText("0");
-        jtfId.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfIdActionPerformed(evt);
+        jtfId.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jtfIdKeyPressed(evt);
             }
         });
 
@@ -657,11 +603,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                 return types [columnIndex];
             }
         });
-        jtDetalle.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                jtDetalleFocusGained(evt);
-            }
-        });
         jScrollPane1.setViewportView(jtDetalle);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -669,7 +610,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 938, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -767,11 +708,11 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(19, 19, 19))
         );
@@ -792,70 +733,24 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jtfTimbradoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfTimbradoFocusGained
-        jtfTimbrado.selectAll();
-    }//GEN-LAST:event_jtfTimbradoFocusGained
-
-    private void jftfAdelantoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jftfAdelantoFocusGained
-        jftfAdelanto.selectAll();
-    }//GEN-LAST:event_jftfAdelantoFocusGained
-
-    private void jftfSerieFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jftfSerieFocusGained
-        jftfSerie.selectAll();
-    }//GEN-LAST:event_jftfSerieFocusGained
-
-    private void jftfFacturaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jftfFacturaFocusGained
-        jftfFactura.selectAll();
-    }//GEN-LAST:event_jftfFacturaFocusGained
-
-    private void jtDetalleFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtDetalleFocusGained
-        validarCombo();  
-        currentTable = "tabla";
-    }//GEN-LAST:event_jtDetalleFocusGained
+    private void jcbMonedaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbMonedaFocusGained
+        System.out.println("jcbMonedaFocusGained: " + evt);
+        jcbMoneda.showPopup();
+    }//GEN-LAST:event_jcbMonedaFocusGained
 
     private void jcbProveedorFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbProveedorFocusGained
-        currentField = "proveedor";        // TODO add your handling code here:
+        System.out.println("jcbProveedorFocusGained: " + evt);
+        jcbProveedor.showPopup();
     }//GEN-LAST:event_jcbProveedorFocusGained
 
-    private void tfcodbarraFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfcodbarraFocusGained
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfcodbarraFocusGained
-
-    private void tfcodbarraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfcodbarraActionPerformed
-
-    }//GEN-LAST:event_tfcodbarraActionPerformed
-
-    private void tfcodbarraKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfcodbarraKeyPressed
-        if (currentTable.equals("tabla")) {
-            //OBS: Aquí debemos llamar a un método que controle que los campos de la cabecera estén completos
-            int row = jtDetalle.getSelectedRow();
-            int rows = jtDetalle.getRowCount();
-            int col = jtDetalle.getSelectedColumn();
-            if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-                this.getProducto(row, col);
-            }
-        } //end if
-    }//GEN-LAST:event_tfcodbarraKeyPressed
-
-    private void tfcodbarraKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfcodbarraKeyReleased
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfcodbarraKeyReleased
-
-    private void jcbMonedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbMonedaActionPerformed
-        //this.getMoneda();
-    }//GEN-LAST:event_jcbMonedaActionPerformed
-
-    private void jftfCotizacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jftfCotizacionFocusGained
-        jftfCotizacion.selectAll();
-    }//GEN-LAST:event_jftfCotizacionFocusGained
-
-    private void jcbProveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbProveedorActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jcbProveedorActionPerformed
-
-    private void jtfIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfIdActionPerformed
+    private void jtfIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtfIdKeyPressed
         currentField = "id";
-    }//GEN-LAST:event_jtfIdActionPerformed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            
+            System.out.println("jtfIdKeyPressed 775 Enter se ejecuta this.imBuscar: " + evt);
+            this.imBuscar();
+        }
+    }//GEN-LAST:event_jtfIdKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -907,41 +802,53 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     private javax.swing.JTextField tfcodbarra;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     *
+     * @param e evento del mouse
+     */
     @Override
     public void mouseClicked(MouseEvent e) {
-        //capturo fila o columna dependiendo de mi necesidad
-
-        //OBS: Aquí debemos llamar a un método que controle que los campos de la cabecera estén completos
-        int fila = jtDetalle.rowAtPoint(e.getPoint());
-        int columna = jtDetalle.columnAtPoint(e.getPoint());
-
-        /*uso la columna para valiar si corresponde a la columna de perfil garantizando
-         * que solo se produzca algo si selecciono una fila de esa columna
-         */
-        if (columna == 0) { //0 corresponde a cod barra
-            //sabiendo que corresponde a la columna de perfil, envio la posicion de la fila seleccionada
-            validarSeleccionMouse(fila);
-        } else if (columna == 2) {//se valida que sea la columna del otro evento 2 que corresponde a precio
-            //JOptionPane.showMessageDialog(null, "Evento del otro icono");
+        System.out.println("mouseClicked 838 source: " + e.getSource());
+        //Verificar si se ejecuto desde Tabla o jtfCodigo
+        Object source = e.getSource();
+        if (source == jtDetalle) {
+            //Capturamos fila y columna del evento click e.getPoint()
+            int fila = jtDetalle.rowAtPoint(e.getPoint());
+            int columna = jtDetalle.columnAtPoint(e.getPoint());
+            System.out.println("mouseClicked tabla: fila: " + fila + " columna: " + columna);
+            //si columna Seleccionada corresponde a Cod_barra
+            if (columna == 0) { //0 corresponde a cod barra
+                validarSeleccionMouse(fila);
+            }
+            //si columna Seleccionada corresponde a Precio
+            if (columna == 2) { //2 corresponde a Precio
+                //JOptionPane.showMessageDialog(null, "Evento del otro icono");
+            }
         }
+        if (source == tfcodbarra) {
+            System.out.println("el click se realizo en jTextFieldCodBarra");
+        }
+
     }
 
     /**
-     * Este metodo simularia el proceso o la acción que se quiere realizar si se
-     * presiona alguno de los botones o iconos de la tabla
+     * Esta funcion falta modificar y deberia capturar los datos de la fila y
+     * cargarlos a un mapa para manejar los datos la row en un mapa
      *
      * @param fila
      */
     private void validarSeleccionMouse(int fila) {
         this.filaSeleccionada = fila;
-        //teniendo la fila entonces se obtiene el objeto correspondiente para enviarse como parammetro o imprimir la información
+        //teniendo la fila entonces se obtiene el objeto correspondiente
+        //para enviarse como parametro o imprimir la información
         pojoCompraDetalle rowDetalle = new pojoCompraDetalle();
         rowDetalle.setString("cod_barra", jtDetalle.getValueAt(fila, 0).toString());
         rowDetalle.setString("descripcion", jtDetalle.getValueAt(fila, 1).toString());
 
-        String info = "INFO PERSONA\n";
+        String info = "ValidarSeleccionMouse: \n";
         info += "Código: " + rowDetalle.getString("cod_barra") + "\n";
         info += "Descripción: " + rowDetalle.getString("descripcion") + "\n";
+        System.out.println("wCOmpra: " + info);
     }
 
     @Override
@@ -951,7 +858,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        this.validarCabecera();
+        //this.validarCabecera();
     }
 
     @Override
@@ -971,58 +878,66 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
     @Override
     public void keyPressed(KeyEvent e) {
-        //System.out.print("\n Estoy en el keyListener, keyPressed");
-        int row = jtDetalle.getSelectedRow();
-        int rows = jtDetalle.getRowCount();
-        int col = jtDetalle.getSelectedColumn();
+        Object source = e.getSource(); //Origen del evento
+        //System.out.println("keyPressed910: " + "key code: " + source);
+        //------KeyListener TABLA-----------
+        //si el evento keyPressed se ha ejecutado desde la Tabla
+        if (source == jtDetalle) {
+            int rows = jtDetalle.getRowCount();
+            int row = jtDetalle.getSelectedRow();
+            int col = jtDetalle.getSelectedColumn();
+            boolean lastRow = (row == (rows - 1));
 
-        int key = e.getKeyChar();
-        //System.out.println("tecla pulsada "+key);
+            //validacion de tecla pulsada
+            int key = e.getKeyChar(); //Tecla Pulsada
+            //Ascci 48-57 numeros arriba del teclado. Ascci 96-105 teclado numerico del costado
+            boolean numeros = (key >= 48 && key <= 57) || (key >= 96 && key <= 105);   // 0 al 9
+            boolean decimalPoint = key == 46;           // '.'
+            boolean erraser = key == 8;                //Backspace
+            boolean enter = key == 10;                  //Enter
+            boolean tabulacion = key == 9;              //Tab
+            boolean celdasNumericas = (col == 2 || col == 3 || col == 4 || col == 5);
+            //Si no es numero, no es decimal, no es tecla borrar, no es Enter y no es tabulacion
+            //entonces no hacer nada e ignorar el evento
+            if (!numeros && !decimalPoint && !erraser && !enter && !tabulacion) {
+                e.consume();
+            }
 
-        boolean numeros = key >= 48 && key <= 57;
-        boolean decimalPoint = key == 46;
-        boolean erraser = key == 8;
-
-        if (!numeros && !decimalPoint && !erraser && key != 10) {
-            //e.consume();
-        } else {
             if (numeros) {
                 if (jtDetalle.getModel().isCellEditable(row, col)) {
-                    this.limpiarCelda(jtDetalle);
+                    jtDetalle.setValueAt("", row, col); //reemplazar valor de la celda
                 }
             }
 
-        }
-
-        //System.out.println("key code "+e.getKeyCode());
-        //System.out.println("Fila : "+row+ "/"+rows+" Column :"+col);
-        if (key == 10 || key == 9 || (key >= 37 && key <= 40)) {//10 es enter
-            if (jtDetalle.isEditing()) {
-                jtDetalle.getCellEditor().stopCellEditing();
+            //Si Enter o Tab y col < 6 entonces dejar de editar la celda y pasar a la siguiente celda
+            if (celdasNumericas && (enter || tabulacion)) {
+                if (jtDetalle.isEditing()) {
+                    jtDetalle.getCellEditor().stopCellEditing();
+                    this.setTotalRow(row);
+                    this.setTotalGral();
+                }
             }
 
-            if (col == 0) {
+            //Si Enter o Tab para col == 0 Codigo Barra
+            if (col == 0 && (enter || tabulacion)) {
+                jtDetalle.getCellEditor().stopCellEditing();
                 this.getProducto(row, col);
                 return;
             }
-            if (col == 2 || col == 3 || col == 4 || col == 5) {
-                this.setTotalRow(row);
-                this.setTotalGral();
-            }
-            //System.out.println("Col "+col+ " key "+key);
-            if (col == 6 && key == 10 && (row == (rows - 1))) { //Si está en la última columna y presiona enter, inserta una nueva fila
-                //Podría controlarse que se haya ingresado previamente el codigo
-                String cod = this.jtDetalle.getValueAt(row, 0).toString();
 
-                //System.out.println("Codigo "+cod);
-                if (cod.equals("0") || cod.equals("") || cod == null) {
-                    JOptionPane.showMessageDialog(this, "Favor ingrese un producto!", "¡A T E N C I O N!", JOptionPane.INFORMATION_MESSAGE);
-                    return;
+            //Enter para Ultima Columna. si ultima fila de la tabla Inserta una nueva fila
+            if (col == 6 && enter && lastRow) {
+                //Verifica que se haya ingresado cod_barra Correcto en la fila
+                String cod = this.jtDetalle.getValueAt(row, 0).toString();
+                if (cod.equals("0") || cod.equals("")) {
+                    JOptionPane.showMessageDialog(this, "keyPressed960: Favor ingrese un producto Valido!", "¡A T E N C I O N!", JOptionPane.INFORMATION_MESSAGE);
+
                 } else {
                     this.imInsDet();
                 }
 
             }
+
         }
     }
 
@@ -1034,20 +949,25 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     @Override
     public void imGrabar(String crud) {
         this.CRUD = crud;
+        String msg;
         if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
-        String msg;
-        if (jtfId.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Todos los campos deben ser completados ");
+        //validacion de campos del Formulario Cabecera
+        if (!validarCabecera()) {
             return;
         }
+        //validacion de campos de Tabla Detalle
+        if (!validarDetalles()) {
+            return;
+        }
+        //Cargar Datos en los Maps e inicializar estructuras de datos para el proceso
         this.setData();
         ArrayList<Map<String, String>> alCabecera;
         alCabecera = new ArrayList<>(); //Instancia array
-        int id, rows = 0;
+        int id;
         id = Integer.parseInt(this.jtfId.getText());
         if (id > 0) {
             alCabecera.add(this.myData);
@@ -1062,9 +982,9 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
-            rows = this.tc.createReg(this.myData);
+            int rowsAffected = this.tc.createReg(this.myData);
             id = this.tc.getMaxId();
-            if (rows < 1) {
+            if (rowsAffected < 1) {
                 msg = "Error al intentar crear el registro";
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
                 return; // si tfId > 0 y no grabo cambios, entonces return
@@ -1073,7 +993,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
                 this.jtfId.requestFocus();
             }
-            
         }
 
         //DETALLES
@@ -1082,31 +1001,31 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         Map<String, String> fields = new HashMap<>();     //Los campos que vamos a recuperar
         ArrayList<Map<String, String>> alDetalle;    //Declara array de Map, cada Map es para un registro
         fields.put("*", "*");
-        
+
         for (Map<String, String> myRow : columnData) {
             where.put("compraid", id + "");
             where.put("cod_barra", myRow.get("cod_barra"));
             this.colDat = this.tcdet.searchListById(fields, where);
-            
+
             myRow.put("compraid", id + "");
-            
+
             if (this.colDat.isEmpty()) { // si no existe un detalle con este cod_barra para esta compra
                 myRow.put("id", "0");
-                rows = this.tcdet.createReg(myRow);
-                if(rows < 1){
+                int rowsAffected = this.tcdet.createReg(myRow);
+                if (rowsAffected < 1) {
                     msg = "No se ha podido grabar el Detalle Codigo:" + myRow.get("cod_barra");
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
                 } else {
                     msg = "Se ha creado el Detalle:" + myRow.get("cod_barra") + "para este producto";
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
                 }
-                
+
             } else { //si ya existe un detalle con este cod_barra para esta compra
                 myRow.put("id", colDat.get(0).get("id"));
                 alDetalle = new ArrayList<>(); //necesitamos el alDetalle por la estructura de la funcion tcdet.updateReg
                 alDetalle.add(myRow);
                 int rowsAffected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-                if(rowsAffected < 1){
+                if (rowsAffected < 1) {
                     msg = "No se ha podido actualizar el detalle: " + myRow.get("cod_barra") + " del producto. Por favor verifique";
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
                     return;
@@ -1118,28 +1037,22 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         }
         this.imInsDet();
         this.imNuevo();
-        // this.fillView(myData, columnData);
     } //Fin imGrabar
 
-    public void limpiarCelda(JTable tabla) {
-        tabla.setValueAt("", tabla.getSelectedRow(), tabla.getSelectedColumn());
-    }
-    
     @Override
     public void imFiltrar() {
         String sql;
-        sql = "";
         wBuscar frame = null;
-        
-        if (currentField.equals("id")){
+        //Por defecto el buscador buscara Registros de compra por ID
+        if (currentField.equals("id")) { //Buscar una venta por ID
         sql = "SELECT id AS codigo, "
-                + "CONCAT(numero_factura, ' ',observacion) AS descripcion "
+                + "CONCAT(numero_factura, ' ', observacion) AS descripcion "
                 + "FROM compras "
-                + "WHERE LOWER(CONCAT(id, ' ',numero_factura, ' ',observacion)) LIKE '%";
+                + "WHERE LOWER(CONCAT(id, ' ', numero_factura, ' ', observacion)) LIKE '%";
         frame = new wBuscar(sql, this.jtfId);
-         }
-        
-        if (currentTable.equals("tabla")) { //para buscar un producto por filtro
+        }
+
+        if (currentTable.equals("tabla")) { //Buscar un producto por filtro
             sql = "SELECT d.cod_barra as codigo, "
                     + "CONCAT(p.nombre, ' - ', "
                     + "p.descripcion, ' - ', m.nombre, ' - ', "
@@ -1171,13 +1084,22 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
+        //validar campos cabecera
+        if (!validarCabecera()) {
+            return;
+        }
+        //validar campos detalles
+        if (!validarDetalles()) {
+            return;
+        }
+
         this.setData();
-        ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<>(); //Instancia array
-        alCabecera.add(this.myData);                      //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
-        int rowsAffected = this.tc.updateReg(alCabecera); //Está guardando igual si en el detalle hay error
+        ArrayList<Map<String, String>> alCabecera;
+        alCabecera = new ArrayList<>();
+        alCabecera.add(this.myData);
+        int rowsAffected = this.tc.updateReg(alCabecera);
         //Para el DETALLE
-        ArrayList<Map<String, String>> alDetalle;         //Declara array de Map, cada Map es para un registro
+        ArrayList<Map<String, String>> alDetalle;         //Cada Map es para un registro
         alDetalle = new ArrayList<>(); //Instancia array
 
         for (Map<String, String> myRow : columnData) {       //hay que recorrer el detalle y envira de a uno.
@@ -1198,8 +1120,9 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     @Override
     public void imBorrar(String crud) {
         this.CRUD = crud;
+        String msg;
         if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
@@ -1219,16 +1142,15 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         int rowsAffected = this.tc.deleteReg(alCabecera); //Está guardando igual si en el detalle hay error
         //Invocamos el método deleteReg del Modelo que procesa un array
         if (rowsAffected <= 0) {
-            String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + jtfId.getText();
+            msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + jtfId.getText();
             System.out.println(msg);
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
         if (rowsAffected > 0) {
-            String msg = "EL REGISTRO: " + jtfId.getText() + " SE HA ELIMINADO CORRECTAMENTE";
+            msg = "EL REGISTRO: " + jtfId.getText() + " SE HA ELIMINADO CORRECTAMENTE";
             System.out.println(msg);
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-
         }
         imNuevo();
     } //Fin imBorrar
@@ -1244,13 +1166,13 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     @Override
     public void imBuscar() {
         this.setData(); //Hace tomar los datos de la vista
-        this.myData = this.tc.searchById(myData);                     //Usa el mismo myData para devolver los valores de la cabecera
-        System.out.println("Compras imBuscar " + this.myData.toString());
+        this.myData = this.tc.searchById(myData);  //Usa el mismo myData para devolver los valores de la cabecera
+        System.out.println("Compras imBuscar myDatax " + this.myData.toString());
         this.limpiarTabla();
         if (this.myData.isEmpty()) {
             System.out.println("No hay registros que mostrar");
             this.resetData();
-            this.fillView(myData, columnData);
+            //this.fillView(myData, columnData);
             return;
         }
         Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
@@ -1307,67 +1229,52 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     @Override
     public void imInsDet() {
         int currentRow = jtDetalle.getSelectedRow();
+        //si no hay fila seleccionada
         if (currentRow == -1) {
-            //System.out.println("no hay fila seleccionada imInsDet 1062");
             modelo.addRow(new Object[]{"", "Descripcion", "0.0", "0.0", "0.0", "0.0", "0.0"});
             return;
         }
-        String cod = this.jtDetalle.getValueAt(currentRow, 0).toString();
-
-        //System.out.println("Codigo "+cod);
-        if (cod.equals("0") || cod.equals("") || cod == null) {
-            /*  String msg = "POR FAVOR INGRESE UN PRODUCTO ";
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION); */
-        } else {
-            //System.out.println("entro en imInsDet");
-            modelo.addRow(new Object[]{"", "Descripcion", "0.0", "0.0", "0.0", "0.0", "0.0"});
-            /**
-             * LUEGO DE CARGAR LA INFORMACIÓN DE LA SOLICITUD EN LA VISTA NOS
-             * POSICIONAMOS EN LA PRIMERA CELDA DE LA SIGUIENTE FILA DE LA TABLA
-             * DE LA VENTANA PRINCIPAL
-             */
-
-            /**
-             * DEBEMOS DEVOLVERLE EL FOCO A LA TABLA
-             */
-            this.jtDetalle.requestFocus();
-
-            /**
-             * tabla.getRowCount () - 1 -> PARA INDICAR QUE ES LA ULTIMA FILA 0
-             * -> EN MI CASO PARA INDICAR QUE DEBE SER EN LA PRIMERA COLUMNA
-             * false, false -> LOS DEJO ASÍ PUES NO NECESITO LA FUNCIONALIDAD DE
-             * ESOS PARÁMETROS
-             */
-            /* toggle: false, extend: false. Clear the previous selection and ensure the new cell is selected.
-            * toggle: false, extend: true. Extend the previous selection from the anchor to the specified cell, clearing all other selections.
-            * toggle: true, extend: false. If the specified cell is selected, deselect it. If it is not selected, select it.
-            * toggle: true, extend: true. Apply the selection state of the anchor to all cells between it and the specified cell.
-             */
-            int toRow = this.jtDetalle.getRowCount() - 1;
-            //System.out.println("a la fila "+toRow);
-            this.jtDetalle.changeSelection(toRow, 0, false, false);
+        if (currentRow != -1) {
+            jtDetalle.getSelectionModel().clearSelection();
         }
+        //Si hay fila seleccionada
+        String cod = this.jtDetalle.getValueAt(currentRow, 0).toString();
+        if (cod.equals("0") || cod.equals("")) {
+            String msg = "imInsDet1258: POR FAVOR INGRESE UN PRODUCTO ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+        } else {
+            System.out.println("imInsDet1261: Exito");
+            modelo.addRow(new Object[]{"", "Descripcion", "0.0", "0.0", "0.0", "0.0", "0.0"});
 
+            this.jtDetalle.requestFocus(); //devolver el foco a la tabla
+            //hacer foco en la col=0 de la nueva fila
+            int lastRow = this.jtDetalle.getRowCount() - 1;
+            this.jtDetalle.changeSelection(lastRow, 0, false, false);
+            //this.jtDetalle.requestFocusInWindow(); // Asegura que el foco esté en la tabla
+        }
     }
 
     @Override
     public void imDelDet() {
         int currentRow = jtDetalle.getSelectedRow();
-        if (currentRow == -1) {
-            System.out.println("no hay fila seleccionada");
+        //si no hay row seleccionado
+        if (currentRow == -1) { 
+            String msg = "imDelDet1283: NO hay fila seleccionada ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
-
-        modelo.removeRow(currentRow);
-        //Si al eliminar queda vacía, habrá que insertar una nueva
-        int rows = jtDetalle.getRowCount();
-
-        if (rows == 0) {
-            System.out.println("Se eliminaron todas las filas");
-            this.imInsDet();
+        //si hay row seleccionado
+        if (currentRow >= 0) { 
+            modelo.removeRow(currentRow);
+            //Si al eliminar queda vacía, habrá que insertar una nueva
+            int rows = jtDetalle.getRowCount();
+            if (rows == 0) {
+                String msg = "imDelDet1291: Se eliminaron todas las filas ";
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+                this.imInsDet();
+            }
         }
-    }
+    }//Fin imDelDet
 
     @Override
     public void imCerrar() {
@@ -1375,24 +1282,19 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         dispose();
     }
 
-    public int getProducto(int row, int col) {
+    public int getProducto(int row, int col) { 
         String codbar, sql;
-        codbar = "";
-        sql = "";
-         if (this.tfcodbarra.getText().equals("")) {
-            codbar = this.jtDetalle.getModel().getValueAt(row, col).toString();
-        } else {
-            codbar = this.tfcodbarra.getText();
-            this.jtDetalle.getModel().setValueAt(codbar, row, 0);
+        int Exito = 0;
+        //recuperar cod_barra de la row
+        codbar = this.jtDetalle.getModel().getValueAt(row, 0).toString(); //col == 0
+        if (codbar.equals("")) { //para evitar error en el sql
+            codbar = "0";
+            JOptionPane.showMessageDialog(this, "Proporcione codigo", "getProducto1314", JOptionPane.OK_OPTION);
+            Exito = 0;
         }
-            codbar = this.jtDetalle.getModel().getValueAt(row, col).toString();
-        if (codbar.equals("0") || codbar.equals("")) {
-            return 0;
-        }
-        //System.out.println("codigo "+codbar);
-        sql = "SELECT CONCAT(p.nombre, ' - ', "
-                + "p.descripcion, ' - ', m.nombre, ' - ', "
-                + "c.color, ' - ', t.tamano, ' - ', s.diseno) AS descripcion "
+        sql = "SELECT CONCAT(p.nombre, ' ', "
+                + "m.nombre, ' , ', "
+                + "c.color, ' ', t.tamano, ' ', s.diseno) AS descripcion "
                 + "FROM productos p, producto_detalle d, marcas m, colores c, tamanos t, disenos s "
                 + "WHERE p.id = d.productoid "
                 + "AND p.marca = m.id "
@@ -1400,38 +1302,39 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                 + "AND d.tamanoid = t.id "
                 + "AND d.disenoid = s.id "
                 + "AND d.cod_barra = '" + codbar + "'";
-        Map<String, String> rtn = new HashMap<>();
+        //Map<String, String> producto = new HashMap<>();
         ResultSet rs;
 
-        //System.out.println("sql "+sql);
         try {
             rs = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
             ResultSetMetaData metaData = rs.getMetaData();
             int colCount = metaData.getColumnCount();
-            // while(rs.next()){
             if (rs.next()) {
+                Exito = 1;
+                System.out.println("Producto INFO: \n");
                 for (int r = 1; r <= colCount; r++) {
-                    //System.out.println("column "+metaData.getColumnName(r)+" valor "+rs.getString(metaData.getColumnName(r)));
-                    rtn.put(metaData.getColumnName(r), rs.getString("descripcion"));
-                    this.jtDetalle.getModel().setValueAt(rs.getString(metaData.getColumnName(r)), row, 1);
+                    System.out.println("column "+metaData.getColumnName(r)+" valor "+rs.getString(metaData.getColumnName(r)));
+                    //producto.put(metaData.getColumnName(r), rs.getString("descripcion"));
+                    String descripcion = rs.getString("descripcion");
+                    this.jtDetalle.getModel().setValueAt(descripcion, row, 1); //Descripcion en jtDetalle
+                    //this.jtDetalle.getModel().setValueAt("10", row, 2);
                 }
             } else {
                 this.jtDetalle.getModel().setValueAt("0", row, 0);
                 this.jtDetalle.getModel().setValueAt("", row, 1);
+                String msg = "No se ha encontrado Producto con el Codigo: " + codbar;
+                JOptionPane.showMessageDialog(this, msg, "getProducto1346", JOptionPane.OK_OPTION);
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return 0;
+        return Exito;
     }
-
-
 
     /**
      * Calucula el total para una fila específica
      *
-     * @param row int index de la fila a ser procesada
+     * @param row fila a ser procesada
      * @return rtn int que devuelve el estado de la operación, falta completar
      */
     public int setTotalRow(int row) {
@@ -1483,22 +1386,23 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         iva = 0.0;
         exenta = 0.0;
 
-//        monedaDecimal = Integer.parseInt(mapMoneda.get("decimales"));
-
+        monedaDecimal = Integer.parseInt(mapMoneda.get("decimales"));
         Map<String, String> rtn = new HashMap<>();
         Map<String, String> select = new HashMap<>();
         Map<String, String> where = new HashMap<>();
         columnData.clear();
+        //Recorrer Rows de Detalles
         for (int row = 0; row < rows; row++) {
             codbar = this.jtDetalle.getModel().getValueAt(row, 0).toString();
             if (codbar.equals("0") || codbar.equals("")) { //Si no se especifica códio, no tiene sentido continuar
+                JOptionPane.showMessageDialog(this, "Favor ingrese un producto!", "¡setTotalGral 1435!", JOptionPane.INFORMATION_MESSAGE);
                 continue;
             }
             where.clear();
             //Por cada codigo de barras 
             select.put("*", "*");
             where.put("cod_barra", codbar);
-            this.mapProductoDet = this.tmProductoDet.readRegisterById(select, where);//Recupera el id de producto
+            this.mapProductoDet = this.tmProductoDet.readRegisterById(select, where);//Recupera el id de productoDetalle
             //Para recuperar el producto
             where.clear();
             where.put("id", this.mapProductoDet.get("productoid"));
@@ -1511,6 +1415,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             descuento = Tools.sGetDecimalStringAnyLocaleAsDouble(this.jtDetalle.getModel().getValueAt(row, 4).toString());
             bonificado = Tools.sGetDecimalStringAnyLocaleAsDouble(this.jtDetalle.getModel().getValueAt(row, 5).toString());
             if (precio <= 0 || cantidad <= 0) {
+                System.out.println("setTotalGral 1455: precio o cantidad <= 0");
                 continue;
             }
             if (iva > 0.0) {
@@ -1570,48 +1475,97 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     public boolean validarCabecera() { //Acordate que esto tenes que completar
         boolean rtn;
         rtn = true;
-        Date fecha;
-        fecha = jdcProceso.getDate();
-        if (fecha == null) {
-            JOptionPane.showMessageDialog(this, "Favor ingrese una fecha de operación válida!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
+        String msg = "Defecto Cabecera";
+        //validar id
+        if (jtfId.getText().isEmpty() || "".equals(jtfId.getText())) {
+            msg = "El campo Id no debe ser vacio";
+            rtn = false;
+            jtfId.setText("0");
+            jtfId.requestFocus();
+        }
+        //Fecha Proceso
+        Date fechaProceso = jdcProceso.getDate();
+        if (fechaProceso == null) {
+            msg = "Favor ingrese una fecha de operación válida!";
             jdcProceso.requestFocus();
             jdcProceso.setDate(new Date());
             rtn = false;
         }
-
-        fecha = jdcLlega.getDate();
-
-        if (fecha == null) {
-            JOptionPane.showMessageDialog(this, "Favor ingrese una fecha de llegada válida!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
+        //Fecha Llegada
+        Date fechaLlegada = jdcLlega.getDate();
+        if (fechaLlegada == null) {
+            msg = "Favor ingrese una fecha de llegada válida";
             jdcLlega.requestFocus();
             jdcLlega.setDate(new Date());
             rtn = false;
         }
-
         //Aquí verificar que la fecha de llegada no sea inferior que la fecha de proceso
+//        if (fechaProceso != null && fechaLlegada != null) {
+//            if (fechaProceso.after(fechaLlegada)) { // Comparando fechas usando JDateChooser
+//                msg = "La fecha de Llegada no puede ser anterior a la fecha de Proceso";
+//                jdcLlega.requestFocus();
+//                rtn = false;
+//            }
+//        }
         //continuar con los demás controles
+        if (!rtn) {
+            JOptionPane.showMessageDialog(this, msg, "¡Favor Verificar!", JOptionPane.INFORMATION_MESSAGE);
+        }
+
         return rtn;
     }
+
+    public boolean validarDetalles() {
+        //Validar Campos de los Detalles
+        boolean valor = true;
+        String msg = "Defecto Detalle";
+        int rows = this.jtDetalle.getRowCount();
+        for (int i = 0; i < rows; i++) {
+            //celda codigo de barra
+            String codigo_barra = (String) jtDetalle.getValueAt(i, 0);
+            if (codigo_barra.equals("0") || "".equals(codigo_barra)) {
+                msg = "Proporcione codigo de barra para el registro";
+                jtDetalle.changeSelection(i, 0, false, false);
+                valor = false;
+            }
+
+            String cantidad = (String) jtDetalle.getValueAt(i, 3);
+            if (Integer.parseInt(cantidad) < 1) {
+                msg = "Cantidad no puede ser menor a 1";
+                jtDetalle.changeSelection(i, 3, false, false);
+                valor = false;
+            }
+
+            String descuento = (String) jtDetalle.getValueAt(i, 4);
+            if ("".equals(descuento)) {
+                jtDetalle.setValueAt("0", i, 4);
+                jtDetalle.changeSelection(i, 4, false, false);
+                valor = false;
+            }
+        }
+        if (!valor) {
+            JOptionPane.showMessageDialog(this, msg, "Validacion de Campos Detalle!", JOptionPane.DEFAULT_OPTION);
+        }
+        return valor;
+    } //Fin validarDetalles
 
     /**
      * Recupera los datos de la moneda que se usa en el proceso
      */
     public void getMoneda() {
         String idMoneda = ComboBox.ExtraeCodigo(this.jcbMoneda.getSelectedItem().toString());
-        if(Integer.parseInt(idMoneda) > 0){
+        if (Integer.parseInt(idMoneda) > 0) {
             this.mapMoneda.clear();
             Map<String, String> fields = new HashMap<>();
             Map<String, String> where = new HashMap<>();
             fields.put("*", "*");
             where.put("id", idMoneda);
-            this.mapMoneda = tmMoneda.readRegisterById(this.mapMoneda, where);
+            this.mapMoneda = tmMoneda.readRegisterById(fields, where);
         }
-
     }
 
     /**
-     * Carga todos los datos de la cabacera a una estructrua de datos tipo
-     * Map<String, String>
+     * Prepara los Map Cabecera y Detalle con los valores de los campos
      */
     private void setData() {
         java.util.Date df = new java.util.Date();
@@ -1648,7 +1602,8 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         myData.put("depositoid", ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));
         //Recorre el detalle y guarda cada fila
         //columndata ya se procesó con el metodo setTotalGral
-        this.setTotalGral();
+        this.getMoneda();
+        //this.setTotalGral();
         //Recorre el detalle y guarda cada fila
         //columndata ya se procesó con el metodo setTotalGral
         System.out.println("myData " + myData);
@@ -1662,7 +1617,8 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     }//fin setData
 
     /**
-     * Limpia
+     * Establece los valores por defecto en los Mapas de Datos de Cabecera y
+     * Detalle
      */
     private void resetData() {
         this.myData = new HashMap<>();
@@ -1674,7 +1630,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         this.myData.put("numero_factura", "0");
         this.myData.put("serie", "001001");
         this.myData.put("timbrado", "0");
-       // this.myData.put("vence", df.getTime() + "");
+        // this.myData.put("vence", df.getTime() + "");
         this.myData.put("proveedorid", "0");
         this.myData.put("plazoid", "0");
         this.myData.put("monedaid", "0");
@@ -1688,12 +1644,11 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         this.myData.put("observacion", "Obs");
         this.myData.put("depositoid", "0");
 
-       
         jcbMoneda.setSelectedIndex(0);
         jcbPlazo.setSelectedIndex(0);
-        jcbDeposito.setSelectedIndex(0); 
-        jcbProveedor.setSelectedIndex(0); 
-        jcbTipo.setSelectedIndex(0); 
+        jcbDeposito.setSelectedIndex(0);
+        jcbProveedor.setSelectedIndex(0);
+        jcbTipo.setSelectedIndex(0);
         this.myDet = new HashMap<>();
 
         this.myDet.put("compraid", "0");
@@ -1779,7 +1734,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                     jtfObs.setText(value);
                     break;
                 case "tipocompra":
-                     jcbTipo.setSelectedItem(Integer.parseInt(value));
+                    jcbTipo.setSelectedItem(Integer.parseInt(value));
                     break;
                 case "plazoid":
                     ComboBox.E_estado(jcbPlazo, "plazo_pago", "id, plazo", "id=" + value);
@@ -1788,7 +1743,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
                     ComboBox.E_estado(jcbProveedor, "proveedores", "id, nombre", "id=" + value);
                     break;
                 case "monedaid":
-                    ComboBox.E_estado(jcbMoneda, "monedas", "id, nombre", "id=" + value);
+                    ComboBox.E_estado(jcbMoneda, "monedas", "id, moneda", "id=" + value);
                     break;
                 case "depositoid":
                     ComboBox.E_estado(jcbDeposito, "depositos", "id, nombre", "id=" + value);
@@ -1796,14 +1751,25 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             }//end switch
         }//end for Cabecera  
 
-        int row;
-        row = 0;
+        //DETALLE TABLA
+        this.modelo.setRowCount(0); // Limpiar la tabla antes de llenar
+        
         for (Map<String, String> myRow : columnData) { //Detalles
-            //this.modelo.addRow(new Object[]{"0", "", 0.0, 0.0, 0.0, 0.0});
+            // Añadir una nueva fila vacía al modelo
+            this.modelo.addRow(new Object[]{"0", "", 0.0, 0.0, 0.0, 0.0});
+            int row = modelo.getRowCount() - 1; // Índice de la última fila añadida
+            //cargar codigo de barra en la nueva fila
             this.jtDetalle.setValueAt(myRow.get("cod_barra"), row, 0);
-            this.jtDetalle.setValueAt(myRow.get("descripcion"), row, 1);
-            //this.getProducto(row, 1);
-            // System.out.println(myRow.get("descripcion"));
+            //verificar que el codigo de barra corresponda a un producto existente en la DB antes de continuar
+            int exist = this.getProducto(row, 0);
+            if(exist == 0){
+                String msg = "Producto: " + myRow.get("cod_barra") + " no encontrado";
+                JOptionPane.showMessageDialog(this, msg, "1767Validacion de Campos Detalle!", JOptionPane.DEFAULT_OPTION);
+                modelo.removeRow(row);
+                continue;
+            }
+            //System.out.println(myRow.get("descripcion"));
+            //this.jtDetalle.setValueAt(myRow.get("descripcion"), row, 1);
             //this.jtDet.editCellAt(row, 0, this.keyPress(KeyEvent.VK_ENTER));
             this.jtDetalle.setValueAt(myRow.get("precio_bruto"), row, 2);
             this.jtDetalle.setValueAt(myRow.get("cantidad"), row, 3);
@@ -1812,7 +1778,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             this.jtDetalle.setValueAt(myRow.get("total"), row, 6);
 
             //this.jtDetalle.setValueAt(decimalFormat(650.75), row, 5);
-            //int exist = this.getProducto(row, 0);
+            
             row++;
         }//end for Detalles
     }//end fillView
@@ -1825,45 +1791,47 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             for (int i = 0; filas > i; i++) {
                 modelo.removeRow(0);
             }
+            //mirar funcion jtDetalle.removeAll()
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al limpiar la tabla.");
+            JOptionPane.showMessageDialog(null, "Error al limpiar la tabla asdfasdf."+e.getMessage());
         }
     }//fin limpiarTabla
-    
-    public void validarCombo(){
+
+    public void validarCombo() {
         int codigo = 0;
         int condicion = 0;
         //Plazo
         codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbPlazo.getSelectedItem().toString()));
-        if (codigo == 0){
+        if (codigo == 0) {
             this.jcbPlazo.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Plazo!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
         }
         //Moneda
         codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString()));
-        if (codigo == 0){
+        if (codigo == 0) {
             this.jcbMoneda.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Moneda!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
         }
         //TipoCompra
         codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbTipo.getSelectedItem().toString()));
-        if (codigo == 0){
+        if (codigo == 0) {
             this.jcbTipo.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione tipo de Operacion!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
         }
         //Deposito
         codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));
-        if (codigo == 0){
+        if (codigo == 0) {
             this.jcbDeposito.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Depósito!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
         }
         //Proveedor
         codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbProveedor.getSelectedItem().toString()));
-        if (codigo == 0){
+        if (codigo == 0) {
             this.jcbProveedor.requestFocus();
             JOptionPane.showMessageDialog(this, "Favor Seleccione Proveedor!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
@@ -1876,6 +1844,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             String msg = "CONDICIÓN Y PLAZO NO COMPATIBLE";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
         }
-           
-     }
+
+    }
 }//FIN DE LA CLASE

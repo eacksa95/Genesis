@@ -3,23 +3,210 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Productos" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c322db9d-42de-4cf1-a198-72b06d64c08c">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="db_genesis"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="479"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="521"/>
+	<parameter name="productoId" class="java.lang.String"/>
+	<parameter name="depositoId" class="java.lang.String"/>
 	<queryString language="SQL">
-		<![CDATA[]]>
+		<![CDATA[SELECT p.impuesto, p.servicio, p.estado,
+	p.marca, p.categoriaid,
+	CONCAT(p.nombre, c.color, t.tamano, dis.diseno) AS descripcion,
+	d.cod_barra, d.uxb, d.stock,
+	s.depositoid, s.cantidad, s.reservado,
+	dep.nombre as deposito
+FROM productos p, producto_detalle d, stock s, depositos dep,
+colores c, tamanos t, disenos dis
+	where p.id = $P{productoId} 
+	and p.id = d.productoid
+	and d.cod_barra = s.cod_barra
+	and dep.id =$P{depositoId}
+	and s.depositoid = dep.id
+	and d.colorid = c.id
+	and d.tamanoid = t.id
+	and d.disenoid = dis.id
+]]>
 	</queryString>
+	<field name="impuesto" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="impuesto"/>
+		<property name="com.jaspersoft.studio.field.label" value="impuesto"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="productos"/>
+	</field>
+	<field name="servicio" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="servicio"/>
+		<property name="com.jaspersoft.studio.field.label" value="servicio"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="productos"/>
+	</field>
+	<field name="estado" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="estado"/>
+		<property name="com.jaspersoft.studio.field.label" value="estado"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="productos"/>
+	</field>
+	<field name="marca" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="marca"/>
+		<property name="com.jaspersoft.studio.field.label" value="marca"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="productos"/>
+	</field>
+	<field name="categoriaid" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="categoriaid"/>
+		<property name="com.jaspersoft.studio.field.label" value="categoriaid"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="productos"/>
+	</field>
+	<field name="descripcion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="descripcion"/>
+		<property name="com.jaspersoft.studio.field.label" value="descripcion"/>
+	</field>
+	<field name="cod_barra" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="cod_barra"/>
+		<property name="com.jaspersoft.studio.field.label" value="cod_barra"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="producto_detalle"/>
+	</field>
+	<field name="uxb" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="uxb"/>
+		<property name="com.jaspersoft.studio.field.label" value="uxb"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="producto_detalle"/>
+	</field>
+	<field name="stock" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="stock"/>
+		<property name="com.jaspersoft.studio.field.label" value="stock"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="producto_detalle"/>
+	</field>
+	<field name="depositoid" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="depositoid"/>
+		<property name="com.jaspersoft.studio.field.label" value="depositoid"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="stock"/>
+	</field>
+	<field name="cantidad" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="cantidad"/>
+		<property name="com.jaspersoft.studio.field.label" value="cantidad"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="stock"/>
+	</field>
+	<field name="reservado" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="reservado"/>
+		<property name="com.jaspersoft.studio.field.label" value="reservado"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="stock"/>
+	</field>
+	<field name="deposito" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="deposito"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="depositos"/>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="79" splitType="Stretch"/>
+		<band height="41" splitType="Stretch"/>
 	</title>
 	<pageHeader>
-		<band height="35" splitType="Stretch"/>
+		<band height="44" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="5" width="123" height="30" uuid="794bb887-87b7-4a19-ac7a-38cff3751b31"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[Seguimiento de Productos]]></text>
+			</staticText>
+		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="61" splitType="Stretch"/>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="5" width="60" height="30" uuid="1a1dec84-6279-4d37-8b87-d68efa729b74">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="937175ff-f9e3-4ba1-badd-69509114bbf1"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Codigo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="5" width="180" height="30" uuid="d11f198e-4bd9-4c2f-9f9a-285349fca24c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2437b86b-9873-4a7f-8040-74d4b971b09a"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[descripcion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="5" width="50" height="30" uuid="559ceaf7-b77f-44e2-a949-b1e3d5b73671">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1e7b8f0c-b960-4c5d-bbae-8143113befaf"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[U./caja]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="5" width="60" height="30" uuid="e9db07e4-4053-4a0b-b610-cc608759df89">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6684ce15-7794-4efc-abd3-ee7bd1865d5f"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[stock minimo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="5" width="80" height="30" uuid="4056f58b-823f-46b2-8f2f-d519dcda72e8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b3424e1c-63b9-4304-bf63-404272797e25"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[deposito]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="5" width="50" height="30" uuid="ce5b0532-3d57-4246-b459-8a5a3fd78823">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="11788432-e5e7-4aaa-9a3c-f41665f4ed87"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[cantidad]]></text>
+			</staticText>
+		</band>
 	</columnHeader>
 	<detail>
-		<band height="125" splitType="Stretch"/>
+		<band height="62" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="7" width="60" height="30" uuid="dd0cb510-6542-4689-bfc0-f8c60c296edc">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="937175ff-f9e3-4ba1-badd-69509114bbf1"/>
+				</reportElement>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{cod_barra}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="9" width="180" height="30" uuid="2b8640aa-c73b-4164-9a40-a3e5e8548987">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2437b86b-9873-4a7f-8040-74d4b971b09a"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="10" width="30" height="30" uuid="4a9d391d-28f5-4997-9b5b-4cfb64173f39">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1e7b8f0c-b960-4c5d-bbae-8143113befaf"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{uxb}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="10" width="40" height="30" uuid="f30d1394-1207-46d4-bd79-e15f444e4001">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6684ce15-7794-4efc-abd3-ee7bd1865d5f"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{stock}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="9" width="80" height="30" uuid="414c7a1b-ca31-4c17-8f46-ab5480b14626">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b3424e1c-63b9-4304-bf63-404272797e25"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{deposito}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="10" width="50" height="30" uuid="0bd5fb70-2949-4670-8b94-179bd7745ed6">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="11788432-e5e7-4aaa-9a3c-f41665f4ed87"/>
+				</reportElement>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+			</textField>
+		</band>
 	</detail>
 	<columnFooter>
 		<band height="45" splitType="Stretch"/>

@@ -70,21 +70,27 @@ public class wPrincipal extends javax.swing.JFrame {
         mitenCambioPassword = new javax.swing.JMenuItem();
         menuStock = new javax.swing.JMenu();
         menuStockFichas = new javax.swing.JMenu();
-        mitenProveedor = new javax.swing.JMenuItem();
-        mitenCategoria = new javax.swing.JMenuItem();
+        menuStockFichasProducto = new javax.swing.JMenu();
         mitenProducto = new javax.swing.JMenuItem();
-        mitenProductoDetalle = new javax.swing.JMenuItem();
-        mitenDeposito = new javax.swing.JMenuItem();
+        mitenCategoria = new javax.swing.JMenuItem();
         mitenColor = new javax.swing.JMenuItem();
         mitenDisenho = new javax.swing.JMenuItem();
         mitenTamano = new javax.swing.JMenuItem();
         mitenMarca = new javax.swing.JMenuItem();
+        mitenProveedor = new javax.swing.JMenuItem();
+        mitenDeposito = new javax.swing.JMenuItem();
         menuStockProcesos = new javax.swing.JMenu();
         menuStockInformes = new javax.swing.JMenu();
         mitenReporteProductos = new javax.swing.JMenuItem();
         menuCompra = new javax.swing.JMenu();
         menuCompraProcesos = new javax.swing.JMenu();
         mitenComprar = new javax.swing.JMenuItem();
+        menuCompraInformes = new javax.swing.JMenu();
+        mitenReporteCompras = new javax.swing.JMenuItem();
+        menuVenta = new javax.swing.JMenu();
+        menuVentaProcesos = new javax.swing.JMenu();
+        mitenVender = new javax.swing.JMenuItem();
+        menuVentaInformes = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -324,6 +330,65 @@ public class wPrincipal extends javax.swing.JFrame {
         menuStockFichas.setText("Fichas");
         menuStockFichas.setName("menuStockFichas"); // NOI18N
 
+        menuStockFichasProducto.setText("Producto");
+        menuStockFichasProducto.setName("menuStockFichasProducto"); // NOI18N
+
+        mitenProducto.setText("Producto");
+        mitenProducto.setName("mitenProducto"); // NOI18N
+        mitenProducto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenProductoActionPerformed(evt);
+            }
+        });
+        menuStockFichasProducto.add(mitenProducto);
+
+        mitenCategoria.setText("Categoria");
+        mitenCategoria.setName("mitenCategoria"); // NOI18N
+        mitenCategoria.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenCategoriaActionPerformed(evt);
+            }
+        });
+        menuStockFichasProducto.add(mitenCategoria);
+
+        mitenColor.setText("Colores");
+        mitenColor.setName("mitenColores"); // NOI18N
+        mitenColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenColorActionPerformed(evt);
+            }
+        });
+        menuStockFichasProducto.add(mitenColor);
+
+        mitenDisenho.setText("Diseños");
+        mitenDisenho.setName("mitenDiseno"); // NOI18N
+        mitenDisenho.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenDisenhoActionPerformed(evt);
+            }
+        });
+        menuStockFichasProducto.add(mitenDisenho);
+
+        mitenTamano.setText("Tamaños");
+        mitenTamano.setName("mitenTamano"); // NOI18N
+        mitenTamano.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenTamanoActionPerformed(evt);
+            }
+        });
+        menuStockFichasProducto.add(mitenTamano);
+
+        mitenMarca.setText("Marcas");
+        mitenMarca.setName("mitenMarca"); // NOI18N
+        mitenMarca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenMarcaActionPerformed(evt);
+            }
+        });
+        menuStockFichasProducto.add(mitenMarca);
+
+        menuStockFichas.add(menuStockFichasProducto);
+
         mitenProveedor.setText("Proveedor");
         mitenProveedor.setName("mitenProveedor"); // NOI18N
         mitenProveedor.addActionListener(new java.awt.event.ActionListener() {
@@ -333,33 +398,6 @@ public class wPrincipal extends javax.swing.JFrame {
         });
         menuStockFichas.add(mitenProveedor);
 
-        mitenCategoria.setText("Categoria");
-        mitenCategoria.setName("mitenCategoria"); // NOI18N
-        mitenCategoria.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mitenCategoriaActionPerformed(evt);
-            }
-        });
-        menuStockFichas.add(mitenCategoria);
-
-        mitenProducto.setText("Producto");
-        mitenProducto.setName("mitenProducto"); // NOI18N
-        mitenProducto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mitenProductoActionPerformed(evt);
-            }
-        });
-        menuStockFichas.add(mitenProducto);
-
-        mitenProductoDetalle.setText("Detalle Producto");
-        mitenProductoDetalle.setName("mitenProductoDetalle"); // NOI18N
-        mitenProductoDetalle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mitenProductoDetalleActionPerformed(evt);
-            }
-        });
-        menuStockFichas.add(mitenProductoDetalle);
-
         mitenDeposito.setText("Depósito");
         mitenDeposito.setName("mitenDeposito"); // NOI18N
         mitenDeposito.addActionListener(new java.awt.event.ActionListener() {
@@ -368,42 +406,6 @@ public class wPrincipal extends javax.swing.JFrame {
             }
         });
         menuStockFichas.add(mitenDeposito);
-
-        mitenColor.setText("Colores");
-        mitenColor.setName("mitenColores"); // NOI18N
-        mitenColor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mitenColorActionPerformed(evt);
-            }
-        });
-        menuStockFichas.add(mitenColor);
-
-        mitenDisenho.setText("Diseños");
-        mitenDisenho.setName("mitenDiseno"); // NOI18N
-        mitenDisenho.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mitenDisenhoActionPerformed(evt);
-            }
-        });
-        menuStockFichas.add(mitenDisenho);
-
-        mitenTamano.setText("Tamaños");
-        mitenTamano.setName("mitenTamano"); // NOI18N
-        mitenTamano.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mitenTamanoActionPerformed(evt);
-            }
-        });
-        menuStockFichas.add(mitenTamano);
-
-        mitenMarca.setText("Marcas");
-        mitenMarca.setName("mitenMarca"); // NOI18N
-        mitenMarca.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mitenMarcaActionPerformed(evt);
-            }
-        });
-        menuStockFichas.add(mitenMarca);
 
         menuStock.add(menuStockFichas);
 
@@ -442,7 +444,43 @@ public class wPrincipal extends javax.swing.JFrame {
 
         menuCompra.add(menuCompraProcesos);
 
+        menuCompraInformes.setText("Informes");
+        menuCompraInformes.setName("menuCompraInformes"); // NOI18N
+
+        mitenReporteCompras.setText("Reporte de Compras");
+        mitenReporteCompras.setName("mitenReporteCompras"); // NOI18N
+        mitenReporteCompras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenReporteComprasActionPerformed(evt);
+            }
+        });
+        menuCompraInformes.add(mitenReporteCompras);
+
+        menuCompra.add(menuCompraInformes);
+
         barraMenu.add(menuCompra);
+
+        menuVenta.setText("Venta");
+        menuVenta.setName("menuVenta"); // NOI18N
+
+        menuVentaProcesos.setText("Procesos");
+        menuVentaProcesos.setName("menuVentaProcesos"); // NOI18N
+
+        mitenVender.setText("Vender");
+        mitenVender.setName("mitenVender"); // NOI18N
+        mitenVender.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenVenderActionPerformed(evt);
+            }
+        });
+        menuVentaProcesos.add(mitenVender);
+
+        menuVenta.add(menuVentaProcesos);
+
+        menuVentaInformes.setText("Informes");
+        menuVenta.add(menuVentaInformes);
+
+        barraMenu.add(menuVenta);
 
         setJMenuBar(barraMenu);
 
@@ -670,16 +708,6 @@ public class wPrincipal extends javax.swing.JFrame {
         centrar(view);
     }//GEN-LAST:event_mitenProveedorActionPerformed
 
-    private void mitenProductoDetalleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenProductoDetalleActionPerformed
-        JMenuItem m = (JMenuItem) evt.getSource();
-        wProductoDet view = new wProductoDet(m.getName());
-        if (encuentraVentana(view)){
-            return;
-        }
-        mostrarVentana(view);
-        centrar(view);
-    }//GEN-LAST:event_mitenProductoDetalleActionPerformed
-
     private void mitenCiudadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenCiudadActionPerformed
         JMenuItem m = (JMenuItem) evt.getSource();
         wCiudad view = new wCiudad(m.getName());
@@ -736,6 +764,18 @@ public class wPrincipal extends javax.swing.JFrame {
         ve.imDelDet();
     }//GEN-LAST:event_mitenEliminarDetalleActionPerformed
 
+    private void mitenReporteComprasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenReporteComprasActionPerformed
+        Reporte r = new Reporte("comprasreport", "vFiltroCompras", this);
+        r.setTitle("Reporte de Compras");
+        r.setClosable(true);
+        mostrarVentana(r);
+        centrar(r);
+    }//GEN-LAST:event_mitenReporteComprasActionPerformed
+
+    private void mitenVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenVenderActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_mitenVenderActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -777,6 +817,7 @@ public class wPrincipal extends javax.swing.JFrame {
     public static javax.swing.JDesktopPane desktop;
     public javax.swing.JMenu menuArchivo;
     private javax.swing.JMenu menuCompra;
+    private javax.swing.JMenu menuCompraInformes;
     private javax.swing.JMenu menuCompraProcesos;
     private javax.swing.JMenu menuEditar;
     public javax.swing.JMenu menuFichas;
@@ -784,8 +825,12 @@ public class wPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenu menuSeguridad;
     private javax.swing.JMenu menuStock;
     private javax.swing.JMenu menuStockFichas;
+    private javax.swing.JMenu menuStockFichasProducto;
     private javax.swing.JMenu menuStockInformes;
     private javax.swing.JMenu menuStockProcesos;
+    private javax.swing.JMenu menuVenta;
+    private javax.swing.JMenu menuVentaInformes;
+    private javax.swing.JMenu menuVentaProcesos;
     private javax.swing.JMenuItem mitenActualizar;
     public javax.swing.JMenuItem mitenAnterior;
     private javax.swing.JMenuItem mitenBuscar;
@@ -810,8 +855,8 @@ public class wPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mitenPermisos;
     public javax.swing.JMenuItem mitenPrimero;
     private javax.swing.JMenuItem mitenProducto;
-    private javax.swing.JMenuItem mitenProductoDetalle;
     private javax.swing.JMenuItem mitenProveedor;
+    private javax.swing.JMenuItem mitenReporteCompras;
     private javax.swing.JMenuItem mitenReporteProductos;
     private javax.swing.JMenuItem mitenRol;
     private javax.swing.JMenuItem mitenSalirSistema;
@@ -819,6 +864,7 @@ public class wPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mitenTamano;
     public javax.swing.JMenuItem mitenUltimo;
     private javax.swing.JMenuItem mitenUsuario;
+    private javax.swing.JMenuItem mitenVender;
     private javax.swing.JPopupMenu.Separator separadorArchivo;
     private javax.swing.JPopupMenu.Separator separadorEditar;
     // End of variables declaration//GEN-END:variables

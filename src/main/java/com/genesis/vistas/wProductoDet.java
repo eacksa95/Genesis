@@ -7,6 +7,7 @@ import com.genesis.tabla.GestionCeldas;
 import com.genesis.tabla.GestionEncabezadoTabla;
 import com.genesis.tabla.ModeloTabla;
 import com.genesis.controladores.tableController;
+import java.awt.Component;
 import util.ComboBox;
 import util.Tools;
 import java.awt.event.KeyEvent;
@@ -27,6 +28,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 public class wProductoDet extends javax.swing.JInternalFrame implements MouseListener, KeyListener, ActiveFrame {
+
     private Map<String, String> myData;
     private HashMap<String, String> myDet;
 
@@ -35,11 +37,11 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
 
     ArrayList<pojoProductoDetalle> lista;
     ArrayList<pojoProductoDetalle> listaDetalles;//lista que simula la información de la BD
-    
+
     JComboBox jcbColor;
     JComboBox jcbTamano;
     JComboBox jcbDiseno;
-    
+
     ModeloTabla modelo; //modelo de la Jtable
     String CRUD = "";
     String Opcion = "";
@@ -71,7 +73,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         ComboBox.pv_cargar(jcbMarca, "marcas", " id, nombre ", "id", "");
         ComboBox.pv_cargar(jcbProveedor, "proveedores", "id, nombre", "id", "");
         ComboBox.pv_cargar(jcbCategoria, "categorias", "id, nombre", "id", "");
-        
+
         // COMBO BOX DE LA TABLA//
         ComboBox.pv_cargar(jcbColor, "colores", "id, color", "id", "");
         ComboBox.pv_cargar(jcbTamano, "tamanos", "id, tamano", "id", "");
@@ -108,7 +110,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
          * Aquí se inicializan los valores. El metodo consultar tiene la forma
          * como debería ser en el metodo de recuperar registro.
          */
-        listaDetalles = consultarListaDetalles();        
+        listaDetalles = consultarListaDetalles();
         //Este array cambiará de valores según la tabla que querramos representar
         //en este caso nuestro detalle tiene esa estructura de columnas
         ArrayList<String> titulosList = new ArrayList<>();
@@ -132,10 +134,12 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         Object[][] data = obtenerMatrizDatos(titulosList);
         construirTabla(titulos, data);
     }
-    
+
     /**
-     * Este método simula una consulta a la base de datos y devuelve una lista de pojoProductoDetalle.
-     *@return lista
+     * Este método simula una consulta a la base de datos y devuelve una lista
+     * de pojoProductoDetalle.
+     *
+     * @return lista
      */
     private ArrayList<pojoProductoDetalle> consultarListaDetalles() {
         //ArrayList<pojoCompraDetalle> lista = new ArrayList<>();
@@ -145,8 +149,9 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
     }
 
     /**
-     * Este método convierte la lista de pojoProductoDetalle
-     * en una matriz de objetos para ser usada por la tabla.
+     * Este método convierte la lista de pojoProductoDetalle en una matriz de
+     * objetos para ser usada por la tabla.
+     *
      * @param titulosList
      * @return
      */
@@ -188,7 +193,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
 
         filasTabla = jtDetalle.getRowCount();
         columnasTabla = jtDetalle.getColumnCount();
-        
+
         //se asigna el tipo de dato que tendrán las celdas de cada columna definida respectivamente para validar su personalización
         jtDetalle.getColumnModel().getColumn(0).setCellRenderer(new GestionCeldas("texto"));
         jtDetalle.getColumnModel().getColumn(1).setCellRenderer(new GestionCeldas("jComboBox"));
@@ -196,7 +201,6 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         jtDetalle.getColumnModel().getColumn(3).setCellRenderer(new GestionCeldas("jComboBox"));
         jtDetalle.getColumnModel().getColumn(4).setCellRenderer(new GestionCeldas("numerico"));
         jtDetalle.getColumnModel().getColumn(5).setCellRenderer(new GestionCeldas("numerico"));
-
 
         jtDetalle.getTableHeader().setReorderingAllowed(false);
         jtDetalle.setRowHeight(24);//Altura de las celdas
@@ -279,17 +283,46 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
 
         jLabel9.setText("Impuesto");
 
+        tfImpuesto.setPreferredSize(new java.awt.Dimension(13, 20));
+
         jLabel10.setText("Servicio");
 
         jLabel11.setText("Estado");
 
         jcbMarca.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Marca" }));
+        jcbMarca.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jcbMarcaFocusGained(evt);
+            }
+        });
 
         jcbProveedor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Proveedor" }));
+        jcbProveedor.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jcbProveedorFocusGained(evt);
+            }
+        });
 
         jcbCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Categoria" }));
+        jcbCategoria.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jcbCategoriaFocusGained(evt);
+            }
+        });
 
         jLabel7.setText("%");
+
+        jCServicio.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jCServicioKeyPressed(evt);
+            }
+        });
+
+        jCEstado.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jCEstadoKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -299,94 +332,93 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jcbProveedor, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(39, 39, 39)
+                        .addComponent(jLabel1))
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(tfId, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(tfDescripcion)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addGap(18, 18, 18)
+                                .addComponent(jcbProveedor, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel4)
-                                .addGap(31, 31, 31)
-                                .addComponent(jcbMarca, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(15, 15, 15)
+                                .addComponent(jcbMarca, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel6)
-                                .addGap(18, 18, 18)
-                                .addComponent(jcbCategoria, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGap(16, 16, 16)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel1))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(tfId)
-                                    .addComponent(tfNombre)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(tfDescripcion)))
-                        .addGap(26, 26, 26)
+                                .addGap(15, 15, 15)
+                                .addComponent(jcbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGap(114, 114, 114)
+                                    .addComponent(jLabel9)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(tfImpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel7))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                     .addComponent(jLabel10)
-                                    .addComponent(jLabel11))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jCServicio)
-                                    .addComponent(jCEstado)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(tfImpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel7)))))
-                .addContainerGap(268, Short.MAX_VALUE))
+                                    .addGap(18, 18, 18)
+                                    .addComponent(jCServicio)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGap(117, 117, 117)
+                                .addComponent(jLabel11)
+                                .addGap(18, 18, 18)
+                                .addComponent(jCEstado)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(tfId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
-                        .addGap(11, 11, 11)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
-                        .addGap(12, 12, 12)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(tfDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel9)
-                            .addComponent(tfImpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7))
-                        .addGap(12, 12, 12)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel10)
-                            .addComponent(jCServicio))
-                        .addGap(11, 11, 11)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel11)
-                            .addComponent(jCEstado))))
-                .addGap(10, 10, 10)
+                    .addComponent(tfId, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1)
+                        .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2)))
+                .addGap(15, 15, 15)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(tfDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(jcbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jcbProveedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jcbMarca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                    .addComponent(jcbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel7)
+                    .addComponent(tfImpuesto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(14, 14, 14)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(jcbMarca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel10))
+                    .addComponent(jCServicio))
+                .addGap(15, 15, 15)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel5)
+                        .addComponent(jcbProveedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel11))
+                    .addComponent(jCEstado))
+                .addGap(34, 34, 34))
         );
+
+        tfImpuesto.getAccessibleContext().setAccessibleName("");
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle"));
 
@@ -406,20 +438,25 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
                 return types [columnIndex];
             }
         });
+        jtDetalle.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jtDetalleFocusGained(evt);
+            }
+        });
         jScrollPane1.setViewportView(jtDetalle);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 714, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -427,23 +464,20 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(54, 54, 54)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addGap(25, 25, 25)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(48, 48, 48)
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(52, 52, 52))
+                .addGap(20, 20, 20))
         );
 
         pack();
@@ -455,6 +489,39 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         }
     }//GEN-LAST:event_tfIdKeyPressed
 
+    private void jcbCategoriaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbCategoriaFocusGained
+        System.out.println(evt);
+        jcbCategoria.showPopup();
+    }//GEN-LAST:event_jcbCategoriaFocusGained
+
+    private void jcbMarcaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbMarcaFocusGained
+        System.out.println(evt);
+        jcbMarca.showPopup();
+    }//GEN-LAST:event_jcbMarcaFocusGained
+
+    private void jcbProveedorFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbProveedorFocusGained
+        System.out.println(evt);
+        jcbProveedor.showPopup();
+    }//GEN-LAST:event_jcbProveedorFocusGained
+
+    private void jCServicioKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jCServicioKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            boolean currentValue = jCServicio.isSelected();
+            jCServicio.setSelected(!currentValue); // Toggle the value
+        }
+    }//GEN-LAST:event_jCServicioKeyPressed
+
+    private void jCEstadoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jCEstadoKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            boolean currentValue = jCEstado.isSelected();
+            jCEstado.setSelected(!currentValue); // Toggle the value
+        }
+    }//GEN-LAST:event_jCEstadoKeyPressed
+
+    private void jtDetalleFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtDetalleFocusGained
+        System.out.println(evt);
+        validarCamposCabecera();
+    }//GEN-LAST:event_jtDetalleFocusGained
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCEstado;
@@ -509,67 +576,49 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
      */
     private void validarSeleccionMouse(int fila) {
         this.filaSeleccionada = fila;
-        //teniendo la fila entonces se obtiene el objeto correspondiente para enviarse como parammetro o imprimir la información
+        //teniendo la fila entonces se obtiene el objeto correspondiente
+        //para enviarse como parammetro o imprimir la información
         pojoProductoDetalle rowDetalle = new pojoProductoDetalle();
         rowDetalle.setString("cod_barra", jtDetalle.getValueAt(fila, 0).toString());
-       //rowDetalle.setString("descripcion", jtDetalle.getValueAt(fila, 1).toString());
-
-      //  String info="INFO PERSONA\n";
-       // info+="Código: "+rowDetalle.getString("cod_barra")+"\n";
-       // info+="Descripción: "+rowDetalle.getString("descripcion")+"\n";
-   }
-//    esta funcion estuvo comentada por completo
+        //rowDetalle.setString("descripcion", jtDetalle.getValueAt(fila, 1).toString());
+    }
 
     @Override
     public void imGrabar(String crud) {
-        this.CRUD = crud;        
+        this.CRUD = crud;
         String msg;
+        //Validacion de permisos
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
         //validacion de campos del Formulario Cabecera
-           //validar id
-        if (tfId.getText().isEmpty() || "".equals(tfId.getText())) {
-             JOptionPane.showMessageDialog(this, "El campo Id no debe ser vacio");
-             tfId.requestFocus();
-            return;
-        } //validar Nombre
-        if (tfNombre.getText().isEmpty() || "".equals(tfNombre.getText())) {
-             JOptionPane.showMessageDialog(this, "Proporcione nombre para Producto");
-             tfNombre.requestFocus();
-            return;
-        } // validar Impuesto
-        if (tfImpuesto.getText().isEmpty() || "".equals(tfImpuesto.getText())) {
-             JOptionPane.showMessageDialog(this, "El campo Id no debe ser vacio");
-             tfImpuesto.requestFocus();
-            return;
-        }
-        
-        this.setData();
-        ArrayList<Map<String, String>> alCabecera;         //Cada Map es para un registro cabecera
-        alCabecera = new ArrayList<>(); //Instancia array
-        int idProducto, rows;
-        idProducto = Integer.parseInt(this.tfId.getText());
-        
-        if (idProducto > 0) { 
-            //Actualizar Registro Producto Cabecera
-            alCabecera.add(this.myData); 
-            int rowsAffected = this.tc.updateReg(alCabecera);
+        if (!validarCamposCabecera()) {return;}
+        //validacion de campos de Tabla Detalle
+        if (!validarCamposDetalle()) {return;}
+        //Cargar Datos en los Maps e inicializar estructuras de datos para el proceso
+        this.setData(); //cargar datos en los Maps cabecera y detalle
+        ArrayList<Map<String, String>> alCabecera; //ArrayList para el proceso
+        alCabecera = new ArrayList<>();
+        int idProducto = Integer.parseInt(this.tfId.getText());
+
+        if (idProducto > 0) { //Actualizar Registro Producto
+            alCabecera.add(this.myData);
+            int rows = this.tc.updateReg(alCabecera);
             //si rowsAffected < 1 return
-            if (rowsAffected < 1) {
+            if (rows < 1) {
                 msg = "Error al intentar actualizar el registro: " + this.tfId.getText();
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
                 return; // si tfId < 0 y no grabo cambios, entonces return
             } else {
                 msg = "Se ha actualizado exitosamente el registro: " + this.tfId.getText();
-                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
             }
-            
-        } else { 
-            // Crear Registro Producto Cabecera
-            rows = this.tc.createReg(this.myData);
+        } 
+        
+        if (idProducto == 0) { // Crear Registro Producto
+            int rows = this.tc.createReg(this.myData);
             idProducto = this.tc.getMaxId();
             if (rows < 1) {
                 msg = "Error al intentar crear el registro";
@@ -578,7 +627,6 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
             } else {
                 msg = "Se ha creado exitosamente el registro: " + idProducto;
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-                this.tfId.requestFocus();
             }
         }
         //Detalles
@@ -592,14 +640,14 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
             where.put("productoid", idProducto + "");
             where.put("cod_barra", myRow.get("cod_barra"));
             this.colDat = this.tcdet.searchListById(fields, where);
-            
-            myRow.put("productoid", idProducto + ""); 
+
+            myRow.put("productoid", idProducto + "");
 
             if (this.colDat.isEmpty()) { // si no existe un detalle con este cod_barra para este producto
                 myRow.put("id", "0");
-                rows = this.tcdet.createReg(myRow);
+                int rows = this.tcdet.createReg(myRow);
                 //crear registro en la tabla Stock para el nuevo ProductoDetalle
-                if(rows < 1){
+                if (rows < 1) {
                     msg = "No se ha podido grabar el Detalle Codigo:" + myRow.get("cod_barra");
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
                 } else {
@@ -612,7 +660,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
                 alDetalle = new ArrayList<>(); //necesitamos el alDetalle por la estructura de la funcion tcdet.updateReg
                 alDetalle.add(myRow);
                 int rowsAffected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-                if(rowsAffected < 1){
+                if (rowsAffected < 1) {
                     msg = "No se ha podido actualizar el detalle: " + myRow.get("cod_barra") + " del producto. Por favor verifique";
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
                     return;
@@ -637,7 +685,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         sql = "SELECT id AS codigo, "
                 + "CONCAT(nombre, ' ',descripcion) AS descripcion "
                 + "FROM productos "
-                + "WHERE LOWER(CONCAT(id, ' ',  nombre, ' ',descripcion)) LIKE '%";
+                + "WHERE LOWER(CONCAT(id, ' ', nombre, ' ', descripcion)) LIKE '%";
 
         wBuscar frame = new wBuscar(sql, this.tfId);
         frame.setVisible(true);
@@ -796,7 +844,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
             modelo.addRow(new Object[]{"0", "0", "0", "0", "0", "0"});
             return;
         }
-        
+
         String cod = this.jtDetalle.getValueAt(currentRow, 0).toString();
         if (cod.equals("0") || cod.equals("")) {
             String msg = "POR FAVOR INGRESE UN PRODUCTO ";
@@ -831,12 +879,25 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
             //System.out.println("a la fila "+toRow);
             this.jtDetalle.changeSelection(toRow, 0, false, false);
         }
-
     }
 
     @Override
     public void imDelDet() {
+        int currentRow = jtDetalle.getSelectedRow();
+        if (currentRow == -1) {
+            System.out.println("no hay fila seleccionada");
+            String msg = "NO hay fila seleccionada ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            return;
+        }
         ((DefaultTableModel) this.jtDetalle.getModel()).removeRow(jtDetalle.getSelectedRow());
+        
+        //Si al eliminar queda vacía, habrá que insertar una nueva
+        int rows = jtDetalle.getRowCount();
+        if (rows == 0) {
+            System.out.println("Se eliminaron todas las filas");
+            this.imInsDet();
+        }
     }
 
     @Override
@@ -856,11 +917,15 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         myData.put("impuesto", tfImpuesto.getText());
         //servicio
         int servicio = 0;
-        if (jCServicio.isSelected()) { servicio = 1; }
+        if (jCServicio.isSelected()) {
+            servicio = 1;
+        }
         myData.put("servicio", servicio + "");
         //estado
         int estado = 0;
-        if (jCEstado.isSelected()) { estado = 1; }
+        if (jCEstado.isSelected()) {
+            estado = 1;
+        }
         myData.put("estado", estado + "");
         System.out.println("myData " + myData);
 
@@ -875,7 +940,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
                 continue;
             }
             //celda color
-            String b = (String) jtDetalle.getValueAt(i, 2);
+            String b = (String) jtDetalle.getValueAt(i, 1);
             Integer color = Integer.parseInt(ComboBox.ExtraeCodigo(b));
             //celda tamano
             String c = (String) jtDetalle.getValueAt(i, 2);
@@ -921,12 +986,12 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         jcbMarca.setSelectedIndex(0);
         jcbProveedor.setSelectedIndex(0);
         jcbCategoria.setSelectedIndex(0);
-        
+
         //Detalle
 //        DefaultTableModel dm = (DefaultTableModel) this.jtDetalle.getModel();
 //        dm.getDataVector().removeAllElements();
         this.myDet = new HashMap<>();
-          this.columnData.clear();
+        this.columnData.clear();
 
         this.myDet.put("productoid", "0");
         this.myDet.put("cod_barra", "0");
@@ -945,7 +1010,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
     private void fillView(Map<String, String> data, List<Map<String, String>> columnData) {
         for (Map.Entry<String, String> entry : data.entrySet()) {
             String key = entry.getKey();
-            String value = entry.getValue();       
+            String value = entry.getValue();
             switch (key) {
                 case "id":
                     tfId.setText(value);
@@ -991,9 +1056,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
         //DETALLE TABLA 
         int row;
         row = 0;
-
-        for (Map<String, String> myRow : columnData) {
-
+        for (Map<String, String> myRow : columnData) { //Detalles
             JComboBox cbColor = (JComboBox) jtDetalle.getCellEditor(row, 1).getTableCellEditorComponent(jtDetalle, "0-Seleccionar", true, row, 1);
             ComboBox.E_estado(cbColor, "colores", "id, color", "id=" + myRow.get("colorid"));
 
@@ -1025,13 +1088,66 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
             DefaultTableModel modelo = (DefaultTableModel) jtDetalle.getModel();
             int filas = jtDetalle.getRowCount();
             for (int i = 0; filas > i; i++) {
-                modelo.removeRow(0);
+                modelo.removeRow(i);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error al limpiar la tabla.");
         }
     }//fin limpiarTabla
-    
+
+    public boolean validarCamposCabecera() {
+        String msg = "";
+        boolean valor = true;
+        //validar id
+        if (tfId.getText().isEmpty() || "".equals(tfId.getText())) {
+            msg = "El campo Id no debe ser vacio";
+            valor = false;
+            tfId.setText("0");
+            tfId.requestFocus();
+        }
+        //validar Nombre
+        if (tfNombre.getText().isEmpty() || "".equals(tfNombre.getText())) {
+            msg = "Proporcione nombre para Producto";
+            valor = false;
+            tfNombre.requestFocus();
+        } // validar Impuesto
+        if (tfImpuesto.getText().isEmpty() || "".equals(tfImpuesto.getText())) {
+            msg = "El campo impuesto no puede ser vacio";
+            valor = false;
+            tfImpuesto.requestFocus();
+        }
+        String validacionCategoria = ComboBox.ExtraeCodigo(jcbCategoria.getSelectedItem().toString());
+        if (Integer.parseInt(validacionCategoria) < 1) {
+            msg = "El producto debe tener una categoria";
+            valor = false;
+            jcbCategoria.requestFocus();
+        }
+        if(!valor){
+            JOptionPane.showMessageDialog(this, msg, "Validacion de Campos Cabecera!", JOptionPane.DEFAULT_OPTION);
+        }
+        return valor;
+    }
+
+    public boolean validarCamposDetalle() {
+        //Validar Campos de los Detalles
+        boolean valor = true;
+        String msg = "";
+        int rows = this.jtDetalle.getRowCount();
+        for (int i = 0; i < rows; i++) {
+            //celda codigo de barra
+            String codigo_barra = (String) jtDetalle.getValueAt(i, 0);
+            if (codigo_barra.equals("0") || "".equals(codigo_barra)) {
+                msg = "Proporcione codigo de barra para el registro";
+                jtDetalle.changeSelection(i, 0, false, false);
+                valor = false;
+            }
+        }
+        if(!valor){
+            JOptionPane.showMessageDialog(this, msg, "Validacion de Campos Detalle!", JOptionPane.DEFAULT_OPTION);
+        }
+        return valor;
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
         //System.out.print("\n Estoy en el keyListener, keyPressed");
@@ -1122,6 +1238,7 @@ public class wProductoDet extends javax.swing.JInternalFrame implements MouseLis
      *
      * @param fila
      */
+    
     /* private void validarSeleccionMouse(int fila) {
         this.filaSeleccionada = fila;
         //teniendo la fila entonces se obtiene el objeto correspondiente para enviarse como parammetro o imprimir la información

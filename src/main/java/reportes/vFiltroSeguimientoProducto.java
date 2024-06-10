@@ -214,12 +214,12 @@ private void doClose (int retStatus){
         }
         String argdepositoo = ComboBox.ExtraeCodigo(cbx_deposito.getSelectedItem().toString());
         if (argdepositoo.equals("")){
-            argdepositoo = "0";
+            argdepositoo = "1";
         } 
         argdeposito = Integer.parseInt(argdepositoo);
         
-        par.put("codbarra",argcodbarra);
-        par.put("depositoid",argdeposito);
+        par.put("productoId",argcodbarra);
+        par.put("depositoId",argdeposito);
     } //Fin getParameters
     
     public void setParams(HashMap p){

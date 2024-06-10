@@ -44,7 +44,7 @@
                           <Component id="jCtipo" min="-2" max="-2" attributes="0"/>
                           <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
                               <Component id="tfmenu" max="32767" attributes="0"/>
-                              <Component id="tfid" min="-2" pref="191" max="-2" attributes="0"/>
+                              <Component id="jtfId" min="-2" pref="191" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -59,7 +59,7 @@
               <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tfid" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jtfId" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -88,13 +88,13 @@
         <Property name="text" type="java.lang.String" value="Id"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="tfid">
+    <Component class="javax.swing.JTextField" name="jtfId">
       <Properties>
         <Property name="text" type="java.lang.String" value="0"/>
       </Properties>
       <Events>
-        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tfidFocusGained"/>
-        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tfidKeyPressed"/>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="jtfIdFocusGained"/>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jtfIdKeyPressed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="tfmenu">
