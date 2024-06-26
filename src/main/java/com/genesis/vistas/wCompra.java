@@ -899,9 +899,9 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             boolean celdasNumericas = (col == 2 || col == 3 || col == 4 || col == 5);
             //Si no es numero, no es decimal, no es tecla borrar, no es Enter y no es tabulacion
             //entonces no hacer nada e ignorar el evento
-            if (!numeros && !decimalPoint && !erraser && !enter && !tabulacion) {
-                e.consume();
-            }
+            //if (!numeros && !decimalPoint && !erraser && !enter && !tabulacion) {
+            //    e.consume();
+            //}
 
             if (numeros) {
                 if (jtDetalle.getModel().isCellEditable(row, col)) {
@@ -939,7 +939,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             }
 
         }
-    }
+    } //Fin KeyPressed
 
     @Override
     public void keyReleased(KeyEvent e) {
@@ -965,84 +965,155 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         }
         //Cargar Datos en los Maps e inicializar estructuras de datos para el proceso
         this.setData();
-        ArrayList<Map<String, String>> alCabecera;
-        alCabecera = new ArrayList<>(); //Instancia array
-        int id;
-        id = Integer.parseInt(this.jtfId.getText());
-        if (id > 0) {
-            alCabecera.add(this.myData);
-            int rowsAffected = this.tc.updateReg(alCabecera);
-            //si rowsaffected < 1 return
-            if (rowsAffected < 1) {
-                msg = "Error al intentar actualizar el registro: " + this.jtfId.getText();
-                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
-                return; // si tfId > 0 y no grabo cambios, entonces return
-            } else {
-                msg = "Se ha actualizado exitosamente el registro: " + this.jtfId.getText();
-                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else {
+        int idCompra = Integer.parseInt(this.jtfId.getText());
+        if (idCompra > 0) {
+            this.imActualizar("U");
+            return;
+        }
+        if (idCompra == 0) {
             int rowsAffected = this.tc.createReg(this.myData);
-            id = this.tc.getMaxId();
-            if (rowsAffected < 1) {
+            if (rowsAffected <= 0) {
                 msg = "Error al intentar crear el registro";
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
-                return; // si tfId > 0 y no grabo cambios, entonces return
+                return;
             } else {
-                msg = "Se ha creado exitosamente el registro: " + id;
+                msg = "Se ha creado exitosamente el registro";
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
                 this.jtfId.requestFocus();
+                idCompra = this.tc.getMaxId();
+            }
+        } //Fin Cabecera
+
+        //DETALLES---------------------------------------------------------
+       //si pasó quiere decir que tenemos cabecera y recorremos Detalles
+        for (Map<String, String> myRow : columnData) {
+            myRow.put("id", "0");
+            myRow.put("compraid", idCompra + "");
+            //Los demas datos del detalle ya se han cargado en setData
+            int rowsAffected = this.tcdet.createReg(myRow);
+            if (rowsAffected < 1) {
+                msg = "No se ha podido grabar el Detalle Codigo:" + myRow.get("cod_barra");
+                JOptionPane.showMessageDialog(this, msg, "ATENCION...!", JOptionPane.DEFAULT_OPTION);
+            } else {
+                msg = "Se ha creado el Detalle:" + myRow.get("cod_barra");
+                JOptionPane.showMessageDialog(this, msg, "ATENCION...!", JOptionPane.DEFAULT_OPTION);
             }
         }
+        this.imNuevo();
+    }//fin imGrabar
 
-        //DETALLES
+    @Override
+    public void imActualizar(String crud) {
+        //Ya se ha validado cabecera y detalle desde imGrabar
+        this.CRUD = crud;
+        String msg;
+        //validar permisos para el usuario. si tiene permiso de actualizar registros de esta vista
+        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            return;
+        }
+        
+        this.setData();
+        ArrayList<Map<String, String>> alCabecera;
+        alCabecera = new ArrayList<>();
+        alCabecera.add(this.myData); //Mapa con Datos de cabecera en array.
+        int rowsAffected = this.tc.updateReg(alCabecera);
+        if (rowsAffected <= 0) {
+            msg = "Error al intentar actualizar el registro: " + this.jtfId.getText();
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
+            return; // si tfId > 0 y no grabo cambios, entonces return
+        } else {
+            msg = "Se ha actualizado exitosamente el registro: " + this.jtfId.getText();
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+        }
+        //-------DETALLES-----------------
         //si pasó quiere decir que tenemos cabecera y recorremos el detalle
+        int idCompra = Integer.parseInt(jtfId.getText()); //id de la cabecera
         Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
         Map<String, String> fields = new HashMap<>();     //Los campos que vamos a recuperar
-        ArrayList<Map<String, String>> alDetalle;    //Declara array de Map, cada Map es para un registro
+        ArrayList<Map<String, String>> alDetalle;         //Declara array de Map, cada Map es para un registro
         fields.put("*", "*");
-
+        
         for (Map<String, String> myRow : columnData) {
-            where.put("compraid", id + "");
+            where.put("compraid", idCompra + "");
             where.put("cod_barra", myRow.get("cod_barra"));
+            //Buscar si ya existe un detalle de este cod_barra para esta compra.
             this.colDat = this.tcdet.searchListById(fields, where);
-
-            myRow.put("compraid", id + "");
-
-            if (this.colDat.isEmpty()) { // si no existe un detalle con este cod_barra para esta compra
+            // si no existe un detalle con este cod_barra para esta compra
+            if (this.colDat.isEmpty()) { 
                 myRow.put("id", "0");
-                int rowsAffected = this.tcdet.createReg(myRow);
-                if (rowsAffected < 1) {
+                myRow.put("compraid", idCompra + "");
+                rowsAffected = this.tcdet.createReg(myRow);
+                if (rowsAffected <= 0) {
                     msg = "No se ha podido grabar el Detalle Codigo:" + myRow.get("cod_barra");
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
                 } else {
-                    msg = "Se ha creado el Detalle:" + myRow.get("cod_barra") + "para este producto";
+                    msg = "Se ha creado el Detalle:" + myRow.get("cod_barra");
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
                 }
-
             } else { //si ya existe un detalle con este cod_barra para esta compra
-                myRow.put("id", colDat.get(0).get("id"));
+                myRow.put("id", colDat.get(0).get("id")); // id del detalle
+                myRow.put("compraid", idCompra + "");
                 alDetalle = new ArrayList<>(); //necesitamos el alDetalle por la estructura de la funcion tcdet.updateReg
                 alDetalle.add(myRow);
-                int rowsAffected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-                if (rowsAffected < 1) {
-                    msg = "No se ha podido actualizar el detalle: " + myRow.get("cod_barra") + " del producto. Por favor verifique";
+                rowsAffected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
+                if (rowsAffected <= 0) {
+                    msg = "No se ha podido actualizar el detalle: " + myRow.get("cod_barra");
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
                     return;
                 } else {
-                    msg = "Ya existe un Detalle con este codigo de barra:" + myRow.get("cod_barra") + "para este producto";
+                    msg = "Se ha actualizado el Detalle con este codigo:" + myRow.get("cod_barra");
                     JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
                 }
             }
         }
-        this.imInsDet();
-        this.imNuevo();
-    } //Fin imGrabar
+    } //Fin imActualizar
 
+    /**
+     * Esta funcion se apoya en un Trigger en la base de datos para elimiar
+     * tanto el registro de cabecera como sus detalles
+     * @param crud D
+     */
+    @Override
+    public void imBorrar(String crud) {
+        String msg;
+        this.CRUD = crud;
+        //validar permisos para el usuario. si tiene permiso de borrar registros de esta vista
+        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            return;
+        }
+        this.setData();
+        int idCompra = Integer.parseInt(jtfId.getText());
+        if(idCompra <= 0){
+            msg = "NO SE HA ENCONTRADO EL REGISTRO";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            return;
+        }
+        if(idCompra > 0){
+            ArrayList<Map<String, String>> alCabecera;
+            alCabecera = new ArrayList<>();
+            alCabecera.add(myData);                           
+            int rowsAffected = this.tc.deleteReg(alCabecera);
+            if (rowsAffected <= 0) {
+                msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + jtfId.getText();
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+                return;
+            }
+            if (rowsAffected > 0) {
+                msg = "EL REGISTRO: " + jtfId.getText() + " SE HA ELIMINADO CORRECTAMENTE";
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+            }
+            imNuevo();
+        }    
+    }//fin ImBorrar
+    
     @Override
     public void imFiltrar() {
         String sql;
-        wBuscar frame = null;
+        wBuscar frame = new wBuscar();
         //Por defecto el buscador buscara Registros de compra por ID
         if (currentField.equals("id")) { //Buscar una venta por ID
         sql = "SELECT id AS codigo, "
@@ -1074,100 +1145,21 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         } catch (PropertyVetoException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.DEFAULT_OPTION);
         }
-    }
-
-    @Override
-    public void imActualizar(String crud) {
-        this.CRUD = crud;
-        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-            return;
-        }
-        //validar campos cabecera
-        if (!validarCabecera()) {
-            return;
-        }
-        //validar campos detalles
-        if (!validarDetalles()) {
-            return;
-        }
-
-        this.setData();
-        ArrayList<Map<String, String>> alCabecera;
-        alCabecera = new ArrayList<>();
-        alCabecera.add(this.myData);
-        int rowsAffected = this.tc.updateReg(alCabecera);
-        //Para el DETALLE
-        ArrayList<Map<String, String>> alDetalle;         //Cada Map es para un registro
-        alDetalle = new ArrayList<>(); //Instancia array
-
-        for (Map<String, String> myRow : columnData) {       //hay que recorrer el detalle y envira de a uno.
-            System.out.println("ENVIAMOS " + myData.get("id"));
-            myRow.put("compraid", myData.get("id"));      //asignamos el id de la cabecera como el fk del detalle
-            alDetalle.add(myRow);
-        }
-        //Hay que considerar que el upd puede ser que se envíe una fila nueva
-        int affected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-        if (affected <= 0) {                               //Si no guardó la cabecera, no se procesa detalle
-            System.out.println("No se ha podido actualizar el detalle");
-            return;
-        }
-        this.resetData();
-        this.fillView(myData, columnData);
-    }
-
-    @Override
-    public void imBorrar(String crud) {
-        this.CRUD = crud;
-        String msg;
-        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
-            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-            return;
-        }
-        this.setData();
-        //Para el DETALLE
-        ArrayList<Map<String, String>> alDetalle;         //Declara array de Map, cada Map es para un registro
-        alDetalle = new ArrayList<>(); //Instancia array
-
-        for (Map<String, String> myRow : columnData) {       //hay que recorrer el detalle y envira de a uno.
-            myRow.put("compraid", myData.get("id"));      //asignamos el id de la cabecera como el fk del detalle
-            alDetalle.add(myRow);
-        }
-        int affected = this.tcdet.deleteReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-        ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<>(); //Instancia array
-        alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
-        int rowsAffected = this.tc.deleteReg(alCabecera); //Está guardando igual si en el detalle hay error
-        //Invocamos el método deleteReg del Modelo que procesa un array
-        if (rowsAffected <= 0) {
-            msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + jtfId.getText();
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-            return;
-        }
-        if (rowsAffected > 0) {
-            msg = "EL REGISTRO: " + jtfId.getText() + " SE HA ELIMINADO CORRECTAMENTE";
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-        }
-        imNuevo();
-    } //Fin imBorrar
+    } //Fin imFiltrar
 
     @Override
     public void imNuevo() {
         this.resetData();
         this.limpiarTabla();
-        this.imInsDet();
         this.fillView(myData, columnData);
+        this.imInsDet();
     }
 
     @Override
     public void imBuscar() {
         this.setData(); //Hace tomar los datos de la vista
         this.myData = this.tc.searchById(myData);  //Usa el mismo myData para devolver los valores de la cabecera
-        System.out.println("Compras imBuscar myDatax " + this.myData.toString());
+        System.out.println("Compras imBuscar myData: " + this.myData.toString());
         this.limpiarTabla();
         if (this.myData.isEmpty()) {
             System.out.println("No hay registros que mostrar");
@@ -1184,10 +1176,10 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         this.columnData = this.tcdet.searchListById(fields, where);
         if (this.columnData.isEmpty()) {
             this.resetData();
-            //return
+            return;
         }
         this.fillView(myData, columnData);
-    }
+    } //Fin imBuscar
 
     @Override
     public void imPrimero() {
@@ -1229,6 +1221,7 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
     @Override
     public void imInsDet() {
         int currentRow = jtDetalle.getSelectedRow();
+        System.out.println("wCompra1240 imInsDet currentRow: " + currentRow);
         //si no hay fila seleccionada
         if (currentRow == -1) {
             modelo.addRow(new Object[]{"", "Descripcion", "0.0", "0.0", "0.0", "0.0", "0.0"});
@@ -1282,57 +1275,8 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         dispose();
     }
 
-    public int getProducto(int row, int col) { 
-        String codbar, sql;
-        int Exito = 0;
-        //recuperar cod_barra de la row
-        codbar = this.jtDetalle.getModel().getValueAt(row, 0).toString(); //col == 0
-        if (codbar.equals("")) { //para evitar error en el sql
-            codbar = "0";
-            JOptionPane.showMessageDialog(this, "Proporcione codigo", "getProducto1314", JOptionPane.OK_OPTION);
-            Exito = 0;
-        }
-        sql = "SELECT CONCAT(p.nombre, ' ', "
-                + "m.nombre, ' , ', "
-                + "c.color, ' ', t.tamano, ' ', s.diseno) AS descripcion "
-                + "FROM productos p, producto_detalle d, marcas m, colores c, tamanos t, disenos s "
-                + "WHERE p.id = d.productoid "
-                + "AND p.marca = m.id "
-                + "AND d.colorid = c.id "
-                + "AND d.tamanoid = t.id "
-                + "AND d.disenoid = s.id "
-                + "AND d.cod_barra = '" + codbar + "'";
-        //Map<String, String> producto = new HashMap<>();
-        ResultSet rs;
-
-        try {
-            rs = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
-            ResultSetMetaData metaData = rs.getMetaData();
-            int colCount = metaData.getColumnCount();
-            if (rs.next()) {
-                Exito = 1;
-                System.out.println("Producto INFO: \n");
-                for (int r = 1; r <= colCount; r++) {
-                    System.out.println("column "+metaData.getColumnName(r)+" valor "+rs.getString(metaData.getColumnName(r)));
-                    //producto.put(metaData.getColumnName(r), rs.getString("descripcion"));
-                    String descripcion = rs.getString("descripcion");
-                    this.jtDetalle.getModel().setValueAt(descripcion, row, 1); //Descripcion en jtDetalle
-                    //this.jtDetalle.getModel().setValueAt("10", row, 2);
-                }
-            } else {
-                this.jtDetalle.getModel().setValueAt("0", row, 0);
-                this.jtDetalle.getModel().setValueAt("", row, 1);
-                String msg = "No se ha encontrado Producto con el Codigo: " + codbar;
-                JOptionPane.showMessageDialog(this, msg, "getProducto1346", JOptionPane.OK_OPTION);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return Exito;
-    }
-
     /**
-     * Calucula el total para una fila específica
+     * Calcula el total para una fila específica
      *
      * @param row fila a ser procesada
      * @return rtn int que devuelve el estado de la operación, falta completar
@@ -1517,37 +1461,86 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
 
     public boolean validarDetalles() {
         //Validar Campos de los Detalles
-        boolean valor = true;
+        boolean rtn = true;
         String msg = "Defecto Detalle";
         int rows = this.jtDetalle.getRowCount();
         for (int i = 0; i < rows; i++) {
             //celda codigo de barra
             String codigo_barra = (String) jtDetalle.getValueAt(i, 0);
             if (codigo_barra.equals("0") || "".equals(codigo_barra)) {
-                msg = "Proporcione codigo de barra para el registro";
+                msg = "Proporcione codigo de barra para la fila: " + i;
                 jtDetalle.changeSelection(i, 0, false, false);
-                valor = false;
+                rtn = false;
             }
 
             String cantidad = (String) jtDetalle.getValueAt(i, 3);
             if (Integer.parseInt(cantidad) < 1) {
                 msg = "Cantidad no puede ser menor a 1";
                 jtDetalle.changeSelection(i, 3, false, false);
-                valor = false;
+                rtn = false;
             }
 
             String descuento = (String) jtDetalle.getValueAt(i, 4);
             if ("".equals(descuento)) {
                 jtDetalle.setValueAt("0", i, 4);
                 jtDetalle.changeSelection(i, 4, false, false);
-                valor = false;
+                rtn = false;
             }
         }
-        if (!valor) {
+        if (!rtn) {
             JOptionPane.showMessageDialog(this, msg, "Validacion de Campos Detalle!", JOptionPane.DEFAULT_OPTION);
         }
-        return valor;
+        return rtn;
     } //Fin validarDetalles
+    
+    public int getProducto(int row, int col) { 
+        String codbar, sql;
+        int Exito = 0;
+        //recuperar cod_barra de la row
+        codbar = this.jtDetalle.getModel().getValueAt(row, 0).toString(); //col == 0
+        if (codbar.equals("")) { //para evitar error en el sql
+            codbar = "0";
+            JOptionPane.showMessageDialog(this, "Proporcione codigo", "getProducto1314", JOptionPane.OK_OPTION);
+            Exito = 0;
+        }
+        sql = "SELECT CONCAT(p.nombre, ' ', "
+                + "m.nombre, ' , ', "
+                + "c.color, ' ', t.tamano, ' ', s.diseno) AS descripcion "
+                + "FROM productos p, producto_detalle d, marcas m, colores c, tamanos t, disenos s "
+                + "WHERE p.id = d.productoid "
+                + "AND p.marca = m.id "
+                + "AND d.colorid = c.id "
+                + "AND d.tamanoid = t.id "
+                + "AND d.disenoid = s.id "
+                + "AND d.cod_barra = '" + codbar + "'";
+        //Map<String, String> producto = new HashMap<>();
+        ResultSet rs;
+
+        try {
+            rs = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
+            ResultSetMetaData metaData = rs.getMetaData();
+            int colCount = metaData.getColumnCount();
+            if (rs.next()) {
+                Exito = 1;
+                System.out.println("Producto INFO: \n");
+                for (int r = 1; r <= colCount; r++) {
+                    System.out.println("column "+metaData.getColumnName(r)+" valor "+rs.getString(metaData.getColumnName(r)));
+                    //producto.put(metaData.getColumnName(r), rs.getString("descripcion"));
+                    String descripcion = rs.getString("descripcion");
+                    this.jtDetalle.getModel().setValueAt(descripcion, row, 1); //Descripcion en jtDetalle
+                    //this.jtDetalle.getModel().setValueAt("10", row, 2);
+                }
+            } else {
+                this.jtDetalle.getModel().setValueAt("0", row, 0);
+                this.jtDetalle.getModel().setValueAt("", row, 1);
+                String msg = "No se ha encontrado Producto con el Codigo: " + codbar;
+                JOptionPane.showMessageDialog(this, msg, "getProducto1346", JOptionPane.OK_OPTION);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return Exito;
+    } //Fin getProducto
 
     /**
      * Recupera los datos de la moneda que se usa en el proceso
@@ -1568,25 +1561,23 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
      * Prepara los Map Cabecera y Detalle con los valores de los campos
      */
     private void setData() {
-        java.util.Date df = new java.util.Date();
-        String fecha = "";
         myData.put("id", jtfId.getText());
 
-        fecha = (jdcProceso.getDate().getTime() / 1000L) + "";
-        myData.put("fecha_proceso", fecha);
+        String fechaProceso = (jdcProceso.getDate().getTime() / 1000L) + "";
+        myData.put("fecha_proceso", fechaProceso);
 
-        fecha = (jdcFactura.getDate().getTime() / 1000L) + "";
-        myData.put("fecha_factura", fecha);
+        String fechaFactura = (jdcFactura.getDate().getTime() / 1000L) + "";
+        myData.put("fecha_factura", fechaFactura);
 
-        fecha = (jdcLlega.getDate().getTime() / 1000L) + "";
-        myData.put("fecha_llegada", fecha);
+        String fechaLlega = (jdcLlega.getDate().getTime() / 1000L) + "";
+        myData.put("fecha_llegada", fechaLlega);
 
         myData.put("numero_factura", jftfFactura.getText());
         myData.put("serie", jftfSerie.getText());
         myData.put("timbrado", jtfTimbrado.getText());
 
-        fecha = (jdcVence.getDate().getTime() / 1000L) + "";
-        myData.put("vence", fecha);
+        String fechaVence = (jdcVence.getDate().getTime() / 1000L) + "";
+        myData.put("vence", fechaVence);
 
         myData.put("proveedorid", ComboBox.ExtraeCodigo(jcbProveedor.getSelectedItem().toString()));
         myData.put("plazoid", ComboBox.ExtraeCodigo(jcbPlazo.getSelectedItem().toString()));
@@ -1607,13 +1598,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         //Recorre el detalle y guarda cada fila
         //columndata ya se procesó con el metodo setTotalGral
         System.out.println("myData " + myData);
-        //  this.setTotalGral();
-
-        /* if(jtfId.getText() == "0"){
-             String msg = "POR FAVOR INGRESE UN PRODUCTO ";
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-        } */
     }//fin setData
 
     /**
@@ -1649,8 +1633,8 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         jcbDeposito.setSelectedIndex(0);
         jcbProveedor.setSelectedIndex(0);
         jcbTipo.setSelectedIndex(0);
+        
         this.myDet = new HashMap<>();
-
         this.myDet.put("compraid", "0");
         this.myDet.put("cod_barra", "0");
         this.myDet.put("cantidad", "0");
@@ -1662,8 +1646,6 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
         this.myDet.put("total", "0");
 
         this.columnData.add(this.myDet);
-
-        //fillView(myData, columnData);
     }//fin reset data
 
     /**
@@ -1771,11 +1753,11 @@ public class wCompra extends javax.swing.JInternalFrame implements MouseListener
             //System.out.println(myRow.get("descripcion"));
             //this.jtDetalle.setValueAt(myRow.get("descripcion"), row, 1);
             //this.jtDet.editCellAt(row, 0, this.keyPress(KeyEvent.VK_ENTER));
-            this.jtDetalle.setValueAt(myRow.get("precio_bruto"), row, 2);
+            this.jtDetalle.setValueAt(Tools.decimalFormat(Double.parseDouble(myRow.get("precio_bruto"))), row, 2);
             this.jtDetalle.setValueAt(myRow.get("cantidad"), row, 3);
-            this.jtDetalle.setValueAt(myRow.get("descuento"), row, 4);
+            this.jtDetalle.setValueAt(Tools.decimalFormat(Double.parseDouble(myRow.get("descuento"))), row, 4);
             this.jtDetalle.setValueAt(myRow.get("cantbonificado"), row, 5);
-            this.jtDetalle.setValueAt(myRow.get("total"), row, 6);
+            this.jtDetalle.setValueAt(Tools.decimalFormat(Double.parseDouble(myRow.get("total"))), row, 6);
 
             //this.jtDetalle.setValueAt(decimalFormat(650.75), row, 5);
             

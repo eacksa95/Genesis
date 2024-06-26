@@ -4,16 +4,12 @@ import com.genesis.model.conexion;
 import com.genesis.controladores.tableController;
 import util.Tools;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author RC
- */
 public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
 
     private tableController tc;
@@ -43,9 +39,7 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
         jtfId = new javax.swing.JTextField();
         tfmenu = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jCtipo = new javax.swing.JCheckBox();
         jCOrden = new javax.swing.JCheckBox();
-        jCSistema = new javax.swing.JCheckBox();
         jLabel3 = new javax.swing.JLabel();
         tfnivel = new javax.swing.JTextField();
 
@@ -69,11 +63,7 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
 
         jLabel2.setText("Menú");
 
-        jCtipo.setText("Tipo");
-
         jCOrden.setText("Orden");
-
-        jCSistema.setText("Sistema");
 
         jLabel3.setText("Nivel");
 
@@ -86,7 +76,7 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(13, 13, 13)
                         .addComponent(tfnivel))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -94,13 +84,11 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
                             .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCSistema)
                             .addComponent(jCOrden)
-                            .addComponent(jCtipo)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(tfmenu)
                                 .addComponent(jtfId, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -109,21 +97,17 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jtfId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfmenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addGap(18, 18, 18)
-                .addComponent(jCtipo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jCOrden)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jCSistema)
-                .addGap(18, 18, 18)
+                .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(tfnivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addGap(15, 15, 15)
+                .addComponent(jCOrden)
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         pack();
@@ -142,8 +126,6 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCOrden;
-    private javax.swing.JCheckBox jCSistema;
-    private javax.swing.JCheckBox jCtipo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -181,10 +163,8 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
 
     @Override
     public void imFiltrar() {
-        String sql;
-        sql = "";
-        sql = "SELECT id AS codigo, "
-                + "CONCAT(menu, '-', nivel, '-', orden) AS descripcion "
+        String sql = "SELECT id AS codigo, "
+                + "menu AS descripcion "
                 + "FROM menus "
                 + "WHERE LOWER(CONCAT(id, menu)) LIKE '%";
 
@@ -193,7 +173,7 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
         wPrincipal.desktop.add(frame);
         try {
             frame.setSelected(true);
-        } catch (Exception e) {
+        } catch (PropertyVetoException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.OK_OPTION);
         }
     }
@@ -207,7 +187,6 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
-        //System.out.println("V imActualizar");
         this.setData();
         ArrayList<Map<String, String>> alCabecera;        //Declara array de Map, cada Map es para un registro
         alCabecera = new ArrayList<>();                   //Instancia array
@@ -255,7 +234,8 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
 
     @Override
     public void imNuevo() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        resetData();
+        fillView(myData);
     }
 
     @Override
@@ -324,45 +304,20 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
         myData.put("id", jtfId.getText());
         myData.put("menu", tfmenu.getText());
         myData.put("nivel", tfnivel.getText());
-        ///////////
-        int estado = 0;
-        if (jCtipo.isSelected()) {
-            estado = 1;
-        }
-        myData.put("tipo", estado + "");
-        ////////////
-        int estado1 = 0;
-        if (jCOrden.isSelected()) {
-            estado1 = 1;
-        }
-        myData.put("orden", estado1 + "");
-        ///////////
-        int estado2 = 0;
-        if (jCSistema.isSelected()) {
-            estado2 = 1;
-        }
-        myData.put("sistema", estado2 + "");
-
-        System.out.println("SET DATA:" + myData);
+        int orden = 0;
+        if (jCOrden.isSelected()) { orden = 1; }
+        myData.put("orden", orden + "");
     }//fin setData
 
     private void resetData() {
-        this.myData = new HashMap<String, String>();
-        java.util.Date df = new java.util.Date();
+        this.myData = new HashMap<>();
         this.myData.put("id", "0");
         this.myData.put("menu", "");
         this.myData.put("nivel", "");
         this.myData.put("orden", "0");
-        this.myData.put("tipo", "0");
-        this.myData.put("sistema", "0");
-        
-
-        //fillView(myData);
     }
 
     private void fillView(Map<String, String> data) {
-        Date df;
-        long dateLong;
         for (Map.Entry<String, String> entry : data.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
@@ -370,21 +325,12 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
                 case "id":
                     jtfId.setText(value);
                     break;
-                case "nivel":
-                    tfnivel.setText(value);
-                    break;
                 case "menu":
                     tfmenu.setText(value);
                     break;
-
-                case "tipo":
-                    if (Integer.parseInt(value) == 0) {
-                        jCtipo.setSelected(false);
-                    } else {
-                        jCtipo.setSelected(true);
-                    }
+                case "nivel":
+                    tfnivel.setText(value);
                     break;
-                ///////
                 case "orden":
                     if (Integer.parseInt(value) == 0) {
                         jCOrden.setSelected(false);
@@ -392,16 +338,6 @@ public class wMenu extends javax.swing.JInternalFrame implements ActiveFrame {
                         jCOrden.setSelected(true);
                     }
                     break;
-                /////////////
-                case "sistema":
-                    if (Integer.parseInt(value) == 0) {
-                        jCSistema.setSelected(false);
-                    } else {
-                        jCSistema.setSelected(true);
-                    }
-                    break;
-                /////////////
-
             }//end switch
         }//end for
     }//end fill

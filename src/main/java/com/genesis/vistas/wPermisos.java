@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.genesis.vistas;
 
 import com.genesis.model.conexion;
@@ -22,7 +17,9 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame {
-    private boolean userSelectItem = false; // Variable para controlar si el usuario seleccionó un item de comboBox
+    
+    private boolean userSelectItem = false; // ItemStateChanged jcbRol
+    private wPrincipal mainFrame; // Referencia a la ventana principal
     private Map<String, String> myData;
     private HashMap<String, String> myDet;
     private tableController tc;
@@ -31,9 +28,10 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
     String menuName = "";
     String CRUD = "";
 
-    public wPermisos(String menuName) {
+    public wPermisos(String menuName, wPrincipal mainFrame) {
         initComponents();
         this.menuName = menuName;
+        this.mainFrame = mainFrame;
         myData = new HashMap<>();
         ComboBox.pv_cargar(jcbRol, "roles", " id, rol ", "id", "");
         tc = new tableController();
@@ -210,7 +208,7 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
         int numRows = jtDetalle.getRowCount();
         int numCols = jtDetalle.getColumnCount();
         //rolid, ver, C, R, U, D, menuid
-        Object fieldValue = null;  //Como las columnas almancenan datos distintos se tomo como Objetos
+        Object fieldValue;  //Como las columnas almancenan datos distintos se tomo como Objetos
         for (int i = 0; i < numRows; i++) {
             alPermisos.clear();
             for (int j = 0; j < numCols; j++) {
@@ -235,6 +233,7 @@ public class wPermisos extends javax.swing.JInternalFrame implements ActiveFrame
             msg = "ERROR AL INTENTAR ACTUALIZAR EL PERMISO";
         } else {
             msg = "SE HA ACTUALIZADO CORRECTAMENTE LOS PERMISOS";
+            this.mainFrame.procesarMenus();
         }
         JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
     }//fin imGrabar

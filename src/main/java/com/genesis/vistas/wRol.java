@@ -173,7 +173,7 @@ public class wRol extends javax.swing.JInternalFrame implements ActiveFrame {
             if (rows > 0) {
                 //Establecer permisos para el nuevo Rol
                 id = this.tc.getMaxId();
-                this.setPermisos(myData.get("admin"), id); //si admin entonces permiso total, sino permisos Limitados
+                //this.setPermisos(myData.get("admin"), id); //si admin entonces permiso total, sino permisos Limitados
                 String msg = "SE CREÓ EL NUEVO REGISTRO: " + id;
                 System.out.println(msg);
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
@@ -390,6 +390,14 @@ public class wRol extends javax.swing.JInternalFrame implements ActiveFrame {
         }//end for
     }//end fill
 
+    @Deprecated
+    /**
+     * Establece los Permisos para el nuevo Rol creado.
+     * Si admin = 1 entonces permisos totales a todos los menus
+     * sino solo vista.
+     * Esta funcion Esta siendo Reemplazada por Triggers en la base de datos
+     * que gestionan de mejor manera la actualizacion de los permisos
+     */
     private void setPermisos(String isAdmin, int idRol){
         //inicializando variables y recopilando datos necesarios
         int maxMenuId = this.tcMenu.getMaxId();

@@ -16,30 +16,22 @@ public class Reporte extends javax.swing.JInternalFrame {
     javax.swing.JFrame padre; 
     /**
      * Creates new form Reporte
-     * @param r: es un tipo texto con el nombre del reporte sin la extenxi�n .jrxml
-     * @param f: es el nombre de la ventana de filtrado del reporte asociada al mismo 
-     * @param c: es el objeto conexion que se le pasa desde la ventana principal.
+     * @param r: nombre del reporte sin la extenxi�n .jrxml
+     * @param f: nombre de la ventana de filtrado del reporte asociada al mismo 
+     * @param p: wPrincipal que es el padre
      */
     public Reporte(String r, String f, javax.swing.JFrame p) {
         initComponents();
         this.rp = r;
         this.vf = f;
-
         this.padre = p;
-        //filtrarListado();
     }
     public void filtrarListado(){
-        JasperReport jr;
-        JasperPrint jp;
-        JRViewer jv;
-        //JasperViewer jv ;
-        HashMap par = new HashMap();
+        HashMap par = new HashMap(); //mapa de parametros para el reporte
         //Map<String,Object> par = new HashMap<String,Object>();
-
+        //si se utiliza una ventana para recuperar los parametros para el reporte
         if(vf.length() > 0){
             switch(vf){
-                   
-                    
                     case "vFactura":
                     vFactura k = new vFactura(this.padre, true);
                     k.setParams(par);
@@ -51,7 +43,6 @@ public class Reporte extends javax.swing.JInternalFrame {
                     j.setParams(par);
                     j.setVisible(true);
                     break;
-                    
                     
                     case "vFiltroVentas":
                     vFiltroVentas l = new vFiltroVentas(this.padre, true);
@@ -71,7 +62,6 @@ public class Reporte extends javax.swing.JInternalFrame {
                     z.setVisible(true);
                     break;
                     
-
                      case "vFiltroCtaPagar":
                     vFiltroCtaPagar x = new vFiltroCtaPagar(this.padre, true);
                     x.setParams(par);
@@ -98,30 +88,26 @@ public class Reporte extends javax.swing.JInternalFrame {
                     
             }
         }else{
-            par.put("ardesc", "a7");
-            par.put("arid", "7");
-            par.put("argdepo", "1");
-            par.put("numerofac", "1");
-            par.put("compraid", 1);
-            par.put("ventaid", 1);
-            par.put("numeroven", 1);
-            par.put("IDCTACOBRAR", 1);
-            
+            par.put("cod_barra", "0");
+            par.put("deposito", "1");
         }
 
+        //se inicializan objetos para el reporte
+        JasperReport jr;
+        JasperPrint jp;
+        JRViewer jv;
         try {
- 
             jr = JasperCompileManager.compileReport(new File("").getAbsolutePath() +"/src/main/java/reportes/"+this.rp+".jrxml");
             if(jr != null){ 
                 System.out.println("El reporte fue compilado satisfactoriamente");
             }
             
             jp = JasperFillManager.fillReport(jr, par, conexion.con);
-
-            if(jp != null){
-                 System.out.println("El reporte fue rellenado");
+            if(jp != null){ 
+                    System.out.println("El reporte fue rellenado");
+                    System.out.println("Reporte107 - Datos del reporte: " + jp.toString());
             }
-            System.out.println(jp.toString());
+            
             jv = new JRViewer(jp);
             //JasperViewer.viewReport(jp);
             jpReporte.setLayout(new BorderLayout());
@@ -131,6 +117,7 @@ public class Reporte extends javax.swing.JInternalFrame {
             setTitle("Reporte");
             setClosable(true);
         } catch (Exception e) {
+            System.out.println("Reporte119: CATCH: Error al mostrar el reporte");
             e.printStackTrace();
         }
 

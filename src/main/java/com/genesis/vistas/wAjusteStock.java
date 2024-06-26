@@ -1,7 +1,7 @@
 package com.genesis.vistas;
 
 import com.genesis.model.conexion;
-import com.genesis.model.pojoTransferenciaDetalle;
+import com.genesis.model.pojoAjusteDetalle;
 import com.genesis.model.tableModel;
 import com.genesis.tabla.GestionCeldas;
 import com.genesis.tabla.GestionEncabezadoTabla;
@@ -32,65 +32,68 @@ import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-public class wTransferencia extends javax.swing.JInternalFrame implements MouseListener, KeyListener, ActiveFrame {
+public class wAjusteStock extends javax.swing.JInternalFrame implements MouseListener, KeyListener, ActiveFrame {
 
+    int tipoopcion = 0;
+    
     private Map<String, String> myData;
     private HashMap<String, String> myDet;
-    private tableController tc;
-    private tableController tcdet;
-
-    ArrayList<pojoTransferenciaDetalle> lista;// = new ArrayList<>(); //cambiar pojoo
-
-    ArrayList<pojoTransferenciaDetalle> listaDetalles;//lista que simula la información de la BD //cambiar pojoo
-
-    ModeloTabla modelo;//modelo definido en la clase ModeloTabla
-
-    private ArrayList<Map<String, String>> columnData, colDat;
-
-    private tableModel tMPrecio;
-    Map<String, String> mapPrecio;// = new HashMap<String, String>();
-    String currentField;
-    String currentTable;
+    private tableController tc; //tableController Ajuste Stock
+    private tableController tcdet; //tableController Ajuste Stock Detalle
+    private tableModel tmAjuste;
     private tableModel tmAjusteDet;
-    Map<String, String> mapAjusteDet;
+    private ArrayList<Map<String, String>> columnData, colDat;
+    
+    ArrayList<pojoAjusteDetalle> lista;
+    ArrayList<pojoAjusteDetalle> listaDetalles;
+    ModeloTabla modelo; //modelo de la JTable jtDetalle
 
     private tableModel tmProducto;
-    Map<String, String> mapProducto;// = new HashMap<String, String>();
-
+    Map<String, String> mapProducto;
+    
     private tableModel tmProductoDet;
     Map<String, String> mapProductoDet;
 
-    private tableModel tmCompra;
-    Map<String, String> mapCompra;// = new HashMap<String, String>();
-
-    private tableModel tmCompraDet;
-    Map<String, String> mapCompraDet;
     String menuName = "";
     String CRUD = "";
     private DateFormat dateFormat, dateTimeFormat, dateIns; //= new SimpleDateFormat("dd/MM/yyyy HH:mm"); 
-    private int ped_env;
+    
+    private String currentTable = "";
+    private String currentField = "";
+    
 
     /**
-     * Creates new form wTransferencia
-     * @param pe pedido o confirmar
+     * Creates new form wAjusteStock
+     * @param tipoopcion define si la ventana se ejecuta para solicitar ajuste de stock o para aprobarlo
      * @param menuName menu ejecutado desde wPrincipal
      */
-    public wTransferencia(int pe, String menuName) {
+    public wAjusteStock(int tipoopcion, String menuName) {
         initComponents();
         this.menuName = menuName;
-        this.ped_env = pe;
+        this.tipoopcion = tipoopcion;
         listaDetalles = new ArrayList<>();
         lista = new ArrayList<>();
         myData = new HashMap<>();
         columnData = new ArrayList<>();
 
-        ComboBox.pv_cargar(jcbDepositoOrigen, "depositos", " id, nombre ", "id", "");
-        ComboBox.pv_cargar(jcbDepositoDestino, "depositos", " id, nombre ", "id", "");
+        if (tipoopcion == 1) {
+            jChAprobado.setEnabled(false);
+            this.setTitle("Pedido de Ajuste de Stock");
+        }
+
+        if (tipoopcion == 2) {
+            jChAprobado.setEnabled(true);
+            this.setTitle("Aprobar Pedido de Ajuste de Stock");
+        }
+
+        // COMBO BOX DESPLEGABLES DE LAS TABLAS//
+        ComboBox.pv_cargar(jcbMoneda, "monedas", " id, moneda ", "id", "");
+        ComboBox.pv_cargar(jcbDeposito, "depositos", " id, nombre ", "id", "");
 
         tc = new tableController();
-        tc.init("transferencias_stock");
+        tc.init("ajustes_stock");
         tcdet = new tableController();
-        tcdet.init("transferencia_stock_detalle");
+        tcdet.init("ajustes_stock_detalle");
 
         //PARA EL DETALLE
         mapProducto = new HashMap<>();
@@ -101,54 +104,48 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         tmProductoDet = new tableModel();
         tmProductoDet.init("producto_detalle");
 
-        mapAjusteDet = new HashMap<>();
         tmAjusteDet = new tableModel();
-        tmAjusteDet.init("transferencia_stock_detalle");
+        tmAjusteDet.init("ajustes_stock_detalle");
+        //setLocationRelativeTo(null);
         construirTabla();
 
         dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         dateIns = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        jDateFechaEnviado.setDate(new Date());
-        jDateFechaRecibido.setDate(new Date());
+        jDateFecha.setDate(new Date());
 
         jtDetalle.addMouseListener(this);
         jtDetalle.addKeyListener(this);
+        jtDetalle.setOpaque(false);
         this.tfcodbarra.addKeyListener(this);
         this.tfcodbarra.addMouseListener(this);
-        jtDetalle.setOpaque(false);
         jtDetalle.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
-        Map<String, String> select = new HashMap<>();
-        Map<String, String> where = new HashMap<>();
-        currentField = "";
-        currentTable = "";
     }
 
     private void construirTabla() {
-        
         listaDetalles = consultarListaDetalles();
-        
+        //Este array cambiará de valores según la tabla que querramos representar
+        //en este caso nuestro detalle tiene esa estructura de columnas
         ArrayList<String> titulosList = new ArrayList<>();
 
         titulosList.add("Cod Barra");
-        titulosList.add("Descripción");
-        titulosList.add("Cantidad Pedido");
-        titulosList.add("Cantidad Enviado");
+        titulosList.add("Descripcion");
+        titulosList.add("Cantidad Actual");
+        titulosList.add("Cantidad Ajustada");
 
         String titulos[] = new String[titulosList.size()];
 
         for (int i = 0; i < titulos.length; i++) {
             titulos[i] = titulosList.get(i);
         }
-        
+
         Object[][] data = obtenerMatrizDatos(titulosList);
         construirTabla(titulos, data);
     }
 
-    private ArrayList<pojoTransferenciaDetalle> consultarListaDetalles() {
+    private ArrayList<pojoAjusteDetalle> consultarListaDetalles() {
         //ArrayList<pojoCompraDetalle> lista = new ArrayList<>();
-        this.lista.add(new pojoTransferenciaDetalle(0, "0", "Descripcion", 0, 0));
-        
+        this.lista.add(new pojoAjusteDetalle(0, "0", "Descripcion", 0, 0));
         return lista;
     }
 
@@ -158,11 +155,10 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
 
         for (int x = 0; x < informacion.length; x++) {
             //Poner los nombres de los campos de la tabla de la bd
-            informacion[x][0] = listaDetalles.get(x).getString("cod_barra");
+            informacion[x][0] = listaDetalles.get(x).getString("Cod_barra");
             informacion[x][1] = listaDetalles.get(x).getString("Descripcion");
-            informacion[x][2] = listaDetalles.get(x).getInteger("cantidad_pedido") + "";
-            informacion[x][3] = listaDetalles.get(x).getInteger("cantidad_envio") + "";
-
+            informacion[x][2] = listaDetalles.get(x).getDouble("Cantidad_Actual") + "";
+            informacion[x][3] = listaDetalles.get(x).getDouble("Cantidad_Ajuste") + "";
         }
         return informacion;
     }
@@ -170,13 +166,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
     private void construirTabla(String[] titulos, Object[][] data) {
         ArrayList<Integer> noEditable = new ArrayList<>();
         noEditable.add(1);
-        if (ped_env == 0) {
-            noEditable.add(3);
-            jChAprobado.setEnabled(false);
-        } else {
-            noEditable.add(2);
-        }
-
+        noEditable.add(2);
         modelo = new ModeloTabla(data, titulos, noEditable);
         //se asigna el modelo a la tabla
         jtDetalle.setModel(modelo);
@@ -187,14 +177,15 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         jtDetalle.getColumnModel().getColumn(2).setCellRenderer(new GestionCeldas("numerico"));
         jtDetalle.getColumnModel().getColumn(3).setCellRenderer(new GestionCeldas("numerico"));
 
+        //Mas Propiedades para la tabla
         jtDetalle.getTableHeader().setReorderingAllowed(false);
-        jtDetalle.setRowHeight(25);//tamaño de las celdas
+        jtDetalle.setRowHeight(25);//Altura de las celdas
         jtDetalle.setGridColor(new java.awt.Color(0, 0, 0));
-        //Se define el tamaño de largo para cada columna y su contenido
+        //Se define el Ancho para cada columna
         jtDetalle.getColumnModel().getColumn(0).setPreferredWidth(50);//cod_barra
         jtDetalle.getColumnModel().getColumn(1).setPreferredWidth(250);//descripcion
-        jtDetalle.getColumnModel().getColumn(2).setPreferredWidth(100);//precio
-        jtDetalle.getColumnModel().getColumn(3).setPreferredWidth(100);//precio
+        jtDetalle.getColumnModel().getColumn(2).setPreferredWidth(50);//Cantidad Actual
+        jtDetalle.getColumnModel().getColumn(3).setPreferredWidth(50);//Cantidad Ajuste
 
         //personaliza el encabezado
         JTableHeader jtableHeader = jtDetalle.getTableHeader();
@@ -215,23 +206,22 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jtfId = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        jtfMotivo = new javax.swing.JTextField();
+        jtfId = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jtfNroDocumento = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
+        jcbDeposito = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
-        jDateFechaEnviado = new com.toedter.calendar.JDateChooser();
+        tfMotivo = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jDateFechaRecibido = new com.toedter.calendar.JDateChooser();
+        jcbMoneda = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
-        jcbDepositoOrigen = new javax.swing.JComboBox<>();
-        jcbDepositoDestino = new javax.swing.JComboBox<>();
-        jLabel7 = new javax.swing.JLabel();
-        tfcodbarra = new javax.swing.JTextField();
+        tfObs = new javax.swing.JTextField();
+        jChContabilizado = new javax.swing.JCheckBox();
         jChAprobado = new javax.swing.JCheckBox();
-        jPanel2 = new javax.swing.JPanel();
+        jDateFecha = new com.toedter.calendar.JDateChooser();
+        tfcodbarra = new javax.swing.JTextField();
+        jDetalle = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtDetalle = new javax.swing.JTable();
 
@@ -239,19 +229,16 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Pedido de Transferencia de Producto");
+        setTitle("Ajuste Stock");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Cabecera"));
+
+        jLabel1.setText("ID");
 
         jtfId.setText("0");
         jtfId.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jtfIdFocusGained(evt);
-            }
-        });
-        jtfId.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfIdActionPerformed(evt);
             }
         });
         jtfId.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -260,47 +247,21 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             }
         });
 
-        jLabel1.setText("ID");
+        jLabel2.setText("Fecha Ajuste");
 
-        jLabel2.setText("Motivo");
+        jLabel3.setText("Deposito");
 
-        jLabel3.setText("Nro Documento");
+        jcbDeposito.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Depósito" }));
 
-        jLabel4.setText("Fecha Envío");
+        jLabel4.setText("Motivo");
 
-        jLabel5.setText("Fecha Recibido");
+        jLabel5.setText("Moneda");
 
-        jLabel6.setText("Depósito Origen");
+        jcbMoneda.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Moneda" }));
 
-        jcbDepositoOrigen.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Depósito" }));
+        jLabel6.setText("Observación");
 
-        jcbDepositoDestino.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Depósito" }));
-        jcbDepositoDestino.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jcbDepositoDestinoActionPerformed(evt);
-            }
-        });
-
-        jLabel7.setText("Depósito Destino");
-
-        tfcodbarra.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                tfcodbarraFocusGained(evt);
-            }
-        });
-        tfcodbarra.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfcodbarraActionPerformed(evt);
-            }
-        });
-        tfcodbarra.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                tfcodbarraKeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                tfcodbarraKeyReleased(evt);
-            }
-        });
+        jChContabilizado.setText("Contabilizado");
 
         jChAprobado.setText("Aprobado");
 
@@ -309,79 +270,74 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(jLabel5)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel3)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGap(59, 59, 59)
+                                    .addComponent(jLabel1))
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jLabel2))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jDateFechaRecibido, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jtfId)
+                            .addComponent(jcbDeposito, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(tfMotivo)
+                            .addComponent(jcbMoneda, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jDateFecha, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE))
+                        .addGap(28, 28, 28)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jChContabilizado)
+                            .addComponent(jChAprobado)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
+                        .addContainerGap()
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jcbDepositoOrigen, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3))
-                                .addGap(18, 18, 18)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jtfMotivo)
-                                    .addComponent(jtfId)
-                                    .addComponent(jtfNroDocumento)
-                                    .addComponent(jDateFechaEnviado, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jcbDepositoDestino, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(44, 44, 44)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tfcodbarra, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jChAprobado))))
-                .addContainerGap(162, Short.MAX_VALUE))
+                        .addComponent(tfObs)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tfcodbarra, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jtfId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jtfMotivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(jChAprobado))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jtfNroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jDateFechaEnviado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
+                    .addComponent(jtfId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jChContabilizado))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(jChAprobado))
+                    .addComponent(jDateFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jcbDeposito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(tfMotivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jDateFechaRecibido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(17, 17, 17)
+                    .addComponent(jcbMoneda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(jcbDepositoOrigen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(14, 14, 14)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jcbDepositoDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tfObs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tfcodbarra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle"));
+        jDetalle.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle"));
 
         jtDetalle.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -391,22 +347,15 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
                 {null, null, null, null}
             },
             new String [] {
-                "Cod Barra", "Descripción", "Cantidad Pedido", "Cantidad Envío"
+                "Cod Barra", "Descripción", "Cantidad Actual", "Cantidad Ajuste"
             }
         ) {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
-            boolean[] canEdit = new boolean [] {
-                true, true, true, false
-            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
             }
         });
         jtDetalle.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -416,20 +365,21 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         });
         jScrollPane1.setViewportView(jtDetalle);
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
-                .addContainerGap())
+        javax.swing.GroupLayout jDetalleLayout = new javax.swing.GroupLayout(jDetalle);
+        jDetalle.setLayout(jDetalleLayout);
+        jDetalleLayout.setHorizontalGroup(
+            jDetalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDetalleLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 632, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
-                .addContainerGap())
+        jDetalleLayout.setVerticalGroup(
+            jDetalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDetalleLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(243, 243, 243))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -438,101 +388,67 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jDetalle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(20, Short.MAX_VALUE))
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(265, 265, 265)))
+                .addContainerGap(40, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                .addComponent(jDetalle, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jtfIdFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfIdFocusGained
+        currentField = "id";
+    }//GEN-LAST:event_jtfIdFocusGained
+
     private void jtfIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtfIdKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             this.imBuscar();
-        }            // TODO add your handling code here:
+        }
     }//GEN-LAST:event_jtfIdKeyPressed
 
-    private void jcbDepositoDestinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbDepositoDestinoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jcbDepositoDestinoActionPerformed
-
-    private void jtfIdFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfIdFocusGained
-        this.currentField = "id";     
-// TODO add your handling code here:
-    }//GEN-LAST:event_jtfIdFocusGained
-
     private void jtDetalleFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtDetalleFocusGained
-    currentTable = "tabla";    
-    validarCombo();// TODO add your handling code here:
+    currentTable = "tabla";  
+    validarCombo();
     }//GEN-LAST:event_jtDetalleFocusGained
-
-    private void tfcodbarraFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfcodbarraFocusGained
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfcodbarraFocusGained
-
-    private void tfcodbarraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfcodbarraActionPerformed
-
-    }//GEN-LAST:event_tfcodbarraActionPerformed
-
-    private void tfcodbarraKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfcodbarraKeyPressed
-        if (currentTable.equals("tabla")) {
-            //OBS: Aquí debemos llamar a un método que controle que los campos de la cabecera estén completos
-            int row = jtDetalle.getSelectedRow();
-            int rows = jtDetalle.getRowCount();
-            int col = jtDetalle.getSelectedColumn();
-            if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-                this.getProducto(row, col);
-            }
-        } // TODO add yo        // TODO add your handling code here:
-    }//GEN-LAST:event_tfcodbarraKeyPressed
-
-    private void tfcodbarraKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfcodbarraKeyReleased
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfcodbarraKeyReleased
-
-    private void jtfIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfIdActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfIdActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jChAprobado;
-    private com.toedter.calendar.JDateChooser jDateFechaEnviado;
-    private com.toedter.calendar.JDateChooser jDateFechaRecibido;
+    private javax.swing.JCheckBox jChContabilizado;
+    private com.toedter.calendar.JDateChooser jDateFecha;
+    private javax.swing.JPanel jDetalle;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox<String> jcbDepositoDestino;
-    private javax.swing.JComboBox<String> jcbDepositoOrigen;
+    private javax.swing.JComboBox<String> jcbDeposito;
+    private javax.swing.JComboBox<String> jcbMoneda;
     private javax.swing.JTable jtDetalle;
     private javax.swing.JTextField jtfId;
-    private javax.swing.JTextField jtfMotivo;
-    private javax.swing.JTextField jtfNroDocumento;
+    private javax.swing.JTextField tfMotivo;
+    private javax.swing.JTextField tfObs;
     private javax.swing.JTextField tfcodbarra;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("mouseClicked 524 source: " + e.getSource());
+        System.out.println("mouseClicked 838 source: " + e.getSource());
         //Verificar si se ejecuto desde Tabla o jtfCodigo
         Object source = e.getSource();
         if (source == jtDetalle) {
@@ -549,7 +465,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             System.out.println("el click se realizo en jTextFieldCodBarra");
         }
     } // Fin mouseClicked
-    
+
     /**
      * Esta funcion falta modificar y deberia capturar los datos de la fila y
      * cargarlos a un mapa para manejar los datos la row en un mapa
@@ -559,15 +475,16 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
     private void validarSeleccionMouse(int fila) {
         //se puede mostrar en consola el codigo de barras y descripcion del producto al seleccionar
         //con el mouse una fila de la tabla
-        pojoTransferenciaDetalle rowDetalle = new pojoTransferenciaDetalle();
+        pojoAjusteDetalle rowDetalle = new pojoAjusteDetalle();
         rowDetalle.setString("cod_barra", jtDetalle.getValueAt(fila, 0).toString());
         rowDetalle.setString("descripcion", jtDetalle.getValueAt(fila, 1).toString());
 
         String info = "INFO DETALLE\n";
         info += "Código: " + rowDetalle.getString("cod_barra") + "\n";
         info += "Descripción: " + rowDetalle.getString("descripcion") + "\n";
-        System.out.println("validarSeleccionMouse558: " + info);
+        System.out.println("validarSeleccionMouse490: " + info);
     }
+
     @Override
     public void mousePressed(MouseEvent e) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -580,7 +497,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        //  throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -590,14 +507,14 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
 
     @Override
     public void keyTyped(KeyEvent e) {
-        //  throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     @Override
     public void keyReleased(KeyEvent e) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public void keyPressed(KeyEvent e) {
         Object source = e.getSource(); //Origen del evento
@@ -708,11 +625,11 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         fields.put("*", "*");
 
         for (Map<String, String> myRow : columnData) {
-            where.put("transferenciaid", idAjuste + "");
+            where.put("ajusteid", idAjuste + "");
             where.put("cod_barra", myRow.get("cod_barra"));
             this.colDat = this.tcdet.searchListById(fields, where);
 
-            myRow.put("transferenciaid", idAjuste + "");
+            myRow.put("ajusteid", idAjuste + "");
 
             if (this.colDat.isEmpty()) {   // si no existe un detalle con este cod_barra para esta compra
                 myRow.put("id", "0");
@@ -741,7 +658,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         }
         this.imNuevo();
     }//fin imGrabar
-    
+
     @Override
     public void imActualizar(String crud) {
         this.CRUD = crud;
@@ -772,14 +689,14 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         Map<String, String> fields = new HashMap<>();     //Los campos que vamos a recuperar
         ArrayList<Map<String, String>> alDetalle;         //Declara array de Map, cada Map es para un registro
         fields.put("*", "*");
-        int idTransferencia = Integer.parseInt(this.jtfId.getText());
+        int idAjuste = Integer.parseInt(this.jtfId.getText());
         rowsAffected = 0;
         for (Map<String, String> myRow : columnData) {
-            where.put("transferenciaid", idTransferencia + "");
+            where.put("ajusteid", idAjuste + "");
             where.put("cod_barra", myRow.get("cod_barra"));
             this.colDat = this.tcdet.searchListById(fields, where);
 
-            myRow.put("transferenciaid", idTransferencia + "");
+            myRow.put("ajusteid", idAjuste + "");
 
             if (this.colDat.isEmpty()) {   // si no existe un detalle con este cod_barra para esta compra
                 myRow.put("id", "0");
@@ -808,7 +725,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         }
         this.imNuevo();
     }//fin imActualizar
-    
+
     @Override
     public void imBorrar(String crud) {
         this.CRUD = crud;
@@ -840,7 +757,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         alDetalle = new ArrayList<>(); 
         //Recorremos los detalles
         for (Map<String, String> myRow : columnData) {       //hay que recorrer los detalles y enviar de a uno.
-            myRow.put("transferenciaid", myData.get("id"));      //asignamos el id de la cabecera como el fk del detalle
+            myRow.put("ajusteid", myData.get("id"));      //asignamos el id de la cabecera como el fk del detalle
             alDetalle.add(myRow);
         }
         rowsAffected = this.tcdet.deleteReg(alDetalle);   
@@ -859,21 +776,21 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         }
         imNuevo();
     }
-
+    
     @Override
     public void imFiltrar() {
         String sql;
         wBuscar frame = new wBuscar();
         if (currentField.equals("id")){
             sql = "SELECT id AS codigo, "
-                    + "CONCAT(motivo, ' ',nro_documento) AS descripcion "
-                    + "FROM transferencias_stock "
-                    + "WHERE LOWER(CONCAT(motivo, ' ',nro_documento)) LIKE '%";
+                    + "CONCAT(motivo, ' ',depositoid, ' ',monedaid) AS descripcion "
+                    + "FROM ajustes_stock "
+                    + "WHERE LOWER(CONCAT(id, ' ',motivo, ' ',monedaid)) LIKE '%";
             frame = new wBuscar(sql, this.jtfId);
         }
         
-        String depositoid = ComboBox.ExtraeCodigo(jcbDepositoOrigen.getSelectedItem().toString());        
-         if (currentTable.equals("tabla")) { //para buscar un producto por filtro
+        String depositoid = ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString());
+        if (currentTable.equals("tabla")) { //para buscar un producto por filtro
             sql = "SELECT DISTINCT d.cod_barra as codigo, "
                     + "CONCAT(p.nombre, ' - ', "
                     + "m.nombre, ' - ', "
@@ -895,7 +812,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         try {
             frame.setSelected(true);
         } catch (PropertyVetoException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.DEFAULT_OPTION);
         }
     }
 
@@ -920,7 +837,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             return;
         }
         Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
-        where.put("transferenciaid", this.myData.get("id"));
+        where.put("ajusteid", this.myData.get("id"));
         //Los campos que vamos a recuperar
         Map<String, String> fields = new HashMap<>();
         fields.put("*", "*");
@@ -929,7 +846,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             this.resetData();
         }
         this.fillView(myData, columnData);
-    } //Fin imBuscar
+    }
 
     @Override
     public void imPrimero() {
@@ -971,29 +888,44 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
     @Override
     public void imInsDet() {
         int currentRow = jtDetalle.getSelectedRow();
-        System.out.println("wTransferencias964 imInsDet currentRow: " + currentRow);
-        //si no hay fila seleccionada
         if (currentRow == -1) {
+            System.out.println("no hay fila seleccionada imInsDet 1062");
             modelo.addRow(new Object[]{"0", "Descripcion", 0, 0});
             return;
         }
-        if (currentRow != -1) {
-            jtDetalle.getSelectionModel().clearSelection();
-        }
-        //Si hay fila seleccionada
         String cod = this.jtDetalle.getValueAt(currentRow, 0).toString();
         if (cod.equals("0") || cod.equals("")) {
-            String msg = "imInsDet976: POR FAVOR INGRESE UN PRODUCTO ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            /*  String msg = "POR FAVOR INGRESE UN PRODUCTO ";
+            System.out.println(msg);
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION); */
         } else {
-            System.out.println("imInsDet979: Exito");
+            //System.out.println("entro en imInsDet");
             modelo.addRow(new Object[]{"0", "Descripcion", 0, 0});
+            /**
+             * LUEGO DE CARGAR LA INFORMACIÓN DE LA SOLICITUD EN LA VISTA NOS
+             * POSICIONAMOS EN LA PRIMERA CELDA DE LA SIGUIENTE FILA DE LA TABLA
+             * DE LA VENTANA PRINCIPAL
+             */
 
-            this.jtDetalle.requestFocus(); //devolver el foco a la tabla
-            //hacer foco en la col=0 de la nueva fila
-            int lastRow = this.jtDetalle.getRowCount() - 1;
-            this.jtDetalle.changeSelection(lastRow, 0, false, false);
-            //this.jtDetalle.requestFocusInWindow(); // Asegura que el foco esté en la tabla
+            /**
+             * DEBEMOS DEVOLVERLE EL FOCO A LA TABLA
+             */
+            this.jtDetalle.requestFocus();
+
+            /**
+             * tabla.getRowCount () - 1 -> PARA INDICAR QUE ES LA ULTIMA FILA 0
+             * -> EN MI CASO PARA INDICAR QUE DEBE SER EN LA PRIMERA COLUMNA
+             * false, false -> LOS DEJO ASÍ PUES NO NECESITO LA FUNCIONALIDAD DE
+             * ESOS PARÁMETROS
+             */
+            /* toggle: false, extend: false. Clear the previous selection and ensure the new cell is selected.
+            * toggle: false, extend: true. Extend the previous selection from the anchor to the specified cell, clearing all other selections.
+            * toggle: true, extend: false. If the specified cell is selected, deselect it. If it is not selected, select it.
+            * toggle: true, extend: true. Apply the selection state of the anchor to all cells between it and the specified cell.
+             */
+            int toRow = this.jtDetalle.getRowCount() - 1;
+            //System.out.println("a la fila "+toRow);
+            this.jtDetalle.changeSelection(toRow, 0, false, false);
         }
     }
 
@@ -1002,7 +934,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         int currentRow = jtDetalle.getSelectedRow();
         //si no hay row seleccionado
         if (currentRow == -1) { 
-            String msg = "imDelDet995: NO hay fila seleccionada ";
+            String msg = "imDelDet939: NO hay fila seleccionada ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
@@ -1012,7 +944,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             //Si al eliminar queda vacía, habrá que insertar una nueva
             int rows = jtDetalle.getRowCount();
             if (rows == 0) {
-                String msg = "imDelDet1006: Se eliminaron todas las filas ";
+                String msg = "imDelDet949: Se eliminaron todas las filas ";
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
                 this.imInsDet();
             }
@@ -1028,11 +960,11 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
     public int getProducto(int row, int col) { 
         int Exito = 0;
         //recuperar cod_barra de la row y DepositoId del ComboBox cabecera
-        String depositoid = ComboBox.ExtraeCodigo(jcbDepositoOrigen.getSelectedItem().toString());
+        String depositoid = ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString());
         String codbar = this.jtDetalle.getModel().getValueAt(row, 0).toString(); //col == 0
         if (codbar.equals("")) { //para evitar error en el sql
             codbar = "0";
-            JOptionPane.showMessageDialog(this, "Proporcione codigo para la fila", "getProducto1025", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(this, "Proporcione codigo para la fila", "getProducto927", JOptionPane.OK_OPTION);
             Exito = 0;
         }
         String sql = "SELECT CONCAT(p.nombre, ' ', "
@@ -1058,6 +990,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
                 Exito = 1;
                 System.out.println("getProducto INFO: ");
                 System.out.println("column "+metaData.getColumnName(1)+" valor "+rs.getString("descripcion"));
+
                 for (int r = 1; r <= colCount; r++) {                    
                     //PRODUCTO DESCRIPCION
                     String descripcion = rs.getString("descripcion");
@@ -1071,7 +1004,7 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
                 this.jtDetalle.getModel().setValueAt("0", row, 0);
                 this.jtDetalle.getModel().setValueAt("", row, 1);
                 String msg = "No se ha encontrado Producto con el Codigo: " + codbar;
-                JOptionPane.showMessageDialog(this, msg, "getProducto1065", JOptionPane.OK_OPTION);
+                JOptionPane.showMessageDialog(this, msg, "getProducto1346", JOptionPane.OK_OPTION);
             }
         } catch (SQLException ex) {
             Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
@@ -1081,22 +1014,23 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
 
     private void setData() {
         //CABECERA
-        String fechaEnviado = (jDateFechaEnviado.getDate().getTime() / 1000L) + "";
-        myData.put("fecha_envio", fechaEnviado);
-        
-        String fechaRecibido = (jDateFechaRecibido.getDate().getTime() / 1000L) + "";
-        myData.put("fecha_recibo", fechaRecibido);
+        String fecha = (jDateFecha.getDate().getTime() / 1000L) + "";
+        myData.put("fecha", fecha);
 
         myData.put("id", jtfId.getText());
-        myData.put("deposito_origen", ComboBox.ExtraeCodigo(jcbDepositoOrigen.getSelectedItem().toString()));
-        myData.put("deposito_destino", ComboBox.ExtraeCodigo(jcbDepositoDestino.getSelectedItem().toString()));
-        myData.put("motivo", jtfMotivo.getText());
-        myData.put("nro_documento", jtfNroDocumento.getText());
+        myData.put("depositoid", ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));
+        myData.put("monedaid", ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString()));
+        myData.put("motivo", tfMotivo.getText());
+        myData.put("observacion", tfObs.getText());
 
         int aprobado = 0;
         if (jChAprobado.isSelected()) { aprobado = 1; }
         myData.put("aprobado", aprobado + "");
         
+        int contabilizado = 0;
+        if (jChContabilizado.isSelected()) { contabilizado = 1; }
+        myData.put("contabilizado", contabilizado + "");
+
         System.out.println("myData " + myData);
 
         //DETALLE------------------------------
@@ -1110,17 +1044,17 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
                 continue;
             }
             //carputando valores de la tabla, verificando que no sean null y casteando
-            Object cantidadPedido = this.jtDetalle.getValueAt(row, 2);
-            Object cantidadEnviado = this.jtDetalle.getValueAt(row, 3);
-            String pedido = cantidadPedido != null ? cantidadPedido.toString() : "";
-            String enviado = cantidadEnviado != null ? cantidadEnviado.toString() : "";
+            Object actualValue = this.jtDetalle.getValueAt(row, 2);
+            Object ajusteValue = this.jtDetalle.getValueAt(row, 3);
+            String actual = actualValue != null ? actualValue.toString() : "";
+            String ajuste = ajusteValue != null ? ajusteValue.toString() : "";
             
-            if (enviado.equals("")) {    
+            if (ajuste.equals("")) {    
                 JOptionPane.showMessageDialog(this, "Debe proporcionar una cantidad valida", "setData1007", JOptionPane.DEFAULT_OPTION);
                 continue;
             }
-            int cantEnviado = Integer.parseInt(enviado);
-            if (cantEnviado < 0) {
+            int cai = Integer.parseInt(ajuste);
+            if (cai < 0) {
                 JOptionPane.showMessageDialog(this, "Debe proporcionar una cantidad valida", "setData1012", JOptionPane.DEFAULT_OPTION);
                 continue;
             }
@@ -1130,8 +1064,8 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             myDet.put("ajusteid", id);
             myDet.put("cod_barra", codbar);
             myDet.put("descripcion", this.jtDetalle.getModel().getValueAt(row, 1).toString());
-            myDet.put("cantidad_pedido", pedido + "");
-            myDet.put("cantidad_enviado", enviado + "");
+            myDet.put("cantidad_actual", actual + "");
+            myDet.put("cantidad_ajuste", ajuste + "");
 
             this.columnData.add(this.myDet);
 
@@ -1142,23 +1076,25 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
     private void resetData() {
         this.myData = new HashMap<>();
         this.myData.put("id", "0");
-        this.myData.put("motivo", "Motivo de Transferencia");
-        this.myData.put("nro_documento", "0");
+        this.myData.put("monedaid", "0");
+        this.myData.put("depositoid", "0");
+        this.myData.put("motivo", "");
+        this.myData.put("observacion", "");
         this.myData.put("aprobado", "0");
-        this.myData.put("deposito_origen", "0");
-        this.myData.put("deposito_destino", "0");
-        //this.myData.put("fecha_envio", title);
-        //this.myData.put("fecha_recibo", title);
+        this.myData.put("contabilizado", "0");
 
-        //Detalle---------------------------------
+        //Detalle---------------------
         this.myDet = new HashMap<>();
         this.myDet.put("ajusteid", "0");
         this.myDet.put("cod_barra", "");
         this.myDet.put("descripcion", "");
-        this.myDet.put("cantidad_pedido", "0");
-        this.myDet.put("cantidad_origen", "0");
+        this.myDet.put("cantidad_actual", "0");
+        this.myDet.put("cantidad_ajuste", "0");
 
         this.columnData.add(this.myDet);
+
+        //fillView(myData, columnData);
+        //jC.setSelected(false);
     }//fin reset data
 
     private void fillView(Map<String, String> data, List<Map<String, String>> columnData) {
@@ -1171,40 +1107,41 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
                 case "id":
                     jtfId.setText(value);
                     break;
+                case "observacion":
+                    tfObs.setText(value);
+                    break;
+                case "monedaid":
+                    ComboBox.E_estado(jcbMoneda, "monedas", "id, moneda", "id=" + value);
+                    break;
+                case "depositoid":
+                    ComboBox.E_estado(jcbDeposito, "depositos", "id, nombre", "id=" + value);
+                    break;
                 case "motivo":
-                    jtfMotivo.setText(value);
+                    tfMotivo.setText(value);
                     break;
-                case "nro_documento":
-                    jtfNroDocumento.setText(value);
-                    break;
-                case "deposito_origen":
-                    ComboBox.E_estado(jcbDepositoOrigen, "depositos", "id, nombre", "id=" + value);
-                    break;
-                case "deposito_destino":
-                    ComboBox.E_estado(jcbDepositoDestino, "depositos", "id, nombre", "id=" + value);
-                    break;
-                case "fecha_envio":
+                case "fecha":
                     dateLong = Long.parseLong(value) * 1000L;
                     df = new Date(dateLong);
-                    jDateFechaEnviado.setDate(df);
-                    break;
-                case "fecha_recibido":
-                    dateLong = Long.parseLong(value) * 1000L;
-                    df = new Date(dateLong);
-                    jDateFechaRecibido.setDate(df);
+                    jDateFecha.setDate(df);
                     break;
                 case "aprobado":
-                    if(Integer.parseInt(value) == 0) {
+                    if (Integer.parseInt(value) == 0) {
                         jChAprobado.setSelected(false);
                     } else {
                         jChAprobado.setSelected(true);
                     }
                     break;
-
+                case "contabilizado":
+                    if (Integer.parseInt(value) == 0) {
+                        jChContabilizado.setSelected(false);
+                    } else {
+                        jChContabilizado.setSelected(true);
+                    }
+                    break;
             }//end switch
         }//end CABECERA   
 
-       //DETALLE TABLA
+        //DETALLE TABLA
         this.modelo.setRowCount(0); // Limpiar la tabla antes de llenar
         
         for (Map<String, String> myRow : columnData) { //Detalles
@@ -1217,17 +1154,17 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             int exist = this.getProducto(row, 0);
             if(exist == 0){
                 String msg = "Producto: " + myRow.get("cod_barra") + " no encontrado";
-                JOptionPane.showMessageDialog(this, msg, "1211fillView Detalle!", JOptionPane.DEFAULT_OPTION);
+                JOptionPane.showMessageDialog(this, msg, "1145fillView Detalle!", JOptionPane.DEFAULT_OPTION);
                 modelo.removeRow(row);
                 continue;
             }
-            this.jtDetalle.setValueAt(myRow.get("cantidad_pedido"), row, 2);
-            this.jtDetalle.setValueAt(myRow.get("cantidad_enviado"), row, 3);
+            this.jtDetalle.setValueAt(myRow.get("cantidad_actual"), row, 2);
+            this.jtDetalle.setValueAt(myRow.get("cantidad_ajuste"), row, 3);
             row++;
-        }//end for Detalle
+        }//end for 2
     }//Fin FillView
     
-   /**
+    /**
      * Controla que todos los datos obligatorios de la cabecera tengan los
      * valores requeridos En caso contrario se devuelve el foco a la cabecera.
      * Este método se llama en el evento focus de la tabla
@@ -1245,14 +1182,15 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             jtfId.setText("0");
             jtfId.requestFocus();
         }
-        //Fecha Enviado
-        Date fechaEnviado = jDateFechaEnviado.getDate();
-        if (fechaEnviado == null) {
+        //Fecha Proceso
+        Date fechaProceso = jDateFecha.getDate();
+        if (fechaProceso == null) {
             msg = "Favor ingrese una fecha de operación válida!";
-            jDateFechaEnviado.requestFocus();
-            jDateFechaEnviado.setDate(new Date());
+            jDateFecha.requestFocus();
+            jDateFecha.setDate(new Date());
             rtn = false;
         }
+        
         //continuar con los demás controles
         if (!rtn) {
             JOptionPane.showMessageDialog(this, msg, "¡Favor Verificar!", JOptionPane.INFORMATION_MESSAGE);
@@ -1274,10 +1212,10 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
                 jtDetalle.changeSelection(i, 0, false, false);
                 rtn = false;
             }
-            //CANTIDAD ENVIADO
-            String cantidadEnviado = jtDetalle.getValueAt(i, 3).toString();
-            if (Integer.parseInt(cantidadEnviado) < 0) {
-                msg = "Cantidad no puede ser menor a 0";
+            //CANTIDAD AJUSTE
+            String cantidadAjuste = (String) jtDetalle.getValueAt(i, 3);
+            if (Integer.parseInt(cantidadAjuste) < 1) {
+                msg = "Cantidad no puede ser menor a 1";
                 jtDetalle.changeSelection(i, 3, false, false);
                 rtn = false;
             }
@@ -1288,23 +1226,22 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
         return rtn;
     } //Fin validarDetalles
     
-    
-  public void validarCombo(){
+     public void validarCombo(){
            int codigo = 0;
-            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbDepositoOrigen.getSelectedItem().toString()));            
+            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString()));            
             if (codigo == 0){
-            this.jcbDepositoOrigen.requestFocus();
-            JOptionPane.showMessageDialog(this, "Favor Seleccione Depósito Origen!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
+            this.jcbDeposito.requestFocus();
+            JOptionPane.showMessageDialog(this, "Favor Seleccione Depósito!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
             return;
             }
             
-            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbDepositoDestino.getSelectedItem().toString()));
+            codigo = Integer.parseInt(ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString()));
             if (codigo == 0){
-            this.jcbDepositoDestino.requestFocus();
-            JOptionPane.showMessageDialog(this, "Favor Seleccione Depósito Destino!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
-            }
+            this.jcbMoneda.requestFocus();
+            JOptionPane.showMessageDialog(this, "Favor Seleccione Moneda!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
+            }  
      } //Fin validarCombo
-  
+     
     public void limpiarTabla() {
         this.columnData.clear();
         try {
@@ -1317,5 +1254,5 @@ public class wTransferencia extends javax.swing.JInternalFrame implements MouseL
             JOptionPane.showMessageDialog(null, "Error al limpiar la tabla.");
         }
     }//fin limpiarTabla
-
+    
 } //Fin Clase

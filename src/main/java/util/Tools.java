@@ -5,52 +5,44 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import com.genesis.model.conexion;
+import com.genesis.model.tableModel;
 import com.toedter.calendar.IDateEditor;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Tools {
 public static javax.swing.JMenuBar barra;
     private static ResultSet rs_suc;
     protected IDateEditor dateEditor;
 
-//    public static void E_estado(javax.swing.JComboBox cb, String aTabla, String arg) {
-//        try {
-//            //javax.swing.JComboBox cb_carga;
-//            //cb_carga = cb;
-//            rs_suc = conexion.ejecuteSQL("SELECT * FROM " + aTabla + " WHERE " + arg + " ORDER BY 1");
-//            if (!rs_suc.first()) {
-//                return;
-//            }
-//
-//            cb.setSelectedItem(rs_suc.getString(1) + "-" + rs_suc.getString(2));
-//
-//        } catch (SQLException erro) {
-//            JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. - ERROR: " + erro);
-//        }
-//    }
-    
-
-    
+    /**
+     * Validacion del password ingresado en wLogin
+     * @param passArray[] array de caracteres que se utiliza para analizar el password ingresado
+     * caracter por caracter
+     * @return rtn. true si hay error en el password
+    */    
     public static boolean validatePsw(char passArray[]){
-        boolean rtn = false;
-        int li_valido = 0;
+        boolean rtn = true;
+        int caracterInvalido = 0;
         for (int i = 0; i < passArray.length; i++) {
             char c = passArray[i];
             if (!Character.isLetterOrDigit(c)) {
-                li_valido++;
+                caracterInvalido++;
             }
         }
-        if (li_valido == 0) {
+        if (caracterInvalido > 0) {
             JOptionPane.showMessageDialog(null, "La contrase\u00F1a tiene carcteres inválidos!", "Atencion", JOptionPane.ERROR_MESSAGE);
-            rtn = true;
+            rtn = false;
         }
         return rtn;
     }
@@ -128,41 +120,80 @@ public static javax.swing.JMenuBar barra;
         return rtn;
     }
 
-    public static double sGetDecimalStringAnyLocaleAsDouble(String value) {
-        if (value == null) {
-            //System.out.println("CORE - Null value!");
+/**
+ * Actualmente la funcion recibe un valor String que viene de un JTable jtDetalle
+ * @param value La cadena que representa un número.
+ * value = jtDetalle.getModel().getValueAt(row, col).tostring()
+ * 
+ * @return El valor double correspondiente o 0.0 si la conversión falla.
+ */
+public static double sGetDecimalStringAnyLocaleAsDouble(String value) {
+    // Definir la configuración de localización y el patrón de formato
+    Locale locale = new Locale("es-PY", "PYT");
+    DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance(locale);
+    String pattern = "###,###.###"; //formato por defecto
+    decimalFormat.applyPattern(pattern);
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+    symbols.setDecimalSeparator(',');
+    symbols.setGroupingSeparator('.');
+    decimalFormat.setDecimalFormatSymbols(symbols);
+    
+    double d = 0.0; // Inicializar un valor numérico por defecto
+    
+    // Verificar si el valor no es nulo ni vacío
+    if (value != null && !value.isEmpty()) {
+        if (isNumeric(value)) {
+            try { // Formatear el valor de String a Double con decimalFormat
+                Number number = decimalFormat.parse(value);
+                d = number.doubleValue();
+                return d;
+            } catch (ParseException ex) {
+                Logger.getLogger(Tools.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else { //Si no es Numerico
             return 0.0;
         }
-
-        Locale theLocale = Locale.getDefault();
-        NumberFormat numberFormat = DecimalFormat.getInstance(theLocale);
-        Number theNumber;
-        try {
-            theNumber = numberFormat.parse(value);
-            return theNumber.doubleValue();
-        } catch (ParseException e) {
-            // The string value might be either 99.99 or 99,99, depending on Locale.
-            // We can deal with this safely, by forcing to be a point for the decimal separator, and then using Double.valueOf ...
-            //http://stackoverflow.com/questions/4323599/best-way-to-parsedouble-with-comma-as-decimal-separator
-            String valueWithDot = value.replaceAll(",", ".");
-
-            try {
-                return Double.valueOf(valueWithDot);
-            } catch (NumberFormatException e2) {
-                // This happens if we're trying (say) to parse a string that isn't a number, as though it were a number!
-                // If this happens, it should only be due to application logic problems.
-                // In this case, the safest thing to do is return 0, having first fired-off a log warning.
-//                System.out.println("CORE - Warning: Value is not a number" + value);
-                return 0.0;
-            }
-        }
+    } else {
+        return 0.0; // Asignar un valor predeterminado si es nulo o vacío
     }
+    return 0.0;
+}
+//    // Verificar si el valor es nulo y retornar 0.0 en ese caso
+//    if (value == null) {
+//        return 0.0;
+//    }
+//    // Obtener la configuración regional predeterminada del sistema
+//    Locale theLocale = Locale.getDefault();
+//    // Crear un formateador numérico según la configuración regional
+//    NumberFormat numberFormat = DecimalFormat.getInstance(theLocale);
+//    try {
+//        // Intentar convertir la cadena a un número usando el formateador
+//        Number theNumber = numberFormat.parse(value);
+//        // Retornar el valor double del número
+//        return theNumber.doubleValue();
+//    } catch (ParseException e) {
+//        // Si ocurre un error de parseo, intentar un enfoque alternativo
+//        // Reemplazar todas las comas (,) en la cadena por puntos (.)
+//        String valueWithDot = value.replaceAll(",", ".");
+//        try {
+//            // Intentar convertir la cadena modificada a un valor double
+//            return Double.valueOf(valueWithDot);
+//        } catch (NumberFormatException e2) {
+//            // Si ocurre otro error, retornar 0.0
+//            return 0.0;
+//        }
+//    }
+//} // Fin sGetDecimalStringAnyLocaleAsDouble
 
+
+    /**
+     * Establece un formato para un numero decimal y devuelve en forma de String
+     * @param numb numero que se desea formatear
+     * @return rtn String del numero formateado
+    */
     public static String decimalFormat(double numb) {
-        String rtn;
         DecimalFormat formatea = new DecimalFormat("#,###.##");
-        rtn = formatea.format(numb);
-        return rtn;
+        return formatea.format(numb);
     }
 
     /**
@@ -194,6 +225,15 @@ public static javax.swing.JMenuBar barra;
         return dateEditor.getDate();
     }
 
+    /**
+     * Se utiliza en practicamente todas las vistas para verificar que el usuario en sesion
+     * tenga los permisos necesarios para realizar las operaciones que se necesiten
+     * tanto para ver el menu en wPrincipal o para realizar operaciones de C,R,U,D
+     * @param idrol id rol del usuario. Se obtiene de conexion
+     * @param menuName menu seleccionado en wPrincipal para abrir la ventana actual
+     * @param opcion operaciones: ver, C, R, U, D
+     * @return 
+     */
     public static int validarPermiso(int idrol, String menuName, String opcion) {
         ResultSet sql;
         int valor = 0;
@@ -205,11 +245,9 @@ public static javax.swing.JMenuBar barra;
                 valor = 0;
             } else {
                 valor = sql.getInt(opcion);
-
             }
-//            System.out.println("SQL FUNCION VALIDARPERMISO;" + sql);
-        } catch (Exception error) {
-
+        } catch (SQLException error) {
+            Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, error);
         }
         return valor;
     }
@@ -224,38 +262,31 @@ public static javax.swing.JMenuBar barra;
      * @return double convertido a moneda destino y redondeado
      */
     public static double cambiarCotizacion(int origen, int destino, long fecha, double importe, double defecto) {
-        String sql;
-        double total, cotizacion;
+        String sql = "";
+        double total = 0.0;
+        double cotizacion = 0.0;
+        int operador = 0;
+        int decimales = 0;
         BigDecimal rtn;
-        int operador, decimales;
-
-        operador = 0;
-        decimales = 0;
-        total = 0.0;
-        sql = "";
-        cotizacion = 0.0;
-
+        //VALIDACION DE MONEDAS
         if (origen == 0 || destino == 0) {
-            //Mensaje de no se encuentra Moenda origen o destino
+            //Mensaje de no se encuentra Moneda origen o destino
             return 0.0;
         }
         if (importe == 0 && defecto > 0) {
             importe = defecto;
         }
-        if (origen == destino) {
-            //Las monedas origen y destino son iguales
+        if (origen == destino) { //Las monedas origen y destino son iguales
             return importe;
         }
 
         try {
-            sql = "SELECT cotizacion, operacion, decimales "
-                    + "FROM SYS_COTIZACIONES c, SYS_MONEDAS m "
+            sql = "SELECT c.cotizacion, c.operacion, m.decimales "
+                    + "FROM cotizaciones c, monedas m "
                     + "WHERE c.monedadestid = m.id "
                     + " AND monedaorigid = " + origen
                     + " AND monedadestid = " + destino
                     + " AND FROM_UNIXTIME(fecha, '%d/%m/%Y') = FROM_UNIXTIME(" + fecha + ", '%d/%m/%Y')";
-
-//            System.out.println("sql = " + sql);
             rs_suc = conexion.ejecuteSQL(sql);
             if (!rs_suc.first()) {
                 return 0.0;
@@ -281,123 +312,23 @@ public static javax.swing.JMenuBar barra;
 //        System.out.println("de: " + origen + " a: " + destino + " oper " + operador + " cotiz: " + cotizacion + " rtn: " + total + " dec: " + decimales);
         return rtn.doubleValue();
     }
-    public static void procesarMenus(javax.swing.JMenuBar b) {
-        barra = b;
-        javax.swing.JMenu m_menu;
-        javax.swing.JMenu m_submenu;
-        javax.swing.JMenu m_item;
-        javax.swing.JMenu m_subitem;
-//        System.out.println("Entro en metodo procesarMenus");
-        String s_nombre = "", s_text = "", s_menu = "";
-        int cantm = 0, cod = 0, cants = 0, canti = 0, cantj = 0, li_grabados = 0;
-        int li_grabar = 0, li_cm, li_csm, li_ci, li_csi; //utilizo para saber si 1-grabo o 0-modifico
 
-        cantm = (int) barra.getMenuCount();
-        cod = 0;
-        //System.out.println(s_nombre+" con "+cantm+" menus");
-        if (cantm > 0) {
-            li_cm = 0;
-            for (int m = 0; m < cantm; m++) {
-                s_nombre = "";
-                li_cm++;
-
-                if (barra.getMenu(m) instanceof javax.swing.JMenu) {
-                    cod++;
-                    m_menu = barra.getMenu(m);
-                    s_nombre = m_menu.getName();
-                    if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
-                        m_menu.setVisible(false);
-                        cants = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
-                    } else {
-                        m_menu.setVisible(true);
-                        cants = m_menu.getItemCount();
-                    }
-                }
-
-                if (cants > 0) {
-                    li_csm = 1;
-                    m_menu = barra.getMenu(m);
-                    for (int s = 0; s < cants; s++) {
-                        s_nombre = "";
-                        if (m_menu.getItem(s) instanceof javax.swing.JMenu) {
-                            cod++;
-                            m_submenu = (javax.swing.JMenu) m_menu.getItem(s);
-                            s_nombre = m_submenu.getName();
-                            if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
-                                m_submenu.setVisible(false);
-                                cants = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
-                            } else {
-                                m_submenu.setVisible(true);
-                                canti = m_submenu.getItemCount();
-                                li_csm++;
-                            }                            
-                        } else {
-                            if (m_menu.getItem(s) instanceof javax.swing.JMenuItem) {
-                                cod++;
-                                s_nombre = m_menu.getItem(s).getName();
-                                if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
-                                    m_menu.getItem(s).setVisible(false);
-                                    canti = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
-                                } else {
-                                    m_menu.getItem(s).setVisible(true);
-                                    canti = 0;
-                                    li_csm++;
-                                }
-                            } else {
-                                canti = 0;
-                            }
-                        }
-                        
-                        if (canti > 0) {
-                            li_ci = 1;
-                            m_submenu = (javax.swing.JMenu) m_menu.getItem(s);
-                            for (int i = 0; i < canti; i++) {
-                                s_nombre = "";
-                                if (m_submenu.getItem(i) instanceof javax.swing.JMenu) {
-                                    cod++;
-                                    m_item = (javax.swing.JMenu) m_submenu.getItem(i);
-                                    s_nombre = m_item.getName();
-                                    if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
-                                        m_item.setVisible(false);
-                                        cantj = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
-                                    } else {
-                                        m_item.setVisible(true);
-                                        cantj = m_item.getItemCount();
-                                        li_ci++;
-                                    }
-                                } else {
-                                    if (m_submenu.getItem(i) instanceof javax.swing.JMenuItem) {
-                                        cod++;
-                                        s_nombre = m_submenu.getItem(i).getName();
-                                        if (Tools.validarPermiso(conexion.getGrupoId(), s_nombre, "ver") == 0) {
-                                            m_submenu.getItem(i).setVisible(false);
-                                            cantj = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
-                                        } else {
-                                            m_submenu.getItem(i).setVisible(true);
-                                            cantj = 0;
-                                            li_ci++;
-                                        }
-                                    } else {
-                                        cantj = 0;
-                                    }
-                                }
-                                //System.out.println(s_nombre+" con "+cantj+" subitems");
-                                if (cantj > 0) {
-                                    li_csi = 0;
-                                    for (int j = 0; j < cantj; j++) {
-                                        cod++;
-                                        s_nombre = "";
-                                        s_text = "";
-                                        m_subitem = (javax.swing.JMenu) m_menu.getItem(i);
-                                        li_csi++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    /**
+     * Es una forma simple de verificar un valor es de tipo numérico
+     *
+     * @param strNum String que es el valor a identificar si es o no un número
+     * @return boolean true si que es un número o false si es cualquier otro
+     * valor distinto a un número
+     */
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
         }
-    }//fin procesarMenus
-
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }//fin isNumeric
 }//fin clase

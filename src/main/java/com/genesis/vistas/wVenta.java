@@ -1,17 +1,13 @@
 package com.genesis.vistas;
 
 import com.genesis.model.conexion;
-import static com.genesis.model.conexion.con;
-import static com.genesis.model.conexion.url;
 import com.genesis.model.pojoCompraDetalle;
 import com.genesis.model.pojoVentaDetalle;
 import com.genesis.model.tableModel;
 import com.genesis.tabla.GestionCeldas;
 import com.genesis.tabla.GestionEncabezadoTabla;
 import com.genesis.tabla.ModeloTabla;
-import com.sun.jdi.connect.spi.Connection;
 import com.genesis.controladores.tableController;
-import com.genesis.vistas.ActiveFrame;
 import util.ComboBox;
 import util.Tools;
 import java.awt.BorderLayout;
@@ -76,11 +72,9 @@ import net.sf.jasperreports.view.JasperViewer;
 import reportes.Reporte;
 import reportes.vFactura;
 import com.genesis.vistas.wPrincipal;
+import java.beans.PropertyVetoException;
 
-/**
- *
- * @author RC
- */
+
 public class wVenta extends javax.swing.JInternalFrame implements MouseListener, KeyListener, ActiveFrame {
 
     //Controladores
@@ -91,7 +85,6 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
 
     private int precioid;
     int nrodocnuevo = 0;
-    int monori = 0;
     int nrodoc = 0;
     int nrovent = 0;
     int nroventnuevo = 0;
@@ -101,72 +94,80 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
     int tipoopcion = 0;
     int IDVENTA = 0;
     int cotizacionGlobal = 0;
-    double precioo = 0;
-    double limite = 0;
+    int operacionCotizacion = 0;
+    double limite = 0; //Limite de Credito del cliente. Revisar setTotalGral
     String varserie = "";
     String vartimbrado = "";
     int iRow = 0;
     int iColumn = 0;
-    long fechaa;
+    //Modelos y estructuras de datos
     private tableModel tmMoneda;
-    Map<String, String> mapMoneda;// = new HashMap<String, String>();
+    Map<String, String> mapMoneda;
+    
+    private tableModel tmCotizacion;
+    Map<String, String> mapCotizacion;
 
     private tableModel tmProducto;
-    Map<String, String> mapProducto;// = new HashMap<String, String>();
+    Map<String, String> mapProducto;
 
     private tableModel tmProductoDet;
-    Map<String, String> mapProductoDet;// = new HashMap<String, String>();
+    Map<String, String> mapProductoDet;
 
-    ArrayList<pojoVentaDetalle> lista;// = new ArrayList<>();
-    public static int filaSeleccionada;
+    ArrayList<pojoVentaDetalle> lista;
     ArrayList<pojoVentaDetalle> listaDetalles;//lista que simula la información de la BD
 
-    //
+    private boolean jcbClienteSelectItem = false; // Bandera JcbCliente itemStateChanged
+    
+    // Estructura de datos de Cabecera y Detalles
     private Map<String, String> myData;
     private Map<String, String> myDataAux;
     private HashMap<String, String> myDet;
     private ArrayList<Map<String, String>> columnData, colDat;
 
     ModeloTabla modelo;//modelo definido en la clase ModeloTabla
-    private int filasTabla;
-    private int columnasTabla;
-
-    private Date fecha; //= jdcFechaProceso.getDate();
+    
     private DateFormat dateFormat, dateTimeFormat, dateIns; //= new SimpleDateFormat("dd/MM/yyyy HH:mm"); 
+    //private static ResultSet rs_suc;
     private int cajaid;
     static FileInputStream inputStream = null;
     private String currentField = "";
     private String currentTable = "";
-    private static ResultSet rs_suc;
+    
     public JInternalFrame[] w_abierto;
 
     /**
      * Creates new form wVenta
+     * @param tipoopcion Tipo de documento que se va a realizar en la venta
+     * @param menuName nombre del Menu ejecutado desde la vista Principal
      */
     public wVenta(int tipoopcion, String menuName) {
         initComponents();
         this.tipoopcion = tipoopcion;
         this.menuName = menuName;
-        listaDetalles = new ArrayList<pojoVentaDetalle>();
+        listaDetalles = new ArrayList<>();
         lista = new ArrayList<>();
-        myData = new HashMap<String, String>();
-        myDataAux = new HashMap<String, String>();
-        columnData = new ArrayList<Map<String, String>>();
-        //Para menejo de Monedas
-        mapMoneda = new HashMap<String, String>();
+        myData = new HashMap<>();
+        myDataAux = new HashMap<>();
+        columnData = new ArrayList<>();
+        //Para menejo de Moneda de operacion y cotizacion
+        mapMoneda = new HashMap<>();
         tmMoneda = new tableModel();
         tmMoneda.init("monedas");
+        //Cotizacion
+        mapCotizacion = new HashMap<>();
+        tmCotizacion = new tableModel();
+        tmCotizacion.init("cotizaciones");
         construirTabla();
 
-        //PARA EL DETALLE
+        //Para Producto Cabecera Se utiliza en setTotalGral para recuperar datos de Productos
         mapProducto = new HashMap<>();
         tmProducto = new tableModel();
         tmProducto.init("productos");
-
+        //Para Producto Detalle. se Utiliza en setTotalGral para recuperar datos de Productos Detalle
         mapProductoDet = new HashMap<>();
         tmProductoDet = new tableModel();
         tmProductoDet.init("producto_detalle");
-        //setLocationRelativeTo(null);
+        
         //Prepara la tabla con los valores iniciales
         //Estos son lísteners, es decir, esta misma clase implementa 
         //las interfaces línener para mouse y key y por tanto, la clase se escucha a sí misma
@@ -183,16 +184,12 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         //Unificamos tipo y tamaño de fuente
         FontUIResource font = new FontUIResource("Times New Roman", Font.PLAIN, 12);
         UIManager.put("Table.font", font);
-        //UIManager.put("Table.foreground", Color.RED);
-//        tfcodbarra.setVisible(false);
+        
         // COMBO BOX DESPLEGABLES DE LAS TABLAS//
         ComboBox.pv_cargar(jcbPlazo, "plazo_pago", " id, plazo ", "id", "");
-        ComboBox.pv_cargar(jcbMoneda, "sys_monedas", " id, moneda ", "id", "");
-        //cargaComboBox.pv_cargar(jcbCliente, "sys_clientes", " id, ruc ", "id", "");
-        ComboBox.pv_cargar(jcbCliente, "clientes c", "c.id, CONCAT(c.nombres,' ', c.apellidos) AS cliente", "c.id", "");
-
+        ComboBox.pv_cargar(jcbMoneda, "monedas", " id, moneda ", "id", "");
+        ComboBox.pv_cargar(jcbCliente, "clientes c, personas p", "c.id, CONCAT(p.nombres,' ', p.apellidos, ':', c.ruc) AS cliente", "c.id", "c.personaid = p.id");
         ComboBox.pv_cargar(jcbDeposito, "depositos", "id, nombre", "id", "");
-
         ComboBox.pv_cargar(jcbTipo, "tipos_documento", "id, tipodocumento", "id", "tipoopcion=" + tipoopcion);
 
         // Inicializamos las fechas
@@ -203,7 +200,7 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         jdcProceso.setDate(new Date());
         jdcFactura.setDate(new Date());
         jdcVencimiento.setDate(new Date());
-        getMoneda();
+        this.getMoneda();
         if (tipoopcion == 1) {
             jcbtipoventa.setSelectedItem("1-Venta Mercadería");
             jcbtipoventa.setEnabled(false);
@@ -234,7 +231,6 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             inputStream.close();
             //Y ahora si queremos los valores del properties:
             this.cajaid = Integer.parseInt(properties.getProperty("caja"));
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -246,17 +242,10 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
     }// fin constructor
 
     private void construirTabla() {
-        /**
-         * Aquí se inicializan los valores. El metodo consultar tiene la forma
-         * como debería ser en el metodo de recuperar registro.
-         */
         listaDetalles.clear();
         listaDetalles = consultarListaDetalles();
-        //Este array cambiará de valores según la tabla que querramos representar
-        //en este caso nuestro detalle tiene esa estructura de columnas
-
+        
         ArrayList<String> titulosList = new ArrayList<>();
-//7 
         titulosList.add("Cod Barra");
         titulosList.add("Descripcion");
         titulosList.add("Precio");
@@ -265,40 +254,27 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         titulosList.add("Bonificado");
         titulosList.add("Total");
 
-        //se asignan las columnas al arreglo para enviarse al momento de construir la tabla
-        //Esto es porque la tabla recibe arreglo [] y no un ArrayList, bien se pudo ya contruir de esa manera 
-        //System.out.println("lista titulos "+titulosList.toString());
         String titulos[] = new String[titulosList.size()];
 
         for (int i = 0; i < titulos.length; i++) {
             titulos[i] = titulosList.get(i);
         }
-        /*obtenemos los datos de la lista y los guardamos en la matriz
-         * que luego se manda a construir la tabla
-         */
+        
         Object[][] data = obtenerMatrizDatos(titulosList);
         construirTabla(titulos, data);
         titulosList.clear();
     }
 
     private ArrayList<pojoVentaDetalle> consultarListaDetalles() {
-        //  ArrayList<pojoVentaDetalle> lista = new ArrayList<>();
-        this.lista.add(new pojoVentaDetalle(0, "", "0", 0, 0, 0, 0, 0));
+        this.lista.add(new pojoVentaDetalle(0, "0", "Descripcion", 0, 0, 0, 0, 0));
         return lista;
     }
 
     private Object[][] obtenerMatrizDatos(ArrayList<String> titulosList) {
 
-        /*se crea la matriz donde las filas son dinamicas pues corresponde
-         * a todos los usuarios, mientras que las columnas son estaticas
-         * correspondiendo a las columnas definidas por defecto
-         */
-//        System.out.println("lista det size "+listaDetalles.size());
-//        System.out.println("title info "+titulosList.size());
         String informacion[][] = new String[listaDetalles.size()][titulosList.size()];
 
         for (int x = 0; x < informacion.length; x++) {
-            //Poner los nombres de los campos de la tabla de la bd  //7 
             informacion[x][0] = listaDetalles.get(x).getString("cod_barra");
             informacion[x][1] = listaDetalles.get(x).getString("descripcion");
             informacion[x][2] = listaDetalles.get(x).getDouble("precio") + "";
@@ -312,16 +288,13 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
     }
 
     private void construirTabla(String[] titulos, Object[][] data) {
-        ArrayList<Integer> noEditable = new ArrayList<Integer>();
+        ArrayList<Integer> noEditable = new ArrayList<>();
         noEditable.add(1);
         noEditable.add(2);
         noEditable.add(6);
         modelo = new ModeloTabla(data, titulos, noEditable);
         //se asigna el modelo a la tabla
         jtDetalle.setModel(modelo);
-
-        filasTabla = jtDetalle.getRowCount();
-        columnasTabla = jtDetalle.getColumnCount();
 
         //se asigna el tipo de dato que tendrán las celdas de cada columna definida respectivamente para validar su personalización
         jtDetalle.getColumnModel().getColumn(0).setCellRenderer(new GestionCeldas("texto"));
@@ -332,11 +305,6 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         jtDetalle.getColumnModel().getColumn(5).setCellRenderer(new GestionCeldas("numerico"));
         jtDetalle.getColumnModel().getColumn(6).setCellRenderer(new GestionCeldas("numerico"));
 
-        //se recorre y asigna el resto de celdas que serian las que almacenen datos de tipo texto
-        /*for (int i = 0; i < titulos.length-5; i++) {//se resta 5 porque las ultimas 5 columnas se definen arriba
-                System.out.println(i);
-                jtDetalle.getColumnModel().getColumn(i).setCellRenderer(new GestionCeldas("texto"));
-        }*/
         jtDetalle.getTableHeader().setReorderingAllowed(false);
         jtDetalle.setRowHeight(25);//tamaño de las celdas
         jtDetalle.setGridColor(new java.awt.Color(0, 0, 0));
@@ -422,6 +390,7 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         setIconifiable(true);
         setMaximizable(true);
         setTitle("Venta de Mercaderías");
+        setPreferredSize(new java.awt.Dimension(1150, 650));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Cabecera"));
 
@@ -470,25 +439,15 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         jtfTimbrado.setEditable(false);
 
         jcbCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Cliente" }));
-        jcbCliente.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                jcbClienteFocusGained(evt);
-            }
-        });
-        jcbCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jcbClienteActionPerformed(evt);
+        jcbCliente.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbClienteItemStateChanged(evt);
             }
         });
 
         jcbPlazo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Plazo" }));
 
         jcbMoneda.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Seleccione Moneda" }));
-        jcbMoneda.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jcbMonedaActionPerformed(evt);
-            }
-        });
 
         jcbCondicion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0-Crédito", "1-Contado" }));
         jcbCondicion.setSelectedIndex(1);
@@ -841,36 +800,15 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jcbClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbClienteActionPerformed
-        // recuperar la lista de precio correspondiente al cliente
-        int clienteid;
-        clienteid = Integer.parseInt(ComboBox.ExtraeCodigo(jcbCliente.getSelectedItem().toString()));
-        ResultSet rs;
-        String sql;
-        sql = "SELECT * FROM clientes WHERE id = " + clienteid;
-        //System.out.println(sql);
-        rs = conexion.ejecuteSQL(sql);
-        try {
-            if (rs.next()) {
-                precioid = rs.getInt("precioid");
-            } else {
-                precioid = 0;
-            }
-        } catch (SQLException ex) {
-            precioid = 0;
-            Logger.getLogger(wVenta.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_jcbClienteActionPerformed
-
     private void jtfIdFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfIdFocusGained
         currentField = "id";
-        jtfId.selectAll();         // TODO add your handling code here:
+        jtfId.selectAll();
     }//GEN-LAST:event_jtfIdFocusGained
 
     private void jtfIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtfIdKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             this.imBuscar();
-        }         // TODO add your handling code here:
+        }
     }//GEN-LAST:event_jtfIdKeyPressed
 
     private void jcbCondicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbCondicionActionPerformed
@@ -880,10 +818,6 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
 //        cargaComboBox.pv_cargar(jcbTipo, "sys_tipos_documento", "id, tipodocumento", "id", "contadocredito="+tip);
     }//GEN-LAST:event_jcbCondicionActionPerformed
 
-    private void jcbMonedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbMonedaActionPerformed
-        this.getMoneda();
-    }//GEN-LAST:event_jcbMonedaActionPerformed
-
     private void tfventaregFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfventaregFocusGained
         currentField = "ventaid";
         tfventareg.selectAll();          // TODO add your handling code here:
@@ -892,7 +826,7 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
     private void tfventaregKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfventaregKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             this.imBuscar();
-        }         //        // TODO add your handling code here:
+        }
     }//GEN-LAST:event_tfventaregKeyPressed
 
     private void jtDetalleFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtDetalleFocusGained
@@ -912,9 +846,30 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         }
     }//GEN-LAST:event_tfcodbarraKeyPressed
 
-    private void jcbClienteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jcbClienteFocusGained
-        currentField = "cliente";        // TODO add your handling code here:
-    }//GEN-LAST:event_jcbClienteFocusGained
+    private void jcbClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbClienteItemStateChanged
+        // recuperar la lista de precio correspondiente al cliente
+        if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED && jcbClienteSelectItem) {
+            currentField = "cliente"; 
+            int clienteid;
+            clienteid = Integer.parseInt(ComboBox.ExtraeCodigo(jcbCliente.getSelectedItem().toString()));
+            ResultSet rs;
+            String sql;
+            sql = "SELECT * FROM clientes WHERE id = " + clienteid;
+            //System.out.println(sql);
+            rs = conexion.ejecuteSQL(sql);
+            try {
+                if (rs.next()) {
+                    precioid = rs.getInt("precioid");
+                } else {
+                    precioid = 0;
+                }
+            } catch (SQLException ex) {
+                precioid = 0;
+                Logger.getLogger(wVenta.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        jcbClienteSelectItem = true; // Marcar que el usuario seleccionó un item
+    }//GEN-LAST:event_jcbClienteItemStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -978,14 +933,9 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         int fila = jtDetalle.rowAtPoint(e.getPoint());
         int columna = jtDetalle.columnAtPoint(e.getPoint());
 
-        /*uso la columna para valiar si corresponde a la columna de perfil garantizando
-         * que solo se produzca algo si selecciono una fila de esa columna
-         */
         if (columna == 0) { //0 corresponde a cod barra
-            //sabiendo que corresponde a la columna de perfil, envio la posicion de la fila seleccionada
             validarSeleccionMouse(fila);
         } else if (columna == 2) {//se valida que sea la columna del otro evento 2 que corresponde a precio
-            //JOptionPane.showMessageDialog(null, "Evento del otro icono");
         }
         if (currentTable.equals("tabla")) {
             //OBS: Aquí debemos llamar a un método que controle que los campos de la cabecera estén completos
@@ -997,26 +947,12 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             iColumn = col;
             if (e.getSource() == this.tfcodbarra) {
                 this.getProducto(iRow, iColumn);
-                return;
             }
 
-            /*uso la columna para valiar si corresponde a la columna de perfil garantizando
-         * que solo se produzca algo si selecciono una fila de esa columna
-             */
-//        System.out.print("\n Estoy en el MouseClicked" + oculto);
-//        if (columna == 0) { //0 corresponde a cod barra
-//           
-//             
-//          
-//        }else if (columna == 2){//se valida que sea la columna del otro evento 2 que corresponde a precio
-//            //JOptionPane.showMessageDialog(null, "Evento del otro icono");
-//        }
         }
     }
 
     private void validarSeleccionMouse(int fila) {
-        this.filaSeleccionada = fila;
-        //teniendo la fila entonces se obtiene el objeto correspondiente para enviarse como parammetro o imprimir la información
         pojoCompraDetalle rowDetalle = new pojoCompraDetalle();
         rowDetalle.setString("cod_barra", jtDetalle.getValueAt(fila, 0).toString());
         rowDetalle.setString("descripcion", jtDetalle.getValueAt(fila, 1).toString());
@@ -1070,9 +1006,9 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             boolean celdasNumericas = (col == 2 || col == 3 || col == 4 || col == 5);
             //Si no es numero, no es decimal, no es tecla borrar, no es Enter y no es tabulacion
             //entonces no hacer nada e ignorar el evento
-            if (!numeros && !decimalPoint && !erraser && !enter && !tabulacion) {
-                e.consume();
-            }
+//            if (!numeros && !decimalPoint && !erraser && !enter && !tabulacion) {
+//                e.consume();
+//            }
 
             if (numeros) {
                 if (jtDetalle.getModel().isCellEditable(row, col)) {
@@ -1092,6 +1028,8 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             //Si Enter o Tab para col == 0 Codigo Barra
             if (col == 0 && (enter || tabulacion)) {
                 jtDetalle.getCellEditor().stopCellEditing();
+                this.getMoneda();
+                this.getCotizacion();
                 this.getProducto(row, col);
                 return;
             }
@@ -1117,10 +1055,6 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-//encontrar el lugar correcto para esta funcion
-//        int row = jtDetalle.getSelectedRow();
-//        int col = jtDetalle.getSelectedColumn();
-//      getStock(row, col);  //asegurarse de que el producto exista en el deposito seleccionado
     @Override
     public void imGrabar(String crud) {
         this.CRUD = crud;
@@ -1138,93 +1072,162 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         if (!validarDetalles()) {
             return;
         }
-        //Cargar Datos en los Maps e inicializar estructuras de datos para el proceso
+
         this.setData();
-        ArrayList<Map<String, String>> alCabecera;
-        alCabecera = new ArrayList<>();
 
         recuperarTalonario();
 
-        int id;
-        id = Integer.parseInt(this.jtfId.getText());
-        if (id > 0) {
-            alCabecera.add(this.myData);
-            int rowsAffected = this.tc.updateReg(alCabecera);
-            //si rowsaffected < 1 return
-            if (rowsAffected < 1) {
-                msg = "Error al intentar actualizar el registro: " + this.jtfId.getText();
-                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
-                return; // si tfId > 0 y no grabo cambios, entonces return
-            } else {
-                msg = "Se ha actualizado exitosamente el registro: " + this.jtfId.getText();
-                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
-            }
+        int idVenta = Integer.parseInt(this.jtfId.getText());
+        if (idVenta > 0) {
+            imActualizar("U");
+            return;
         } else {
             int rowsAffected = this.tc.createReg(this.myData);
-            id = this.tc.getMaxId();
-            if (rowsAffected < 1) {
+            if (rowsAffected <= 0) {
                 msg = "Error al intentar crear el registro";
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
                 return; // si tfId > 0 y no grabo cambios, entonces return
             } else {
-                msg = "Se ha creado exitosamente el registro: " + id;
+                msg = "Se ha creado exitosamente el registro: " + idVenta;
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
                 this.jtfId.requestFocus();
+                idVenta = this.tc.getMaxId();
             }
         }
 
-        //DETALLES
+        //DETALLES --------------------------------
         //si pasó quiere decir que tenemos cabecera y recorremos el detalle
-        Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
-        Map<String, String> fields = new HashMap<>();     //Los campos que vamos a recuperar
-        ArrayList<Map<String, String>> alDetalle;    //Declara array de Map, cada Map es para un registro
-        fields.put("*", "*");
-
         for (Map<String, String> myRow : columnData) {
-            where.put("ventaid", id + "");
-            where.put("cod_barra", myRow.get("cod_barra"));
-            this.colDat = this.tcdet.searchListById(fields, where);
-
-            myRow.put("ventaid", id + "");
-
-            if (this.colDat.isEmpty()) { // si no existe un detalle con este cod_barra para esta compra
-                myRow.put("id", "0");
-                int rowsAffected = this.tcdet.createReg(myRow);
-                if (rowsAffected < 1) {
-                    msg = "No se ha podido grabar el Detalle Codigo:" + myRow.get("cod_barra");
-                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-                } else {
-                    msg = "Se ha creado el Detalle:" + myRow.get("cod_barra") + "para este producto";
-                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
-                }
-
-            } else {//si ya existe un detalle con este cod_barra para esta venta
-                myRow.put("id", colDat.get(0).get("id"));
-                alDetalle = new ArrayList<>();  //necesitamos el alDetalle por la estructura de la funcion tcdet.updateReg
-                alDetalle.add(myRow);
-                int rowsAffected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-                if (rowsAffected < 1) {
-                    msg = "No se ha podido actualizar el detalle: " + myRow.get("cod_barra") + " del producto. Por favor verifique";
-                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-                    return;
-                } else {
-                    msg = "Ya existe un Detalle con este codigo de barra:" + myRow.get("cod_barra") + "para este producto";
-                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-                }
+            myRow.put("id", "0");
+            myRow.put("ventaid", idVenta + "");
+            //Los demas datos del detalle ya se han cargado en setData
+            int rowsAffected = this.tcdet.createReg(myRow);
+            if (rowsAffected < 1) {
+                msg = "No se ha podido grabar el Detalle Codigo:" + myRow.get("cod_barra");
+                JOptionPane.showMessageDialog(this, msg, "ATENCION...!", JOptionPane.DEFAULT_OPTION);
+            } else {
+                msg = "Se ha creado el Detalle:" + myRow.get("cod_barra");
+                JOptionPane.showMessageDialog(this, msg, "ATENCION...!", JOptionPane.DEFAULT_OPTION);
             }
         }
-        this.imInsDet();
         this.imNuevo();
     } //Fin imGrabar
 
     @Override
+    public void imActualizar(String crud) {
+        this.CRUD = crud;
+        String msg;
+        //validar permisos para el usuario. si tiene permiso de actualizar registros de esta vista
+        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            return;
+        }
+        
+        this.setData();
+        ArrayList<Map<String, String>> alCabecera;
+        alCabecera = new ArrayList<>();
+        alCabecera.add(this.myData); //Mapa con Datos de cabecera en array.
+        int rowsAffected = this.tc.updateReg(alCabecera);
+        if (rowsAffected <= 0) {
+            msg = "Error al intentar actualizar el registro: " + this.jtfId.getText();
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
+            return; // si tfId > 0 y no grabo cambios, entonces return
+        } else {
+            msg = "Se ha actualizado exitosamente el registro: " + this.jtfId.getText();
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+        }
+        //-------DETALLES-----------------
+        //si pasó quiere decir que tenemos cabecera y recorremos el detalle
+        int idVenta = Integer.parseInt(jtfId.getText()); //id de la cabecera
+        Map<String, String> where = new HashMap<>();      //Por qué campo buscar los registros
+        Map<String, String> fields = new HashMap<>();     //Los campos que vamos a recuperar
+        ArrayList<Map<String, String>> alDetalle;         //Declara array de Map, cada Map es para un registro
+        fields.put("*", "*");
+        
+        for (Map<String, String> myRow : columnData) {
+            where.put("ventaid", idVenta + "");
+            where.put("cod_barra", myRow.get("cod_barra"));
+            //Buscar si ya existe un detalle de este cod_barra para esta compra.
+            this.colDat = this.tcdet.searchListById(fields, where);
+            // si no existe un detalle con este cod_barra para esta compra
+            if (this.colDat.isEmpty()) { 
+                myRow.put("id", "0");
+                myRow.put("ventaid", idVenta + "");
+                rowsAffected = this.tcdet.createReg(myRow);
+                if (rowsAffected <= 0) {
+                    msg = "No se ha podido grabar el Detalle Codigo:" + myRow.get("cod_barra");
+                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+                } else {
+                    msg = "Se ha creado el Detalle:" + myRow.get("cod_barra");
+                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else { //si ya existe un detalle con este cod_barra para esta compra
+                myRow.put("id", colDat.get(0).get("id")); // id del detalle
+                myRow.put("compraid", idVenta + "");
+                alDetalle = new ArrayList<>(); //necesitamos el alDetalle por la estructura de la funcion tcdet.updateReg
+                alDetalle.add(myRow);
+                rowsAffected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
+                if (rowsAffected <= 0) {
+                    msg = "No se ha podido actualizar el detalle: " + myRow.get("cod_barra");
+                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+                    return;
+                } else {
+                    msg = "Se ha actualizado el Detalle con este codigo:" + myRow.get("cod_barra");
+                    JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+                }
+            }
+        }
+    } //Fin imActualizar
+
+    /**
+     * Esta funcion se apoya en un Trigger en la base de datos para elimiar
+     * tanto el registro de cabecera como sus detalles
+     * @param crud D
+     */
+    @Override
+    public void imBorrar(String crud) {
+        String msg;
+        this.CRUD = crud;
+        //validar permisos para el usuario. si tiene permiso de borrar registros de esta vista
+        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            return;
+        }
+        this.setData();
+        int idVenta = Integer.parseInt(jtfId.getText());
+        if(idVenta <= 0){
+            msg = "NO SE HA ENCONTRADO EL REGISTRO";
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            return;
+        }
+        if(idVenta > 0){
+            ArrayList<Map<String, String>> alCabecera;
+            alCabecera = new ArrayList<>();
+            alCabecera.add(myData);                           
+            int rowsAffected = this.tc.deleteReg(alCabecera);
+            if (rowsAffected <= 0) {
+                msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + jtfId.getText();
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+                return;
+            }
+            if (rowsAffected > 0) {
+                msg = "EL REGISTRO: " + jtfId.getText() + " SE HA ELIMINADO CORRECTAMENTE";
+                JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+            }
+            imNuevo();
+        }    
+    }//fin ImBorrar
+    
+    @Override
     public void imFiltrar() {
         String sql;
-        wBuscar frame = null;
-        //Por defecto el buscador buscara Registros de compra por ID
+        wBuscar frame = new wBuscar();
+        //Por defecto el buscador buscara Registros de venta por ID
         if (currentField.equals("id") && (this.tipoopcion == 1)) { //estando en venta para recuperar una nota de venta
             sql = "SELECT v.id AS codigo, "
-                    + " CONCAT(v.serie, ' ', v.numero_documento, ' ',p.nombres, ' ', p.apellidos, ' ', c.ruc) AS descripcion "
+                    + " CONCAT(v.serie, ' ', v.nro_documento, ' ',p.nombres, ' ', p.apellidos, ' ', c.ruc) AS descripcion "
                     + " FROM ventas v, clientes c, personas p "
                     + " WHERE v.tipodoc = 1 "
                     + " AND c.personaid = p.id "
@@ -1236,7 +1239,7 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
 
         if (currentField.equals("id") && (this.tipoopcion == 2)) { //estando como nota de credito para recuperar la nota credito
             sql = "SELECT v.id AS codigo, "
-                    + " CONCAT(v.serie, ' ', v.numero_documento, ' ',p.nombres, ' ', p.apellidos, ' ', c.ruc) AS descripcion "
+                    + " CONCAT(v.serie, ' ', v.nro_documento, ' ',p.nombres, ' ', p.apellidos, ' ', c.ruc) AS descripcion "
                     + " FROM ventas v, clientes c, personas p "
                     + " WHERE v.tipodoc = 2 "
                     + " AND v.clienteid = c.id "
@@ -1297,97 +1300,17 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         wPrincipal.desktop.add(frame);
         try {
             frame.setSelected(true);
-        } catch (Exception e) {
+        } catch (PropertyVetoException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.DEFAULT_OPTION);
         }
     }
 
     @Override
-    public void imActualizar(String crud) {
-        this.CRUD = crud;
-        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-            return;
-        }
-        //validar campos cabecera
-        if (!validarCabecera()) {
-            return;
-        }
-        //validar campos detalles
-        if (!validarDetalles()) {
-            return;
-        }
-
-        this.setData();
-        ArrayList<Map<String, String>> alCabecera;
-        alCabecera = new ArrayList<>();
-        alCabecera.add(this.myData);
-        int rowsAffected = this.tc.updateReg(alCabecera);
-        //Para el DETALLE
-        ArrayList<Map<String, String>> alDetalle;         //Cada Map es para un registro
-        alDetalle = new ArrayList<>(); //Instancia array
-
-        for (Map<String, String> myRow : columnData) {       //hay que recorrer el detalle y envira de a uno.
-            //System.out.println("ENVIAMOS "+myData.get("id"));
-            myRow.put("ventaid", myData.get("id"));      //asignamos el id de la cabecera como el fk del detalle
-            alDetalle.add(myRow);
-        }
-        //Hay que considerar que el upd puede ser que se envíe una fila nueva
-        int affected = this.tcdet.updateReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-        if (affected <= 0) {                               //Si no guardó la cabecera, no se procesa detalle
-            System.out.println("No se ha podido actualizar el detalle");
-            return;
-        }
-        this.resetData();
-        this.fillView(myData, columnData);
-    }
-
-    @Override
-    public void imBorrar(String crud) {
-        this.CRUD = crud;
-        String msg;
-        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
-            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-            return;
-        }
-        this.setData();
-        //Para el DETALLE
-        ArrayList<Map<String, String>> alDetalle;         //Declara array de Map, cada Map es para un registro
-        alDetalle = new ArrayList<>(); //Instancia array
-
-        for (Map<String, String> myRow : columnData) {       //hay que recorrer el detalle y envira de a uno.
-            myRow.put("ventaid", myData.get("id"));      //asignamos el id de la cabecera como el fk del detalle
-            alDetalle.add(myRow);
-        }
-        int affected = this.tcdet.deleteReg(alDetalle);   //Recordar que el modelo sólo procesa de a uno los registros
-        ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<>(); //Instancia array
-        alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
-        int rowsAffected = this.tc.deleteReg(alCabecera); //Está guardando igual si en el detalle hay error
-        //Invocamos el método deleteReg del Modelo que procesa un array
-        if (rowsAffected <= 0) {
-            msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + jtfId.getText();
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
-            return;
-        }
-        if (rowsAffected > 0) {
-            msg = "EL REGISTRO: " + jtfId.getText() + " SE HA ELIMINADO CORRECTAMENTE";
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-
-        }
-        imNuevo();
-    } //Fin imBorrar
-
-    @Override
     public void imNuevo() {
         this.resetData();
         this.limpiarTabla();
-        this.imInsDet();
         this.fillView(myData, columnData);
+        this.imInsDet();
     }
 
     @Override
@@ -1395,10 +1318,10 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         String msg = "";
         Map<String, String> where = new HashMap<>();  //Por qué campo buscar los registros
         Map<String, String> fields = new HashMap<>(); //Los campos que vamos a recuperar
+        this.setData(); //Hace tomar los datos de la vista
         
-//=================================Buscar por id de Cabecera ============================================================        
+//=================Buscar por id de Cabecera ===================================      
         if (currentField.equals("id")) {
-            this.setData(); //Hace tomar los datos de la vista
             this.myData = this.tc.searchById(myData); //Usa el mismo myData para devolver los valores de la cabecera
             System.out.println("Ventas imBuscar " + this.myData.toString());
             this.limpiarTabla();
@@ -1643,186 +1566,6 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         dispose();
     }
 
-    public int getProducto(int row, int col) {
-        String codbar, sql;
-        double preciol;
-        double precio;
-        int monori, mondes, clienteid;
-        long fecha;
-        precio = 0.0;
-        preciol = 0.0;
-        monori = 0;
-        mondes = 0;
-        fecha = 0;
-
-        int Exito = 0;
-        //recuperar cod_barra de la row
-        codbar = this.jtDetalle.getModel().getValueAt(row, 0).toString(); //col == 0
-        if (codbar.equals("")) { //para evitar error en el sql
-            codbar = "0";
-            JOptionPane.showMessageDialog(this, "Proporcione codigo", "getProducto1314", JOptionPane.OK_OPTION);
-            Exito = 0;
-        }
-        sql = "SELECT CONCAT(p.nombre, ' - ', "
-                + "p.descripcion, ' - ', m.nombre, ' - ', "
-                + "c.color, ' - ', t.tamano, ' - ', s.diseno) AS descripcion "
-                + "FROM PRODUCTOS p, PRODUCTO_DETALLE d, MARCAS m, COLORES c, tamanos t, disenos s "
-                + "WHERE p.id = d.productoid "
-                + "AND p.marca = m.cod_marca "
-                + "AND d.colorid = c.id "
-                + "AND d.tamanoid = t.id "
-                + "AND d.disenoid = s.id "
-                + "AND d.cod_barra = '" + codbar + "'";
-        //Map<String, String> producto = new HashMap<>();
-        ResultSet rs;
-
-        try {
-            rs = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
-            ResultSetMetaData metaData = rs.getMetaData();
-            int colCount = metaData.getColumnCount();
-            if (rs.next()) {
-                Exito = 1;
-                System.out.println("Producto INFO: \n");
-                for (int r = 1; r <= colCount; r++) {
-                    System.out.println("column "+metaData.getColumnName(r)+" valor "+rs.getString(metaData.getColumnName(r)));
-                    //producto.put(metaData.getColumnName(r), rs.getString("descripcion"));
-                    String descripcion = rs.getString("descripcion");
-                    this.jtDetalle.getModel().setValueAt(descripcion, row, 1); //Descripcion en jtDetalle
-                }
-            } else {
-                this.jtDetalle.getModel().setValueAt("0", row, 0);
-                this.jtDetalle.getModel().setValueAt("", row, 1);
-                String msg = "No se ha encontrado Producto con el Codigo: " + codbar;
-                JOptionPane.showMessageDialog(this, msg, "getProducto1696", JOptionPane.OK_OPTION);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        //---------------- BUSCAR COTIZACION ----------------//
-        int operador, decimales;
-        operador = 0;
-        decimales = 0;
-        long fechaa;
-        long fechax;
-        int cotizacion;
-        cotizacion = 0;
-
-        int defecto = 7200;
-        int monedaid = 1;
-        int monedadesti = Integer.parseInt(ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString()));
-        if (monedadesti == 1) {
-            precioo = Tools.sGetDecimalStringAnyLocaleAsDouble(this.jtDetalle.getModel().getValueAt(row, 2).toString());
-        } else {
-            fecha = (jdcProceso.getDate().getTime() / 1000L);
-            sql = "SELECT cotizacion FROM cotizaciones c "
-                    + "WHERE c.monedaorigid =  " + monedaid
-                    + " AND c.monedadestid = " + monedadesti
-                    + " AND FROM_UNIXTIME(" + fecha + ", '%d/%m/%Y') = FROM_UNIXTIME(c.fecha, '%d/%m/%Y')";
-
-            Map<String, String> rtnn = new HashMap<>();
-            ResultSet rss;
-            
-            try {
-                rss = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
-                ResultSetMetaData metaData = rss.getMetaData();
-                int colCount = metaData.getColumnCount();
-                if (rss.next()) {
-                    for (int r = 1; r <= colCount; r++) {
-
-                        cotizacionGlobal = rss.getInt("cotizacion");
-
-//            if (defecto > 0) {
-//                cotizacion = defecto;
-//            }
-//            decimales = rss.getInt("decimales");
-                    }
-                    System.out.println("COTIZACIOOON: " + cotizacion);
-                }
-                //Si rtn = 0 returnar algo...
-            } catch (SQLException erro) {
-                JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. - ERROR: " + erro);
-            }
-        }
-
-        //para el precio
-        clienteid = Integer.parseInt(ComboBox.ExtraeCodigo(this.jcbCliente.getSelectedItem().toString()));
-        sql = "SELECT (pd.precio) AS precio, p.moneda"
-                + " FROM PRECIOS p, PRECIOS_DETALLE pd, CLIENTES c"
-                + " WHERE p.id = pd.precioid"
-                + " AND pd.precioid = c.precioid"
-                + " AND c.id = " + clienteid
-                + " AND pd.cod_barra = '" + codbar + "'";
-
-        Map<String, String> rtnn = new HashMap<>();
-        ResultSet rss;
-
-        try {
-            rss = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
-            ResultSetMetaData metaData = rss.getMetaData();
-            int colCount = metaData.getColumnCount();
-            if (rss.next()) {
-                System.out.println("Producto Precio INFO: \n");
-                for (int r = 1; r <= colCount; r++) {
-                    System.out.println("column "+metaData.getColumnName(r)+" valor "+rss.getString(metaData.getColumnName(r)));
-                    //convertir de la moneda de la lista a la moneda de la venta
-                    monori = Integer.parseInt(ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString()));
-                    tableController tcMoneda = new tableController();
-                    tcMoneda.init("monedas");
-                    Map<String, String> where = new HashMap<>(); //Por qué campo buscar los registros                    
-                    where.put("id", monori + "");
-                    this.mapMoneda = tcMoneda.searchById(where);
-                    mondes = 1;
-                    fecha = (jdcProceso.getDate().getTime() / 1000L);
-
-                    preciol = Double.parseDouble(rss.getString("precio"));//Precio de lista
-
-                    System.out.println("deeee " + monori + " aaaa " + mondes + " fechaaaaa " + fecha + " precio aaaa" + preciol);
-
-                    precio = Tools.cambiarCotizacion(monori, mondes, fecha, preciol, cotizacionGlobal);
-                    System.out.println("precio: " + precioo);
-
-                    System.out.println("de " + monori + " a " + mondes + " fecha " + fecha + " precio " + precio);
-
-                    rtnn.put(metaData.getColumnName(r), precio + "".replace(".", ","));
-                    //this.jtDetalle.getModel().setValueAt( rss.getString(metaData.getColumnName(r)), row, 2);
-//                    this.jtDetalle.getModel().setValueAt( precio+"".replace(".", ","), row, 2);
-                    String pre = rss.getString("precio");
-                    precioo = Double.parseDouble(pre);
-
-                    String totrow = Tools.decimalFormat(precioo);
-                    String woDot = "";
-                    woDot = totrow.replace(".", "");
-                    //System.out.println("Sin puntos "+woDot);
-                    String woComa = "";
-                    woComa = woDot.replace(",", ".");
-                    //System.out.println("Coma por punto "+woComa);
-                    double tr = Tools.sGetDecimalStringAnyLocaleAsDouble(totrow);
-
-                    //System.out.println("total string tr "+tr+" fila "+row);
-                    this.jtDetalle.getModel().setValueAt(woComa, row, 2);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "EL PRODUCTO NO TIENE PRECIO DEFINIDO PARA EL CLIENTE!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
-                this.jtDetalle.getModel().setValueAt("0", row, 2);
-//PENDIENTE
-//Aqui debe haber una manera de gestionar la falta de precio para el producto para esta lista de precios en particular
-                this.limpiarTabla();
-                this.imInsDet();
-            }
-            if (precio == 0.0) {
-                JOptionPane.showMessageDialog(this, "CARGAR COTIZACIÓN DEl DIA", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
-                limpiarTabla();
-                imInsDet();
-                //System.out.println("ESTOY EN EL IF");
-            }
-        }
-        catch (SQLException ex) {
-            Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return Exito;
-    } //Fin getProducto
-
     /**
      * Calucula el total para una fila específica
      *
@@ -1830,9 +1573,7 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
      * @return rtn int que devuelve el estado de la operación, falta completar
      */
     public int setTotalRow(int row) {
-
         int rtn = 0;
-
         Double precio, cantidad, descuento, bonificado, totalrow;
         precio = Tools.sGetDecimalStringAnyLocaleAsDouble(this.jtDetalle.getModel().getValueAt(row, 2).toString());
         cantidad = Tools.sGetDecimalStringAnyLocaleAsDouble(this.jtDetalle.getModel().getValueAt(row, 3).toString());
@@ -1865,7 +1606,7 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
     public int setTotalGral() {
         int rtnint = 0, monedaDecimal = 0;
         int rows = this.jtDetalle.getRowCount();
-        String codbar, sql, limi;
+        String codbar, sql;
         codbar = "";
         sql = "";
 
@@ -1879,10 +1620,8 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         base = 0.0;
         iva = 0.0;
         exenta = 0.0;
-        limi = "";
 
         monedaDecimal = Integer.parseInt(mapMoneda.get("decimales"));
-        Map<String, String> rtn = new HashMap<>();
         Map<String, String> select = new HashMap<>();
         Map<String, String> where = new HashMap<>();
         columnData.clear();
@@ -1897,7 +1636,7 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             //Por cada codigo de barras 
             select.put("*", "*");
             where.put("cod_barra", codbar);
-            this.mapProductoDet = this.tmProductoDet.readRegisterById(select, where);//Recupera el id de producto
+            this.mapProductoDet = this.tmProductoDet.readRegisterById(select, where);//Recupera el id de productoDetalle
             //Para recuperar el producto
             where.clear();
             where.put("id", this.mapProductoDet.get("productoid"));
@@ -1932,28 +1671,23 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             totiva = totiva + (impuesto * cantidad);
             totExenta = totExenta + ((exenta - descuento) * (cantidad - bonificado));
             
-
             //para CONTROLAR LIMITE DE CREDITO DEL CLIENTE
             sql = "SELECT (c.credito) AS limite "
-                    + "FROM PRECIO_DETALLE pd, CLIENTES c "
+                    + "FROM precio_detalle pd, clientes c "
                     + "WHERE pd.precioid = c.precioid "
                     + "AND pd.cod_barra = '" + codbar + "'";
-
-            Map<String, String> rtnnn = new HashMap<>();
-            ResultSet rsss;
+            ResultSet rs;
 
             try {
-                rsss = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
-                ResultSetMetaData metaData = rsss.getMetaData();
-                int colCount = metaData.getColumnCount();
-                if (rsss.next()) {
+                rs = conexion.ejecuteSQL(sql);
+                if (rs.next()) {
                     System.out.println("Credito Cliente INFO: ");
-                    for (int r = 1; r <= colCount; r++) {
-                        System.out.println("column "+ metaData.getColumnName(r) + " valor " + rsss.getString(metaData.getColumnName(r)));
-                        limi = rsss.getString("limite");
-                        limite = Double.parseDouble(limi);
-                        System.out.println("Limite de Credito de Cliente: " + limite);
-                    }
+                    System.out.println("Limite de Credito Cliente: " + " valor " + rs.getString("limite"));
+                    
+                    String limi = rs.getString("limite");
+                    limite = Double.parseDouble(limi);
+                    System.out.println("Limite de Credito de Cliente: " + limite);
+                    
                 } else {
                     //PENDIENTE como se deberia manejar el caso en el que el cliente haya alcanzado
                     // el limite maximo de credito
@@ -1970,11 +1704,11 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             System.out.println("limite: " + limite);
             System.out.println("totalventa " + totNeto);
             if (totBruto > limite && condicion == 0) {
-                this.jftfNeto.setText("0");
-                this.jftfImpuesto.setText("0");
-                this.jftfExenta.setText("0");
-                this.jftfTotal.setText("0");
-                imNuevo();
+                //this.jftfNeto.setText("0");
+                //this.jftfImpuesto.setText("0");
+                //this.jftfExenta.setText("0");
+                //this.jftfTotal.setText("0");
+                //imNuevo();
                 JOptionPane.showMessageDialog(this, "LIMITE DE CRÉDITO DEL CLIENTE SUPERADO!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
 
             }
@@ -2006,18 +1740,17 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         this.jftfTotal.setText(Tools.decimalFormat(totBruto));
         return rtnint;
     }//end setTotalGral
-    
-    
+       
     /**
      * Controla que todos los datos obligatorios de la cabecera tengan los
      * valores requeridos En caso contrario se devuelve el foco a la cabecera.
+     * Tambien carga los datos de moneda y cotizacion en sus maps correspondientes
      * Este método se llama en el evento focus de la tabla
      *
      * @return boolean que indica si las condiciones se cumplen o no, true/false
      */
-    public boolean validarCabecera() { //Acordate que esto tenes que completar
-        boolean rtn;
-        rtn = true;
+    public boolean validarCabecera() {
+        boolean rtn = true;
         String msg = "Defecto Cabecera";
         //validar id
         if (jtfId.getText().isEmpty() || "".equals(jtfId.getText())) {
@@ -2034,17 +1767,42 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             jdcProceso.setDate(new Date());
             rtn = false;
         }
-
+        //Fecha Factura
         Date fechaFactura = jdcFactura.getDate();
-
         if (fechaFactura == null) {
             msg = "Favor ingrese una fecha de operación válida!";
             jftfNroDocu.requestFocus();
             jdcFactura.setDate(new Date());
             rtn = false;
         }
-
-        //continuar con los demás controles
+        //Cliente
+        String clienteid = ComboBox.ExtraeCodigo(jcbCliente.getSelectedItem().toString());
+        if (clienteid.isEmpty()) {
+            msg = "favor seleccione un cliente";
+            jcbCliente.requestFocus();
+            jcbCliente.showPopup();
+            rtn = false;
+        }
+        //Deposito
+        String depositoid = ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString());
+        if (depositoid.isEmpty()) {
+            msg = "favor seleccione un deposito";
+            jcbDeposito.requestFocus();
+            jcbDeposito.showPopup();
+            rtn = false;
+        }
+        //Moneda
+        String monedaid = ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString());
+        if (monedaid.isEmpty()) {
+            msg = "favor seleccione un deposito";
+            jcbMoneda.requestFocus();
+            jcbMoneda.showPopup();
+            rtn = false;
+        }
+        
+        this.getMoneda(); //Carga los datos de la moneda operacion en el mapMoneda
+        this.getCotizacion(); //Carga los datos de la cotizacion en el mapCotizacion
+        
         if (!rtn) {
             JOptionPane.showMessageDialog(this, msg, "¡Favor Verificar!", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -2085,6 +1843,127 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
         return valor;
     } //Fin validarDetalles
     
+    public int getProducto(int row, int col) {
+        int Exito = 0;
+        //recuperar cod_barra de la row y DepositoId del ComboBox cabecera
+        String codbar = this.jtDetalle.getModel().getValueAt(row, 0).toString(); //col == 0
+        String depositoid = ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString());
+        
+        if (codbar.equals("")) { //para evitar error en el sql
+            //this.jtDetalle.getModel().setValueAt("0", row, 0); //cod_bar 0
+            codbar = "0";
+            JOptionPane.showMessageDialog(this, "Proporcione codigo", "getProducto1623", JOptionPane.OK_OPTION);
+            Exito = 0;
+            return Exito;
+        }
+        // DESCRIPCION DEL PRODUCTO -------------------
+        String sql = "SELECT CONCAT(p.nombre, ' ', "
+                + "m.nombre, ' , ', "
+                + "c.color, ' ', t.tamano, ' ', s.diseno) AS descripcion, "
+                + "stock.cantidad AS cantidad_actual "
+                + "FROM productos p, producto_detalle d, marcas m, colores c, tamanos t, disenos s, stock, depositos dep "
+                + "WHERE p.id = d.productoid "
+                + "AND p.marca = m.id "
+                + "AND d.colorid = c.id "
+                + "AND d.tamanoid = t.id "
+                + "AND d.disenoid = s.id "
+                + "AND stock.cod_barra = '" + codbar + "' "
+                + "AND stock.depositoid = '" + depositoid + "' "
+                + "AND d.cod_barra = '" + codbar + "'";
+        ResultSet rs;
+
+                //SELECT CONCAT(p.nombre, ' ', m.nombre, ' , ', c.color, ' ', t.tamano, ' ', s.diseno) AS descripcion, 
+                //	stock.cantidad AS cantidad_actual,
+                //	pd.precio AS precio
+                //FROM productos p
+                //JOIN producto_detalle d ON p.id = d.productoid
+                //JOIN marcas m ON p.marca = m.id 
+                //JOIN colores c ON d.colorid = c.id
+                //JOIN tamanos t ON d.tamanoid = t.id
+                //JOIN disenos s ON d.disenoid = s.id
+                //JOIN stock ON stock.cod_barra = d.cod_barra
+                //JOIN depositos dep ON stock.depositoid = dep.id
+                //join clientes cl on cl.id = :clienteid
+                //join precios pr on cl.precioid = pr.id
+                //join precio_detalle pd on pd.cod_barra = d.cod_barra and pd.precioid = pr.id
+                //WHERE stock.cod_barra = :codbar
+                //AND stock.depositoid = :depositoid
+                //AND d.cod_barra = :codbar
+                //and cl.id = :clienteid;
+        try {
+            rs = conexion.ejecuteSQL(sql); //Esto devuelve un ResultSet
+            if (rs.next()) {
+                Exito = 1;
+                //INFORMACION DEL PRODUCTO EN CONSOLA
+                ResultSetMetaData metaData = rs.getMetaData();
+                System.out.println("Producto INFO:");
+                System.out.println("column "+metaData.getColumnName(1)+" valor "+rs.getString("descripcion"));
+
+                //PRODUCTO DESCRIPCION
+                String descripcion = rs.getString("descripcion");
+                this.jtDetalle.getModel().setValueAt(descripcion, row, 1); //Descripcion
+
+                //PRODUCTO CANTIDAD ACTUAL STOCK
+                int cantidad_actual = rs.getInt("cantidad_actual");
+                this.jtDetalle.getModel().setValueAt(cantidad_actual, row, 3); //Cantidad en Deposito Stock
+                
+            } else {
+                this.jtDetalle.getModel().setValueAt("0", row, 0);
+                this.jtDetalle.getModel().setValueAt("Descripcion", row, 1);
+                String msg = "No se ha encontrado Producto con el Codigo: " + codbar;
+                JOptionPane.showMessageDialog(this, msg, "getProducto1696", JOptionPane.OK_OPTION);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //PARA EL PRECIO DEL PRODUCTO --------------------------------
+        String clienteid = ComboBox.ExtraeCodigo(jcbCliente.getSelectedItem().toString());
+        sql = "SELECT (pd.precio) AS precio"
+                + " FROM PRECIOS p, PRECIO_DETALLE pd, CLIENTES c"
+                + " WHERE p.id = pd.precioid"
+                + " AND pd.precioid = c.precioid"
+                + " AND c.id = " + clienteid
+                + " AND pd.cod_barra = '" + codbar + "'";
+        ResultSet rss;
+        try {
+            Double precio = 0.0;
+            rss = conexion.ejecuteSQL(sql);
+            if (rss.next()) {
+                    precio = rss.getDouble("precio"); //Precio de lista
+                    //Double precioCotizado = this.cotizarPrecio(precio);
+                    String totrow = Tools.decimalFormat(precio); //precioCotizado
+                    String woDot = "";
+                    woDot = totrow.replace(".", "");
+                    //System.out.println("Sin puntos "+woDot);
+                    String woComa = "";
+                    woComa = woDot.replace(",", ".");
+                    //System.out.println("Coma por punto "+woComa);
+                    double tr = Tools.sGetDecimalStringAnyLocaleAsDouble(totrow);
+
+                    //System.out.println("total string tr "+tr+" fila "+row);
+                    this.jtDetalle.getModel().setValueAt(woComa, row, 2);
+                
+            } else {
+                JOptionPane.showMessageDialog(this, "EL PRODUCTO NO TIENE PRECIO DEFINIDO PARA EL CLIENTE!", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
+                this.jtDetalle.getModel().setValueAt("0", row, 2);
+//PENDIENTE
+//Aqui debe haber una manera de gestionar la falta de precio para el producto para esta lista de precios en particular
+                this.limpiarTabla();
+                this.imInsDet();
+            }
+            if (precio == 0.0) {
+                JOptionPane.showMessageDialog(this, "CARGAR COTIZACIÓN DEl DIA", "¡A T E N C I O N!", JOptionPane.WARNING_MESSAGE);
+                limpiarTabla();
+                imInsDet();
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(tableModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return Exito;
+    } //Fin getProducto
+    
     /**
      * Recupera los datos de la moneda que se usa en el proceso
      */
@@ -2098,7 +1977,58 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             where.put("id", idMoneda);
             this.mapMoneda = tmMoneda.readRegisterById(fields, where);
         }
-    }
+    } // Fin getMoneda
+    
+    /**
+     * Cargar los datos de la cotizacion en mapCotizacion
+    */
+    public void getCotizacion() {
+        this.mapCotizacion.clear();
+        //monedaOrigen es la moneda en la lista de precios.
+        //para conseguir esta moneda realizamos una consulta SQL de la lista de precios asociada al cliente
+        String clienteid = ComboBox.ExtraeCodigo(jcbCliente.getSelectedItem().toString());
+        int monedaOrigen = 1; //moneda definida en PRECIOS. Por defecto 1 que disponemos como Guaranies
+        String sql = "SELECT p.moneda as MONEDAORIGEN "
+                    + "FROM clientes c, precios p "
+                    + "WHERE c.precioid = p.id "
+                    + "AND c.id = '" + clienteid + "'";
+        ResultSet rs;
+        try {
+            rs = conexion.ejecuteSQL(sql);
+            ResultSetMetaData metaData = rs.getMetaData();
+            int colCount = metaData.getColumnCount();
+            if (rs.next()) {
+                for (int r = 1; r <= colCount; r++) {
+                    monedaOrigen = rs.getInt("MONEDAORIGEN");
+                }
+            }
+        }catch(SQLException ex) {
+            JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. - ERROR: " + ex);
+        }
+        //monedaDestino es la moneda de OPERACION. Esta definida en mapMoneda
+        int monedaDestino = Integer.parseInt(ComboBox.ExtraeCodigo(jcbMoneda.getSelectedItem().toString()));
+        //fechaProceso es necesario para verificar la cotizacion el dia de la operacion
+        long fechaProceso = (jdcProceso.getDate().getTime() / 1000L);
+        //nuevo sql, esta vez consultamos la cotizacion entre monedaOrigen: moneda en listado de precios
+        // y monedaDestino: moneda definida en jcbMoneda para la fecha de la operacion definida en jdcProceso
+        sql = "SELECT c.cotizacion, c.operacion "
+                + "FROM cotizaciones c "
+                + "WHERE c.moneda_origen =  '" + monedaOrigen + "' "
+                + "AND c.moneda_destino = '" + monedaDestino + "' "
+                + "AND c.fecha = '" + fechaProceso + "'";
+        ResultSet rss;
+        try {
+            rss = conexion.ejecuteSQL(sql);
+            if (rss.next()) {
+                //si existe registro con estas condiciones entonces
+                //cargar valor de cotizacion en cotizacionGlobal
+                cotizacionGlobal = rss.getInt("cotizacion");
+                operacionCotizacion = rss.getInt("opearcion");
+            }
+        } catch (SQLException erro) {
+            JOptionPane.showMessageDialog(null, "No se pudo recuperar el registro. - ERROR: " + erro);
+        }
+    } //Fin getCotizacion
 
     /**
     * Prepara los Map Cabecera y Detalle con los valores de los campos
@@ -2287,7 +2217,7 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
                     df = new Date(dateLong);
                     jdcFactura.setDate(df);
                     break;
-                case "numero_documento":
+                case "nro_documento":
                     jftfNroDocu.setText(value);
                     break;
                 case "serie":
@@ -2369,11 +2299,11 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
             //System.out.println(myRow.get("descripcion"));
             //this.jtDetalle.setValueAt(myRow.get("descripcion"), row, 1);
             //this.jtDet.editCellAt(row, 0, this.keyPress(KeyEvent.VK_ENTER));
-            this.jtDetalle.setValueAt(myRow.get("precio_bruto"), row, 2);
+            this.jtDetalle.setValueAt(Tools.decimalFormat(Double.parseDouble(myRow.get("precio_bruto"))), row, 2);
             this.jtDetalle.setValueAt(myRow.get("cantidad"), row, 3);
-            this.jtDetalle.setValueAt(myRow.get("descuento"), row, 4);
+            this.jtDetalle.setValueAt(Tools.decimalFormat(Double.parseDouble(myRow.get("descuento"))), row, 4);
             this.jtDetalle.setValueAt(myRow.get("cantbonificado"), row, 5);
-            this.jtDetalle.setValueAt(myRow.get("total"), row, 6);
+            this.jtDetalle.setValueAt(Tools.decimalFormat(Double.parseDouble(myRow.get("total"))), row, 6);
 
             //this.jtDetalle.setValueAt(decimalFormat(650.75), row, 5);
             
@@ -2395,77 +2325,33 @@ public class wVenta extends javax.swing.JInternalFrame implements MouseListener,
     }//fin limpiarTabla
 
     public void recuperarTalonario() {
-        Date df;
-
-        long fechavence = 0;
-        int tipodocid;
-        tipodocid = Integer.parseInt(ComboBox.ExtraeCodigo(jcbTipo.getSelectedItem().toString()));
-        String sql = "SELECT * FROM talonarios WHERE tipodocid = "
-                + tipodocid + " AND cajaid = "
-                + this.cajaid
-                + " AND activo = 1";
+        
+        int tipodocid = Integer.parseInt(ComboBox.ExtraeCodigo(jcbTipo.getSelectedItem().toString()));
+        String sql = "SELECT * FROM talonarios "
+                + "WHERE tipodocid = '"+ tipodocid + "' "
+                + "AND cajaid = '" + this.cajaid + "' "
+                + "AND activo = 1";
         //System.out.println(sql);
         ResultSet rs = conexion.ejecuteSQL(sql);
         try {
             if (rs.next()) {
                 this.jftfSerie.setText(rs.getString("serie"));
                 this.jtfTimbrado.setText(rs.getString("timbrado"));
-                long dateLong = Long.parseLong(rs.getString("vence")) * 1000L;
-                df = new Date(dateLong);
+                long fechavence = Long.parseLong(rs.getString("vence")) * 1000L;
+                Date df = new Date(fechavence);
                 jdcVencimiento.setDate(df);
 
                 varserie = (rs.getString("serie"));
                 vartimbrado = (rs.getString("timbrado"));
 
-                fechavence = Long.parseLong(rs.getString("vence")) * 1000L;
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(wVenta.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        //PARA RECUPERAR EL ULTIMO NUMERO DE REGISTRO VENTA
-        String sqllL = "SELECT cant_usado AS nro_documento FROM  sys_talonarios WHERE tipodocid = "
-                + tipodocid;
-//               +vartimbrado+ "'"
-//               + "AND serie = '"+varserie+"'";  
-        System.out.println(sqllL);
-        ResultSet rssS = conexion.ejecuteSQL(sqllL);
-
-        try {
-            if (rssS.next()) {
-                nrovent = Integer.parseInt(rssS.getString("nro_documento"));
+                nrovent = Integer.parseInt(rs.getString("cant_usado"));
                 nroventnuevo = nrovent + 1;
                 this.jftfNroDocu.setText(nroventnuevo + "");
-
-                //System.out.println(+nrovent);
-                //System.out.println(+nroventnuevo);
             }
         } catch (SQLException ex) {
             Logger.getLogger(wVenta.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        //PARA RECUPERAR EL ULTIMO NUMERO DE DOCUMENTO
-        if (tipoopcion == 1) {
-
-            String sqll = "SELECT cant_usado AS nro_documento FROM  sys_talonarios WHERE tipodocid = "
-                    + tipodocid;
-            //+" AND vence = '"+fechavence+"'";
-            //System.out.println(sqll);
-            ResultSet rss = conexion.ejecuteSQL(sqll);
-
-            try {
-                if (rss.next()) {
-                    nrodoc = Integer.parseInt(rss.getString("nro_documento"));
-                    nrodocnuevo = nrodoc + 1;
-                    this.jftfNroDocu.setText(nrodocnuevo + "");
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(wVenta.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }//fin recuperarTalonario
-
-    }
+    }//fin recuperarTalonario
 
     public void validartipodocumento() {
         int tipodoc;

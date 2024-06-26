@@ -1,55 +1,24 @@
 package reportes;
 
 import util.ComboBox;
-import util.Tools;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
 
-/**
- *
- * @author vic-h
- */
 public class vFiltroSeguimientoProducto extends javax.swing.JDialog {
-private int returnStatus = RET_CANCEL;
-    
+    private int returnStatus = RET_CANCEL;
     private static final int RET_CANCEL = 0;
-    
     private static final int RET_OK = 0;
-    private Date fecha;
-    private DateFormat dateFormat, dateTimeFormat, dateIns;
     HashMap par = new HashMap();
+    
     /**
      * Creates new form vFiltroProductos
+     * @param parent la ventana principal
+     * @param modal true. Indica si el diálogo es modal, es decir, si bloquea la interacción con otras ventanas mientras está abierto.
      */
     public vFiltroSeguimientoProducto(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-      String cancelName = "cancel";
-//         dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-//        dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-//   dateIns = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
-//        jdt_fechadesde.setDate(new Date());
-//        jdt_fechahasta.setDate(new Date());
-        ComboBox.pv_cargar(cbx_deposito, "depositos", " id, nombre ", "id", "");
-        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
-        ActionMap actionMap = getRootPane().getActionMap();
-        actionMap.put(cancelName, new AbstractAction(){
-            public void actionPerformed(ActionEvent e) {
-              doClose (RET_CANCEL);
-            }
-        });
+        ComboBox.pv_cargar(jcbDeposito, "depositos", " id, nombre ", "id", "");
     }  
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -60,38 +29,32 @@ private int returnStatus = RET_CANCEL;
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        cbx_deposito = new javax.swing.JComboBox<>();
+        jButtonAceptar = new javax.swing.JButton();
+        lblDeposito = new javax.swing.JLabel();
+        jButtonCerrar = new javax.swing.JButton();
+        lblCodBarra = new javax.swing.JLabel();
+        jcbDeposito = new javax.swing.JComboBox<>();
         tf_codbarra = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jButton1.setText("ACEPTAR");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonAceptar.setText("ACEPTAR");
+        jButtonAceptar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonAceptarActionPerformed(evt);
             }
         });
 
-        jLabel1.setText("DEPOSITO");
+        lblDeposito.setText("DEPOSITO");
 
-        jButton2.setText("CANCELAR");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jButtonCerrar.setText("CANCELAR");
+        jButtonCerrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                jButtonCerrarActionPerformed(evt);
             }
         });
 
-        jLabel2.setText("COD BARRA");
-
-        tf_codbarra.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tf_codbarraActionPerformed(evt);
-            }
-        });
+        lblCodBarra.setText("COD BARRA");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -101,19 +64,18 @@ private int returnStatus = RET_CANCEL;
                 .addGap(41, 41, 41)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, 0)
-                        .addComponent(jButton1)
+                        .addComponent(jButtonAceptar)
                         .addGap(93, 93, 93)
-                        .addComponent(jButton2))
+                        .addComponent(jButtonCerrar))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCodBarra, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(tf_codbarra))
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblDeposito, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(cbx_deposito, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jcbDeposito, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -121,68 +83,35 @@ private int returnStatus = RET_CANCEL;
             .addGroup(layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
+                    .addComponent(lblCodBarra)
                     .addComponent(tf_codbarra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(7, 7, 7)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(cbx_deposito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblDeposito)
+                    .addComponent(jcbDeposito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(jButtonAceptar)
+                    .addComponent(jButtonCerrar))
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButtonAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAceptarActionPerformed
         doClose(RET_OK);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButtonAceptarActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        System.exit(0);
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void tf_codbarraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_codbarraActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tf_codbarraActionPerformed
+    private void jButtonCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCerrarActionPerformed
+        setVisible(false);
+        dispose();
+    }//GEN-LAST:event_jButtonCerrarActionPerformed
 
     /**
-     * @param args the command line arguments
-     */
+    * @param args the command line arguments
+    */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(vFiltroSeguimientoProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(vFiltroSeguimientoProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(vFiltroSeguimientoProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(vFiltroSeguimientoProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -197,7 +126,9 @@ private int returnStatus = RET_CANCEL;
             }
         });
     }
-private void doClose (int retStatus){
+    
+    //Operaciones realizadas y luego cierra la ventana
+    private void doClose (int retStatus){
         returnStatus = retStatus;
         getParameters();
         setVisible(false);
@@ -205,18 +136,16 @@ private void doClose (int retStatus){
     }
 
     private void getParameters(){
-         int argdeposito;
-         String argcodbarra = "";
+        String argcodbarra = "";
         if ("".equals(tf_codbarra.getText())){
             argcodbarra = "";
         }else{
           argcodbarra = tf_codbarra.getText();
         }
-        String argdepositoo = ComboBox.ExtraeCodigo(cbx_deposito.getSelectedItem().toString());
-        if (argdepositoo.equals("")){
-            argdepositoo = "1";
-        } 
-        argdeposito = Integer.parseInt(argdepositoo);
+        
+        String argdepositoo = ComboBox.ExtraeCodigo(jcbDeposito.getSelectedItem().toString());
+        if (argdepositoo.equals("")){ argdepositoo = "1"; } 
+        int argdeposito = Integer.parseInt(argdepositoo);
         
         par.put("productoId",argcodbarra);
         par.put("depositoId",argdeposito);
@@ -229,11 +158,11 @@ private void doClose (int retStatus){
         return returnStatus;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> cbx_deposito;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JButton jButtonAceptar;
+    private javax.swing.JButton jButtonCerrar;
+    private javax.swing.JComboBox<String> jcbDeposito;
+    private javax.swing.JLabel lblCodBarra;
+    private javax.swing.JLabel lblDeposito;
     private javax.swing.JTextField tf_codbarra;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 9.0.0.final using JasperReports Library version 6.21.0-4f56c4f36cd19e17675219a9ac4692d5f0f13b06  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6af5848b-22f5-4348-a12e-cdb88ffbd35e">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.sql.tables">
+		<![CDATA[cHJvdmVlZG9yZXMgLDY3NCwxNSwzY2I3NDQwZC03MmY5LTRhOGYtOWY1OC1iOThiYTEwOWQzNmI7
+bWFyY2FzICw0OTMsMTUsM2Q1M2RlOTQtMjhjYy00YTJmLTkxMGYtNDZiMDZlY2U5NjcxO2NvbXBy
+YXMgLDE1LDE1LDg1NTc1OGZkLWRjZmYtNGZhMi04OGFjLTE1ZDY4ZjhlYTNmNDt0YW1hbm9zICw1
+ODMsMTUsZjg1ZWQwZmEtMmQ5OC00MjRkLWIxM2UtYjc1Y2M2YmM4ZGE5O2RlcG9zaXRvcyAsODA0
+LDE1LDQxY2M2Nzk5LTYzZmItNDJiMi04MTZlLWEwMzcwM2Q0MWE3Yztjb21wcmFfZGV0YWxsZSAs
+MTA4LDE1LDVmMWViMmU1LTgxMjAtNDZmMC04NTM4LTFiYWQ4OGEyZDZmMztwcm9kdWN0b19kZXRh
+bGxlICwyNDMsMTUsY2I4N2E0YTMtMTdkOS00NDMzLWEzMGItZTEzM2NiOGFiMWE3O3Byb2R1Y3Rv
+cyAsMzkxLDE1LDgzODQzZmQxLTA4MjEtNDk1Ny05NjJjLTM4YWY5MGEzZGQ4Yjs=]]>
+	</property>
 	<parameter name="compraid" class="java.lang.String">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
@@ -12,14 +23,15 @@
 	<parameter name="depositoid" class="java.lang.String">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
-	<parameter name="fechadesderecep" class="java.lang.String">
+	<parameter name="fechadesderecep" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
-	<parameter name="fechahastarecep" class="java.lang.String">
+	<parameter name="fechahastarecep" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[SELECT cd.cod_barra AS COD_BARRA,
+		<![CDATA[SELECT c.id AS COMPRAID,
+	cd.cod_barra AS COD_BARRA,
 	CONCAT( p.nombre,' - ',m.nombre,' - ',t.tamano) AS DESCRIPCION_PRODUCTO,
 	FROM_UNIXTIME( c.fecha_proceso,'%y/%m/%d') AS FECHARECEPCION,
 	prov.ruc AS RUC,
@@ -52,6 +64,7 @@ WHERE c.id  = cd.compraid
 	AND ((prov.ruc = $P{ruc}) or ($P{ruc} = 0)) 
 	AND ((dep.id = $P{depositoid}) or ($P{depositoid} = 0))]]>
 	</queryString>
+	<field name="COMPRAID" class="java.lang.Integer"/>
 	<field name="COD_BARRA" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
@@ -60,10 +73,10 @@ WHERE c.id  = cd.compraid
 	<field name="RUC" class="java.lang.String"/>
 	<field name="PROVEEDORES" class="java.lang.String"/>
 	<field name="DEPOSITO" class="java.lang.String"/>
-	<field name="CANTIDAD" class="java.lang.String">
+	<field name="CANTIDAD" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="PRECIO" class="java.lang.String">
+	<field name="PRECIO" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="TOTAL" class="java.math.BigDecimal">
@@ -96,11 +109,11 @@ WHERE c.id  = cd.compraid
 				<text><![CDATA[Desde:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="22" y="39" width="186" height="15" uuid="600b469b-5527-4437-81d9-bffcb2b2677d"/>
+				<reportElement x="9" y="35" width="186" height="15" uuid="600b469b-5527-4437-81d9-bffcb2b2677d"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<text><![CDATA[Natalicio Talavera - Guairá - Paraguay]]></text>
+				<text><![CDATA[San Juan Nepomuceno- Caazapa - Paraguay]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="403" y="39" width="40" height="20" uuid="7c3196e3-0f2d-48a9-907f-3e18ab6b58cb"/>
@@ -108,11 +121,11 @@ WHERE c.id  = cd.compraid
 				<text><![CDATA[Hasta:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="42" y="54" width="106" height="14" uuid="962b7347-7482-4d0e-bcd8-c54c02fb22b9"/>
+				<reportElement x="39" y="50" width="106" height="14" uuid="962b7347-7482-4d0e-bcd8-c54c02fb22b9"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<text><![CDATA[Cell: 0975 - 932302]]></text>
+				<text><![CDATA[Cell: 0984 - 230469]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="445" y="19" width="100" height="20" uuid="575cf3c9-d3e7-47c0-b243-1b0ed750b8ab"/>

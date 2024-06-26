@@ -251,6 +251,41 @@
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
               </AuxValues>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="mitenPersonas">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Personas"/>
+                <Property name="name" type="java.lang.String" value="mitenPersonas" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenPersonasActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <Menu class="javax.swing.JMenu" name="menuMonedas">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Monedas"/>
+                <Property name="name" type="java.lang.String" value="menuMonedas" noResource="true"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenMonedas">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Monedas"/>
+                    <Property name="name" type="java.lang.String" value="mitenMonedas" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenMonedasActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenCotizaciones">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cotizaciones"/>
+                    <Property name="name" type="java.lang.String" value="mitenCotizaciones" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenCotizacionesActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="menuSeguridad">
@@ -378,6 +413,15 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenMarcaActionPerformed"/>
                       </Events>
                     </MenuItem>
+                    <MenuItem class="javax.swing.JMenuItem" name="mitenPrecios">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Precios"/>
+                        <Property name="name" type="java.lang.String" value="mitenPrecios" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenPreciosActionPerformed"/>
+                      </Events>
+                    </MenuItem>
                   </SubComponents>
                 </Menu>
                 <MenuItem class="javax.swing.JMenuItem" name="mitenProveedor">
@@ -403,17 +447,57 @@
             <Menu class="javax.swing.JMenu" name="menuStockProcesos">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Procesos"/>
-                <Property name="name" type="java.lang.String" value="mitenStockProcesos" noResource="true"/>
+                <Property name="name" type="java.lang.String" value="menuStockFichasProducto" noResource="true"/>
               </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenAjusteStock">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Solicitud de Ajuste de Stock"/>
+                    <Property name="name" type="java.lang.String" value="mitenAjusteStock" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenAjusteStockActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenAprovarAjusteStock">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Aprovar de Ajuste de Stock"/>
+                    <Property name="name" type="java.lang.String" value="mitenAprovarAjusteStock" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenAprovarAjusteStockActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Pedido de Producto - Transferencia"/>
+                    <Property name="name" type="java.lang.String" value="mitenTransferenciaStock" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Aprobar Pedido de Tranferencia"/>
+                    <Property name="name" type="java.lang.String" value="mitenAprobarTransferenciaStock" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem2ActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
             </Menu>
             <Menu class="javax.swing.JMenu" name="menuStockInformes">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Informes"/>
+                <Property name="name" type="java.lang.String" value="menuStockInformes" noResource="true"/>
               </Properties>
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="mitenReporteProductos">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Reporte de Productos"/>
+                    <Property name="name" type="java.lang.String" value="mitenReporteProductos" noResource="true"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenReporteProductosActionPerformed"/>
@@ -471,6 +555,50 @@
             <Property name="name" type="java.lang.String" value="menuVenta" noResource="true"/>
           </Properties>
           <SubComponents>
+            <Menu class="javax.swing.JMenu" name="menuVentaFichas">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Fichas"/>
+                <Property name="name" type="java.lang.String" value="menuVentaFichas" noResource="true"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenClientes">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Clientes"/>
+                    <Property name="name" type="java.lang.String" value="mitenClientes" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenClientesActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenVendedores">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Vendedores"/>
+                    <Property name="name" type="java.lang.String" value="mitenVendedores" noResource="true"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenTalonarios">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Talonarios"/>
+                    <Property name="name" type="java.lang.String" value="mitenTalonarios" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenTalonariosActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenCobradores">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cobradores"/>
+                    <Property name="name" type="java.lang.String" value="mitenCobradores" noResource="true"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenTiposDocumentos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipos Documentos"/>
+                    <Property name="name" type="java.lang.String" value="mitenTiposDocumentos" noResource="true"/>
+                  </Properties>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
             <Menu class="javax.swing.JMenu" name="menuVentaProcesos">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Procesos"/>
@@ -486,11 +614,21 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenVenderActionPerformed"/>
                   </Events>
                 </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mitenNotaCredito">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nota de Credito"/>
+                    <Property name="name" type="java.lang.String" value="mitenNotaCredito" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mitenNotaCreditoActionPerformed"/>
+                  </Events>
+                </MenuItem>
               </SubComponents>
             </Menu>
             <Menu class="javax.swing.JMenu" name="menuVentaInformes">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Informes"/>
+                <Property name="name" type="java.lang.String" value="menuVentaInformes" noResource="true"/>
               </Properties>
             </Menu>
           </SubComponents>

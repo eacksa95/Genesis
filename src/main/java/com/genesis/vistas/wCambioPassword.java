@@ -1,69 +1,62 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.genesis.vistas;
 
 import com.genesis.model.conexion;
 import com.genesis.model.tableModel;
 import util.Tools;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author RC
- */
 public class wCambioPassword extends javax.swing.JInternalFrame implements ActiveFrame {
-String Opcion = "";
+String menuName = "";
     String CRUD = "";
-    private tableModel tm;
-    private Map<String, String> fields, conditions, rtn;
+    private final tableModel tm;
+    
     /**
      * Creates new form wCambioContrashena
+     * @param menuName menu que se ha ejecutado en wPrincipal para abrir esta ventana
      */
-    public wCambioPassword(String Opcion) {
+    public wCambioPassword(String menuName) {
         initComponents();
-        this.Opcion = Opcion;
+        this.menuName = menuName;
         tm = new tableModel();
         tm.init("usuarios");
-        fields = new HashMap<String, String>();
-        conditions = new HashMap<String, String>();
     }
-    public void wCambioContrasenha() {
-        String msg = "";
-        String strActClave, strNewClave, strConfClave = "";
-        String strEncript = "";
+    
+    public void cambioPassword() {
+        String msg;
+        String strActClave;
+        String strEncript;
         char ch_actclave[] = actclave.getPassword();
         char ch_newclave[] = newclave.getPassword();
         char ch_confclave[] = confclave.getPassword();
-        if (ch_actclave.length < 8) {
-            JOptionPane.showMessageDialog(rootPane, "Clave actual debe ser mayor a 8 caracteres ");
+        //validar Longitud minima del Password actual
+        if (ch_actclave.length < 4) {
+            JOptionPane.showMessageDialog(rootPane, "Clave actual no puede ser menor a 4 caracteres ");
             actclave.requestFocus();
             return;
-
         }
-        if (ch_newclave.length < 8) {
-            JOptionPane.showMessageDialog(rootPane, "Nueva Clave debe ser mayor a 8 caracteres ");
+        //validar Longitud minima del Password nuevo
+        if (ch_newclave.length < 4) {
+            JOptionPane.showMessageDialog(rootPane, "Nueva Clave debe ser mayor a 4 caracteres ");
             newclave.requestFocus();
             return;
         }
-        if (ch_confclave.length < 8) {
-            JOptionPane.showMessageDialog(rootPane, "Clave Confirmación debe ser mayor a 8 caracteres ");
+        //validar Longitud minima de la confirmacion del Password nuevo
+        if (ch_confclave.length < 4) {
+            JOptionPane.showMessageDialog(rootPane, "Nueva Clave debe ser mayor a 4 caracteres ");
             confclave.requestFocus();
             return;
         }
 
-        if (Tools.validatePsw(ch_actclave)) {
-            strActClave = new String(ch_actclave);
-            strEncript = Tools.encryptMD5(strActClave);
+        if (Tools.validatePsw(ch_actclave)) { //Si true entonces contrase es valida
+            //se consulta en DB si contrasena del usuario logueado esta bien
+            Map<String, String> fields = new HashMap<>();
+            Map<String, String> conditions = new HashMap<>();
+            Map<String, String> rtn;
             fields.put("*", "*");
+            strActClave = new String(ch_actclave);
+            strEncript = Tools.encryptMD5(strActClave); //contrasena encriptada
             conditions.put("id", conexion.getUserId() + "");
             conditions.put("password", strEncript);
             rtn = tm.readRegisterById(fields, conditions);
@@ -72,7 +65,7 @@ String Opcion = "";
                 actclave.requestFocus();
                 return;
             }
-            String strNew, strConf = "";
+            String strNew, strConf;
             strNew = new String(ch_newclave);
             strConf = new String(ch_confclave);
             if (!strNew.equals(strConf)) {
@@ -80,27 +73,25 @@ String Opcion = "";
                 newclave.requestFocus();
                 return;
             }
+            // Si Contrasena es correcta y contrasena nueva y confirmacion coinciden
+            // entonces actualizar campo password en registro de usuario
             fields.clear();
-
             String nwPsw = new String(ch_newclave);
             strEncript = Tools.encryptMD5(nwPsw);
             fields.put("id", conexion.getUserId() + "");
             fields.put("password", strEncript);
-           int count = tm.updateRegister(fields);
-            //System.out.println("El usuario "+rtn.toString());
+            int count = tm.updateRegister(fields);
             
-            if (count < 1) {
+            if (count <= 0) {
             msg = "ERROR AL INTENTAR ACTUALIZAR CONTRASEÑA";
-        } else {
+            } else {
             msg = "SE HA ACTUALIZADO CORRECTAMENTE LA CONTRASEÑA";
             this.actclave.setText("");
             this.newclave.setText("");
             this.confclave.setText("");
-        }
+            }
         JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-
         }
-
     }
 
     /**
@@ -130,12 +121,6 @@ String Opcion = "";
         jLabel2.setText("Nueva Contraseña");
 
         jLabel3.setText("Confirmar Contraseña");
-
-        confclave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                confclaveActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -179,10 +164,6 @@ String Opcion = "";
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void confclaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confclaveActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_confclaveActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPasswordField actclave;
@@ -195,16 +176,14 @@ String Opcion = "";
 
     @Override
     public void imGrabar(String crud) {
-     this.CRUD = crud;
-        int metodo = 3;
-        System.out.println("OPCION VENTANA PRINCIPAL: " + Opcion);
-        metodo = Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud);
-        if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
-            String msg = "PERMISO NO AUTORIZADO PARA REALIZAR ESTA OPERACIÓN";
+        this.CRUD = crud;
+        String msg;
+        if (Tools.validarPermiso(conexion.getGrupoId(), menuName, crud) == 0) {
+            msg = "PERMISO NO AUTORIZADO PARA REALIZAR ESTA OPERACIÓN";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN.!!", JOptionPane.DEFAULT_OPTION);
         }
-        wCambioContrasenha();    
-    }
+        cambioPassword();    
+    } //fin imGrabar
 
     @Override
     public void imFiltrar() {

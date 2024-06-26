@@ -185,14 +185,14 @@ public class Login extends javax.swing.JFrame {
 
             //verificar que password no contenga caracteres invalidos
             char passArray[] = textFieldPassword.getPassword();
-            int li_valido = 0;
+            int caracterInvalido = 0;
             for (int i = 0; i < passArray.length; i++) {
                 char c = passArray[i];
                 if (!Character.isLetterOrDigit(c)) {
-                    li_valido++;
+                    caracterInvalido++;
                 }
             }
-            if (li_valido > 0) {
+            if (caracterInvalido > 0) {
                 JOptionPane.showMessageDialog(rootPane, "La contrase\u00F1a tiene carcteres inválidos!");
                 textFieldPassword.requestFocus();
                 return;

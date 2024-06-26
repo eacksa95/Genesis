@@ -14,19 +14,18 @@ import util.Tools;
  * @author Ezequiel Cristaldo
  */
 public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFrame {
-    private tableController tc;
+    
+    private final tableController tc;
     private Map<String, String> myData;
-    conexion con = null;
     String currentField;
     javax.swing.JTextField idObj;
     String Opcion = "";
     String CRUD = "";
-    private String msg;
     String menuName = "";
     
     /**
      * Creates new form RegistrosEmpleados
-     * @params menuName
+     * @param menuName
      */
     public wEmpleados(String menuName) {
         initComponents();
@@ -34,8 +33,8 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
         currentField = "";
         tc = new tableController();
         tc.init("empleados");
-        myData = new HashMap<String, String>();
-        textFieldId.setText("0");
+        myData = new HashMap<>();
+        jtfId.setText("0");
         dateFieldFechaNacimiento.setDateFormatString("yyyy-MM-dd");
         dateFieldFechaIngreso.setDateFormatString("yyyy-MM-dd");
         dateFieldFechaIngreso.setDate(new Date());
@@ -44,10 +43,9 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
     
     private void setData(){
         String fechaNacimiento, fechaIngreso, fechaBaja;
-        String fechaa = "0";
-        myData.put("id", textFieldId.getText());
-        myData.put("nombre", textFieldNombre.getText());
-        myData.put("apellido", textFieldApellido.getText());
+        myData.put("id", jtfId.getText());
+        myData.put("nombre", jftNombre.getText());
+        myData.put("apellido", jtfApellido.getText());
         myData.put("cedula", textFieldCedula.getText());
         
         if(dateFieldFechaNacimiento.getDate() != null){
@@ -82,7 +80,7 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
         myData.put("sueldo", "");
         myData.put("observacion", "");
         fillView(myData);
-        textFieldNombre.requestFocus();
+        jftNombre.requestFocus();
     }
     
     private void fillView(Map<String, String> data){
@@ -91,13 +89,13 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
             String value = entry.getValue();
             switch(key){
                 case"id":
-                    textFieldId.setText(value);
+                    jtfId.setText(value);
                     break;
                 case "nombre":
-                    textFieldNombre.setText(value);
+                    jftNombre.setText(value);
                     break;
                 case"apellido":
-                    textFieldApellido.setText(value);
+                    jtfApellido.setText(value);
                     break;
                 case"cedula":
                     textFieldCedula.setText(value);
@@ -157,12 +155,12 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
 
         textFieldCedula = new javax.swing.JTextField();
         lblCedula = new javax.swing.JLabel();
-        textFieldApellido = new javax.swing.JTextField();
+        jtfApellido = new javax.swing.JTextField();
         lblApellido = new javax.swing.JLabel();
-        textFieldNombre = new javax.swing.JTextField();
+        jftNombre = new javax.swing.JTextField();
         lblNombre = new javax.swing.JLabel();
         lblId = new javax.swing.JLabel();
-        textFieldId = new javax.swing.JTextField();
+        jtfId = new javax.swing.JTextField();
         lblFechaNacimiento = new javax.swing.JLabel();
         lblFechaIngreso = new javax.swing.JLabel();
         lblFechaBaja = new javax.swing.JLabel();
@@ -189,25 +187,25 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
 
         lblCedula.setText("N° Doc.");
 
-        textFieldApellido.setName("textFieldApellido"); // NOI18N
+        jtfApellido.setName("jtfApellido"); // NOI18N
 
         lblApellido.setText("Apellido");
 
-        textFieldNombre.setName("textFieldNombre"); // NOI18N
+        jftNombre.setName("jftNombre"); // NOI18N
 
         lblNombre.setText("Nombre");
 
         lblId.setText("ID");
 
-        textFieldId.setName("textFieldId"); // NOI18N
-        textFieldId.addFocusListener(new java.awt.event.FocusAdapter() {
+        jtfId.setName("jtfId"); // NOI18N
+        jtfId.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                textFieldIdFocusGained(evt);
+                jtfIdFocusGained(evt);
             }
         });
-        textFieldId.addKeyListener(new java.awt.event.KeyAdapter() {
+        jtfId.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                textFieldIdKeyPressed(evt);
+                jtfIdKeyPressed(evt);
             }
         });
 
@@ -235,20 +233,6 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblId)
-                                    .addComponent(lblNombre))
-                                .addGap(18, 18, 18))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblApellido)
-                                .addGap(16, 16, 16)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(textFieldId, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-                            .addComponent(textFieldNombre)
-                            .addComponent(textFieldApellido)))
-                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(lblFechaNacimiento)
                             .addComponent(lblCedula)
@@ -265,7 +249,22 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
                             .addComponent(textFieldCedula, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(dateFieldFechaBaja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(dateFieldFechaNacimiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(dateFieldFechaIngreso, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(dateFieldFechaIngreso, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(lblId)
+                                    .addComponent(lblNombre))
+                                .addGap(18, 18, 18))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblApellido)
+                                .addGap(16, 16, 16)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jftNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                                .addComponent(jtfApellido))
+                            .addComponent(jtfId, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(20, 20, 20))
         );
         layout.setVerticalGroup(
@@ -273,16 +272,16 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
             .addGroup(layout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textFieldId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jtfId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblId))
                 .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNombre)
-                    .addComponent(textFieldNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jftNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textFieldApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jtfApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(textFieldCedula, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -298,7 +297,7 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblFechaBaja)
-                            .addComponent(dateFieldFechaBaja, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE))
+                            .addComponent(dateFieldFechaBaja, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblCargo)
@@ -311,7 +310,7 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblObservacion)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(34, Short.MAX_VALUE))
+                        .addContainerGap(38, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(dateFieldFechaIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
@@ -320,20 +319,20 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void textFieldIdFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldIdFocusGained
+    private void jtfIdFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfIdFocusGained
         this.currentField = "id";
-        this.textFieldId.selectAll();
-    }//GEN-LAST:event_textFieldIdFocusGained
+        this.jtfId.selectAll();
+    }//GEN-LAST:event_jtfIdFocusGained
 
     private void textFieldCedulaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldCedulaFocusGained
         this.currentField = "cedula";
     }//GEN-LAST:event_textFieldCedulaFocusGained
 
-    private void textFieldIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldIdKeyPressed
+    private void jtfIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtfIdKeyPressed
             if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
                 imBuscar();
          }
-    }//GEN-LAST:event_textFieldIdKeyPressed
+    }//GEN-LAST:event_jtfIdKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -341,6 +340,9 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
     private com.toedter.calendar.JDateChooser dateFieldFechaIngreso;
     private com.toedter.calendar.JDateChooser dateFieldFechaNacimiento;
     private javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JTextField jftNombre;
+    public javax.swing.JTextField jtfApellido;
+    public javax.swing.JTextField jtfId;
     private javax.swing.JLabel lblApellido;
     private javax.swing.JLabel lblCargo;
     private javax.swing.JLabel lblCedula;
@@ -351,11 +353,8 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
     private javax.swing.JLabel lblNombre;
     private javax.swing.JLabel lblObservacion;
     private javax.swing.JLabel lblSueldo;
-    public javax.swing.JTextField textFieldApellido;
     private javax.swing.JTextField textFieldCargo;
     public javax.swing.JTextField textFieldCedula;
-    public javax.swing.JTextField textFieldId;
-    public javax.swing.JTextField textFieldNombre;
     private javax.swing.JTextArea textFieldObservacion;
     private javax.swing.JTextField textFieldSueldo;
     // End of variables declaration//GEN-END:variables
@@ -364,47 +363,62 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
     @Override
     public void imGrabar(String CRUD){ // operacion C
         int validacion = Tools.validarPermiso(conexion.getGrupoId(), menuName, CRUD);
-        
-        if(validacion == 0){ 
+        if (validacion == 0){ 
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
             return;
         }
-        int id, rows = 0;
-        id = Integer.parseInt(textFieldId.getText());
+        
+        int id = Integer.parseInt(jtfId.getText());
         if(validacion == 1){
             if (id > 0) {
                 this.setData();
-                this.imActualizar("C");
-                String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + textFieldId.getText();
+                this.imActualizar("U");
+                String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + jtfId.getText();
                 System.out.println(msg);
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
                 return;
             }
             this.setData();
-            rows = this.tc.createReg(this.myData);
-            this.fillView(myData);
-            String msg = "SE CREÓ EL NUEVO REGISTRO: " + textFieldId.getText();
-            System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
-            imNuevo();
+            int rowsAffected = this.tc.createReg(this.myData);
+            if (rowsAffected > 0) {
+                String msg = "SE CREÓ EL NUEVO REGISTRO: " + jtfId.getText();
+                System.out.println(msg);
+                JOptionPane.showMessageDialog(this, msg, "wEmpleados388...!", JOptionPane.DEFAULT_OPTION);
+                imNuevo();
+            } else {
+                String msg = "NO PUDO CREARSE EL NUEVO REGISTRO: " + jtfId.getText();
+                System.out.println(msg);
+                JOptionPane.showMessageDialog(this, msg, "wEmpleados393...!", JOptionPane.DEFAULT_OPTION);
+                imNuevo();
+            }
+
         }
     }
     
     @Override
     public void imActualizar(String CRUD){
         this.CRUD = CRUD;
+        String msg;
         int validacion = Tools.validarPermiso(conexion.getGrupoId(), menuName, CRUD);
         if(validacion == 0){ 
-                String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+                msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
                 JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
                 return;
         }
         this.setData();
         ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
-        alCabecera = new ArrayList<Map<String, String>>(); //Instancia array
+        alCabecera = new ArrayList<>(); //Instancia array
         alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
         int rowsAffected = this.tc.updateReg(alCabecera); //Está guardando igual si en el detalle hay error
+        if (rowsAffected < 1) {
+            msg = "Error al intentar actualizar el registro: " + this.jtfId.getText();
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.ERROR_MESSAGE);
+            return; // si tfId > 0 y no grabo cambios, entonces return
+        } else {
+            msg = "Se ha actualizado exitosamente el registro: " + this.jtfId.getText();
+            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
     
     @Override
@@ -424,13 +438,13 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
         int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array
         //int b =   this.tc.deleteReg(tf_id_marca.getText());
         if (b <= 0) {
-            String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + textFieldId.getText();
+            String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + jtfId.getText();
             System.out.println(msg);
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
             return;
         }
         if (b > 0) {
-            String msg = "EL REGISTRO: " + textFieldId.getText() + " SE HA ELIMINADO CORRECTAMENTE";
+            String msg = "EL REGISTRO: " + jtfId.getText() + " SE HA ELIMINADO CORRECTAMENTE";
             System.out.println(msg);
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
         }
@@ -466,7 +480,7 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
 //                codigo = textFieldCedula;
                 break;
         }
-        wBuscar frame = new wBuscar(sql, textFieldId);
+        wBuscar frame = new wBuscar(sql, jtfId);
         frame.setVisible(true);
         wPrincipal.desktop.add(frame);
         try {
@@ -481,7 +495,7 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
         this.setData();
         myData = tc.searchById(this.myData);
         if (this.myData.size() <= 0) {
-            String msg = "NO SE HA PODIDO RECUPERAR EL REGISTRO: " + textFieldId.getText();
+            String msg = "NO SE HA PODIDO RECUPERAR EL REGISTRO: " + jtfId.getText();
             this.resetData();
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
         }
@@ -492,28 +506,28 @@ public class wEmpleados extends javax.swing.JInternalFrame implements ActiveFram
     @Override
     public void imPrimero() {
         this.setData();
-        this.myData = this.tc.navegationReg(textFieldId.getText(), "FIRST");
+        this.myData = this.tc.navegationReg(jtfId.getText(), "FIRST");
         this.fillView(this.myData);
     }
 
     @Override
     public void imSiguiente() {
         this.setData();
-        this.myData = this.tc.navegationReg(textFieldId.getText(), "NEXT");
+        this.myData = this.tc.navegationReg(jtfId.getText(), "NEXT");
         this.fillView(this.myData);
     }
 
     @Override
     public void imAnterior() {
         this.setData();
-        this.myData = this.tc.navegationReg(textFieldId.getText(), "PRIOR");
+        this.myData = this.tc.navegationReg(jtfId.getText(), "PRIOR");
         this.fillView(this.myData);
     }
 
     @Override
     public void imUltimo() {
         this.setData();
-        this.myData = this.tc.navegationReg(textFieldId.getText(), "LAST");
+        this.myData = this.tc.navegationReg(jtfId.getText(), "LAST");
         this.fillView(this.myData);
     }
 

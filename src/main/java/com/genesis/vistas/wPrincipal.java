@@ -62,6 +62,10 @@ public class wPrincipal extends javax.swing.JFrame {
         mitenDepartamento = new javax.swing.JMenuItem();
         mitenCiudad = new javax.swing.JMenuItem();
         mitenEmpleados = new javax.swing.JMenuItem();
+        mitenPersonas = new javax.swing.JMenuItem();
+        menuMonedas = new javax.swing.JMenu();
+        mitenMonedas = new javax.swing.JMenuItem();
+        mitenCotizaciones = new javax.swing.JMenuItem();
         menuSeguridad = new javax.swing.JMenu();
         mitenUsuario = new javax.swing.JMenuItem();
         mitenRol = new javax.swing.JMenuItem();
@@ -77,9 +81,14 @@ public class wPrincipal extends javax.swing.JFrame {
         mitenDisenho = new javax.swing.JMenuItem();
         mitenTamano = new javax.swing.JMenuItem();
         mitenMarca = new javax.swing.JMenuItem();
+        mitenPrecios = new javax.swing.JMenuItem();
         mitenProveedor = new javax.swing.JMenuItem();
         mitenDeposito = new javax.swing.JMenuItem();
         menuStockProcesos = new javax.swing.JMenu();
+        mitenAjusteStock = new javax.swing.JMenuItem();
+        mitenAprovarAjusteStock = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         menuStockInformes = new javax.swing.JMenu();
         mitenReporteProductos = new javax.swing.JMenuItem();
         menuCompra = new javax.swing.JMenu();
@@ -88,8 +97,15 @@ public class wPrincipal extends javax.swing.JFrame {
         menuCompraInformes = new javax.swing.JMenu();
         mitenReporteCompras = new javax.swing.JMenuItem();
         menuVenta = new javax.swing.JMenu();
+        menuVentaFichas = new javax.swing.JMenu();
+        mitenClientes = new javax.swing.JMenuItem();
+        mitenVendedores = new javax.swing.JMenuItem();
+        mitenTalonarios = new javax.swing.JMenuItem();
+        mitenCobradores = new javax.swing.JMenuItem();
+        mitenTiposDocumentos = new javax.swing.JMenuItem();
         menuVentaProcesos = new javax.swing.JMenu();
         mitenVender = new javax.swing.JMenuItem();
+        mitenNotaCredito = new javax.swing.JMenuItem();
         menuVentaInformes = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -271,6 +287,38 @@ public class wPrincipal extends javax.swing.JFrame {
         menuFichas.add(mitenEmpleados);
         mitenEmpleados.getAccessibleContext().setAccessibleName("mitenEmpleados");
 
+        mitenPersonas.setText("Personas");
+        mitenPersonas.setName("mitenPersonas"); // NOI18N
+        mitenPersonas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenPersonasActionPerformed(evt);
+            }
+        });
+        menuFichas.add(mitenPersonas);
+
+        menuMonedas.setText("Monedas");
+        menuMonedas.setName("menuMonedas"); // NOI18N
+
+        mitenMonedas.setText("Monedas");
+        mitenMonedas.setName("mitenMonedas"); // NOI18N
+        mitenMonedas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenMonedasActionPerformed(evt);
+            }
+        });
+        menuMonedas.add(mitenMonedas);
+
+        mitenCotizaciones.setText("Cotizaciones");
+        mitenCotizaciones.setName("mitenCotizaciones"); // NOI18N
+        mitenCotizaciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenCotizacionesActionPerformed(evt);
+            }
+        });
+        menuMonedas.add(mitenCotizaciones);
+
+        menuFichas.add(menuMonedas);
+
         barraMenu.add(menuFichas);
         menuFichas.getAccessibleContext().setAccessibleName("menuRegistros");
 
@@ -387,6 +435,15 @@ public class wPrincipal extends javax.swing.JFrame {
         });
         menuStockFichasProducto.add(mitenMarca);
 
+        mitenPrecios.setText("Precios");
+        mitenPrecios.setName("mitenPrecios"); // NOI18N
+        mitenPrecios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenPreciosActionPerformed(evt);
+            }
+        });
+        menuStockFichasProducto.add(mitenPrecios);
+
         menuStockFichas.add(menuStockFichasProducto);
 
         mitenProveedor.setText("Proveedor");
@@ -410,12 +467,51 @@ public class wPrincipal extends javax.swing.JFrame {
         menuStock.add(menuStockFichas);
 
         menuStockProcesos.setText("Procesos");
-        menuStockProcesos.setName("mitenStockProcesos"); // NOI18N
+        menuStockProcesos.setName("menuStockFichasProducto"); // NOI18N
+
+        mitenAjusteStock.setText("Solicitud de Ajuste de Stock");
+        mitenAjusteStock.setName("mitenAjusteStock"); // NOI18N
+        mitenAjusteStock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenAjusteStockActionPerformed(evt);
+            }
+        });
+        menuStockProcesos.add(mitenAjusteStock);
+
+        mitenAprovarAjusteStock.setText("Aprovar de Ajuste de Stock");
+        mitenAprovarAjusteStock.setName("mitenAprovarAjusteStock"); // NOI18N
+        mitenAprovarAjusteStock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenAprovarAjusteStockActionPerformed(evt);
+            }
+        });
+        menuStockProcesos.add(mitenAprovarAjusteStock);
+
+        jMenuItem1.setText("Pedido de Producto - Transferencia");
+        jMenuItem1.setName("mitenTransferenciaStock"); // NOI18N
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        menuStockProcesos.add(jMenuItem1);
+
+        jMenuItem2.setText("Aprobar Pedido de Tranferencia");
+        jMenuItem2.setName("mitenAprobarTransferenciaStock"); // NOI18N
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        menuStockProcesos.add(jMenuItem2);
+
         menuStock.add(menuStockProcesos);
 
         menuStockInformes.setText("Informes");
+        menuStockInformes.setName("menuStockInformes"); // NOI18N
 
         mitenReporteProductos.setText("Reporte de Productos");
+        mitenReporteProductos.setName("mitenReporteProductos"); // NOI18N
         mitenReporteProductos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mitenReporteProductosActionPerformed(evt);
@@ -463,6 +559,41 @@ public class wPrincipal extends javax.swing.JFrame {
         menuVenta.setText("Venta");
         menuVenta.setName("menuVenta"); // NOI18N
 
+        menuVentaFichas.setText("Fichas");
+        menuVentaFichas.setName("menuVentaFichas"); // NOI18N
+
+        mitenClientes.setText("Clientes");
+        mitenClientes.setName("mitenClientes"); // NOI18N
+        mitenClientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenClientesActionPerformed(evt);
+            }
+        });
+        menuVentaFichas.add(mitenClientes);
+
+        mitenVendedores.setText("Vendedores");
+        mitenVendedores.setName("mitenVendedores"); // NOI18N
+        menuVentaFichas.add(mitenVendedores);
+
+        mitenTalonarios.setText("Talonarios");
+        mitenTalonarios.setName("mitenTalonarios"); // NOI18N
+        mitenTalonarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenTalonariosActionPerformed(evt);
+            }
+        });
+        menuVentaFichas.add(mitenTalonarios);
+
+        mitenCobradores.setText("Cobradores");
+        mitenCobradores.setName("mitenCobradores"); // NOI18N
+        menuVentaFichas.add(mitenCobradores);
+
+        mitenTiposDocumentos.setText("Tipos Documentos");
+        mitenTiposDocumentos.setName("mitenTiposDocumentos"); // NOI18N
+        menuVentaFichas.add(mitenTiposDocumentos);
+
+        menuVenta.add(menuVentaFichas);
+
         menuVentaProcesos.setText("Procesos");
         menuVentaProcesos.setName("menuVentaProcesos"); // NOI18N
 
@@ -475,9 +606,19 @@ public class wPrincipal extends javax.swing.JFrame {
         });
         menuVentaProcesos.add(mitenVender);
 
+        mitenNotaCredito.setText("Nota de Credito");
+        mitenNotaCredito.setName("mitenNotaCredito"); // NOI18N
+        mitenNotaCredito.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mitenNotaCreditoActionPerformed(evt);
+            }
+        });
+        menuVentaProcesos.add(mitenNotaCredito);
+
         menuVenta.add(menuVentaProcesos);
 
         menuVentaInformes.setText("Informes");
+        menuVentaInformes.setName("menuVentaInformes"); // NOI18N
         menuVenta.add(menuVentaInformes);
 
         barraMenu.add(menuVenta);
@@ -500,8 +641,6 @@ public class wPrincipal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-   
-    /**Iniciar y Mostrar Ventana Empleados*/
     private void mitenEmpleadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenEmpleadosActionPerformed
         JMenuItem m = (JMenuItem) evt.getSource();
         wEmpleados v_empleados = new wEmpleados(m.getName());
@@ -514,7 +653,6 @@ public class wPrincipal extends javax.swing.JFrame {
         centrar(v_empleados);        
     }//GEN-LAST:event_mitenEmpleadosActionPerformed
 
-    /**Ejecuta ActiveFrame.crearRegistro*/
     private void mitenGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenGuardarActionPerformed
             ActiveFrame activeFrame = getActiveFrame();
             if(activeFrame == null){
@@ -539,7 +677,6 @@ public class wPrincipal extends javax.swing.JFrame {
         //activeFrame.procesarSolicitud("F");
     }//GEN-LAST:event_mitenPrimeroActionPerformed
 
-    /**Limpiar formulario de la vista*/
     private void mitenNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenNuevoActionPerformed
         ActiveFrame activeFrame = getActiveFrame();
         if(activeFrame == null){
@@ -587,12 +724,12 @@ public class wPrincipal extends javax.swing.JFrame {
 
     private void mitenPermisosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenPermisosActionPerformed
         JMenuItem m = (JMenuItem) evt.getSource();
-        wPermisos view = new wPermisos(m.getName());
+        wPermisos view = new wPermisos(m.getName(), this);
         if(encuentraVentana(view)){
             return;
         }
         mostrarVentana(view);
-        centrar(view);        // TODO add your handling code here:
+        centrar(view);
     }//GEN-LAST:event_mitenPermisosActionPerformed
 
     private void mitenCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenCategoriaActionPerformed
@@ -607,7 +744,7 @@ public class wPrincipal extends javax.swing.JFrame {
 
     private void mitenProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenProductoActionPerformed
         JMenuItem m = (JMenuItem) evt.getSource();
-        wProductoDet view = new wProductoDet(m.getName());
+        wProducto view = new wProducto(m.getName());
         if (encuentraVentana(view)){
             return;
         }
@@ -773,8 +910,124 @@ public class wPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_mitenReporteComprasActionPerformed
 
     private void mitenVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenVenderActionPerformed
-        // TODO add your handling code here:
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wVenta view = new wVenta(1, m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
     }//GEN-LAST:event_mitenVenderActionPerformed
+
+    private void mitenNotaCreditoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenNotaCreditoActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wVenta view = new wVenta(2, m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenNotaCreditoActionPerformed
+
+    private void mitenClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenClientesActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wCliente view = new wCliente(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenClientesActionPerformed
+
+    private void mitenPreciosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenPreciosActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wPrecios view = new wPrecios(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenPreciosActionPerformed
+
+    private void mitenPersonasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenPersonasActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wPersonas view = new wPersonas(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenPersonasActionPerformed
+
+    private void mitenMonedasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenMonedasActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wMoneda view = new wMoneda(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenMonedasActionPerformed
+
+    private void mitenCotizacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenCotizacionesActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wCotizacion view = new wCotizacion(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenCotizacionesActionPerformed
+
+    private void mitenAjusteStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenAjusteStockActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wAjusteStock view = new wAjusteStock(1, m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenAjusteStockActionPerformed
+
+    private void mitenAprovarAjusteStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenAprovarAjusteStockActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wAjusteStock view = new wAjusteStock(2, m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenAprovarAjusteStockActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wTransferencia view = new wTransferencia(0, m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wTransferencia view = new wTransferencia(1, m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void mitenTalonariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mitenTalonariosActionPerformed
+        JMenuItem m = (JMenuItem) evt.getSource();
+        wTalonarios view = new wTalonarios(m.getName());
+        if (encuentraVentana(view)){
+            return;
+        }
+        mostrarVentana(view);
+        centrar(view);
+    }//GEN-LAST:event_mitenTalonariosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -815,6 +1068,8 @@ public class wPrincipal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JMenuBar barraMenu;
     public static javax.swing.JDesktopPane desktop;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     public javax.swing.JMenu menuArchivo;
     private javax.swing.JMenu menuCompra;
     private javax.swing.JMenu menuCompraInformes;
@@ -822,6 +1077,7 @@ public class wPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenu menuEditar;
     public javax.swing.JMenu menuFichas;
     private javax.swing.JMenu menuLocalidades;
+    private javax.swing.JMenu menuMonedas;
     private javax.swing.JMenu menuSeguridad;
     private javax.swing.JMenu menuStock;
     private javax.swing.JMenu menuStockFichas;
@@ -829,17 +1085,23 @@ public class wPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenu menuStockInformes;
     private javax.swing.JMenu menuStockProcesos;
     private javax.swing.JMenu menuVenta;
+    private javax.swing.JMenu menuVentaFichas;
     private javax.swing.JMenu menuVentaInformes;
     private javax.swing.JMenu menuVentaProcesos;
     private javax.swing.JMenuItem mitenActualizar;
+    private javax.swing.JMenuItem mitenAjusteStock;
     public javax.swing.JMenuItem mitenAnterior;
+    private javax.swing.JMenuItem mitenAprovarAjusteStock;
     private javax.swing.JMenuItem mitenBuscar;
     private javax.swing.JMenuItem mitenCambioPassword;
     private javax.swing.JMenuItem mitenCategoria;
     private javax.swing.JMenuItem mitenCerrarVentana;
     private javax.swing.JMenuItem mitenCiudad;
+    private javax.swing.JMenuItem mitenClientes;
+    private javax.swing.JMenuItem mitenCobradores;
     private javax.swing.JMenuItem mitenColor;
     private javax.swing.JMenuItem mitenComprar;
+    private javax.swing.JMenuItem mitenCotizaciones;
     private javax.swing.JMenuItem mitenDepartamento;
     private javax.swing.JMenuItem mitenDeposito;
     private javax.swing.JMenuItem mitenDisenho;
@@ -851,8 +1113,12 @@ public class wPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mitenInsertarDetalle;
     private javax.swing.JMenuItem mitenMarca;
     private javax.swing.JMenuItem mitenMenu;
+    private javax.swing.JMenuItem mitenMonedas;
+    private javax.swing.JMenuItem mitenNotaCredito;
     private javax.swing.JMenuItem mitenNuevo;
     private javax.swing.JMenuItem mitenPermisos;
+    private javax.swing.JMenuItem mitenPersonas;
+    private javax.swing.JMenuItem mitenPrecios;
     public javax.swing.JMenuItem mitenPrimero;
     private javax.swing.JMenuItem mitenProducto;
     private javax.swing.JMenuItem mitenProveedor;
@@ -861,9 +1127,12 @@ public class wPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mitenRol;
     private javax.swing.JMenuItem mitenSalirSistema;
     public javax.swing.JMenuItem mitenSiguiente;
+    private javax.swing.JMenuItem mitenTalonarios;
     private javax.swing.JMenuItem mitenTamano;
+    private javax.swing.JMenuItem mitenTiposDocumentos;
     public javax.swing.JMenuItem mitenUltimo;
     private javax.swing.JMenuItem mitenUsuario;
+    private javax.swing.JMenuItem mitenVendedores;
     private javax.swing.JMenuItem mitenVender;
     private javax.swing.JPopupMenu.Separator separadorArchivo;
     private javax.swing.JPopupMenu.Separator separadorEditar;
@@ -929,7 +1198,7 @@ public class wPrincipal extends javax.swing.JFrame {
     /**
      * Muestra o Oculta JMenus y JMenuItems dependiendo de los permisos del usuario
      */
-    private void procesarMenus() {
+    public void procesarMenus() {
         javax.swing.JMenu m_menu;
         javax.swing.JMenu m_submenu;
         javax.swing.JMenu m_item;
@@ -968,7 +1237,7 @@ public class wPrincipal extends javax.swing.JFrame {
                             menuName = m_submenu.getName();
                             if (Tools.validarPermiso(idRol, menuName, "ver") == 0) {
                                 m_submenu.setVisible(false);
-                                cants = 0; //Tenemos que prevenir que haga el siguiente if(cants >0)
+                                canti = 0; //Tenemos que prevenir que haga el siguiente if(cants >0) //Corregido 16/06/2024 de cants a canti
                             } else {
                                 m_submenu.setVisible(true);
                                 canti = m_submenu.getItemCount();
@@ -1025,6 +1294,7 @@ public class wPrincipal extends javax.swing.JFrame {
                                     for (int j = 0; j < cantj; j++) {
                                         menuName = "";
                                         m_subitem = (javax.swing.JMenu) m_menu.getItem(i);
+                                        // Validar permisos para subitems si es necesario
                                     }
                                 }
                             }

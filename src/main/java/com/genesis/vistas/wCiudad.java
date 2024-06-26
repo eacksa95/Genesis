@@ -29,7 +29,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     }
 
     private void setData() {
-        myData.put("id", tf_id.getText());
+        myData.put("id", jtfId.getText());
         myData.put("nombre", tf_nombre.getText());
         myData.put("departamentoid", ComboBox.ExtraeCodigo(jcbDepartamento.getSelectedItem().toString()));
     }//fin setData
@@ -47,7 +47,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
             String value = entry.getValue();
             switch (key) {
                 case "id":
-                    tf_id.setText(value);
+                    jtfId.setText(value);
                     break;
                 case "nombre":
                     tf_nombre.setText(value);
@@ -68,7 +68,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        tf_id = new javax.swing.JTextField();
+        jtfId = new javax.swing.JTextField();
         tf_nombre = new javax.swing.JTextField();
         lblId = new javax.swing.JLabel();
         lblCiudad = new javax.swing.JLabel();
@@ -80,15 +80,15 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         setMaximizable(true);
         setTitle("ABM CIUDAD");
 
-        tf_id.setText("0");
-        tf_id.addFocusListener(new java.awt.event.FocusAdapter() {
+        jtfId.setText("0");
+        jtfId.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                tf_idFocusGained(evt);
+                jtfIdFocusGained(evt);
             }
         });
-        tf_id.addKeyListener(new java.awt.event.KeyAdapter() {
+        jtfId.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                tf_idKeyPressed(evt);
+                jtfIdKeyPressed(evt);
             }
         });
 
@@ -111,7 +111,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jcbDepartamento, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tf_id, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                    .addComponent(jtfId, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                     .addComponent(tf_nombre, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -120,7 +120,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tf_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jtfId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblId))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -136,23 +136,23 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tf_idKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_idKeyPressed
+    private void jtfIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtfIdKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             this.imBuscar();
         }             // TODO add your handling code here:
-    }//GEN-LAST:event_tf_idKeyPressed
+    }//GEN-LAST:event_jtfIdKeyPressed
 
-    private void tf_idFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tf_idFocusGained
+    private void jtfIdFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfIdFocusGained
         this.currentField = "id";        // TODO add your handling code here:
-    }//GEN-LAST:event_tf_idFocusGained
+    }//GEN-LAST:event_jtfIdFocusGained
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> jcbDepartamento;
+    private javax.swing.JTextField jtfId;
     private javax.swing.JLabel lblCiudad;
     private javax.swing.JLabel lblDepartamento;
     private javax.swing.JLabel lblId;
-    private javax.swing.JTextField tf_id;
     private javax.swing.JTextField tf_nombre;
     // End of variables declaration//GEN-END:variables
 
@@ -161,33 +161,34 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         this.CRUD = crud;
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "wciudad164...!", JOptionPane.OK_OPTION);
             return;
         }
         int id, rows;
-        id = Integer.parseInt(tf_id.getText());
+        id = Integer.parseInt(jtfId.getText());
         if (id > 0) {
             this.imActualizar("C");
-            String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + tf_id.getText();
+            String msg = "SE HA ACTUALIZADO EXITOSAMENTE EL REGISTRO: " + jtfId.getText();
             System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "wCiudad173...!", JOptionPane.DEFAULT_OPTION);
             return;
         }
         this.setData();
         rows = this.tc.createReg(this.myData);
         this.fillView(myData);
-        String msg = "SE CREÓ EL NUEVO REGISTRO: " + tf_id.getText();
+        String msg = "SE CREÓ EL NUEVO REGISTRO: " + jtfId.getText();
         System.out.println(msg);
-        JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+        JOptionPane.showMessageDialog(this, msg, "wCiudad181...!", JOptionPane.DEFAULT_OPTION);
         imNuevo();
     }
 
     @Override
     public void imActualizar(String crud) {
         this.CRUD = crud;
+        String msg = "";
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
-            String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
+            JOptionPane.showMessageDialog(this, msg, "wCiudad191...!", JOptionPane.OK_OPTION);
             return;
         }
         System.out.println("V imActualizar");
@@ -195,7 +196,15 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         ArrayList<Map<String, String>> alCabecera;         //Declara array de Map, cada Map es para un registro
         alCabecera = new ArrayList<>(); //Instancia array
         alCabecera.add(myData);                           //agrega el Map al array, para la cabecera será el mejor de los casos, es decir 1 registro 
-        int rowsAffected = this.tc.updateReg(alCabecera); //Está guardando igual si en el detalle hay error
+        int rowsAffected = this.tc.updateReg(alCabecera);
+        if (rowsAffected > 0) {
+            msg = "SE ACTUALIZO EL REGISTRO: " + jtfId.getText();
+            System.out.println(msg);
+            JOptionPane.showMessageDialog(this, msg, "wCiudad203...!", JOptionPane.DEFAULT_OPTION);
+        } else {
+            msg = "No se pudo actualizar el registro";
+            JOptionPane.showMessageDialog(this, msg, "wCiudad206...!", JOptionPane.DEFAULT_OPTION);
+        }
     }
 
     @Override
@@ -203,25 +212,25 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         this.CRUD = crud;
         if (Tools.validarPermiso(conexion.getGrupoId(), Opcion, crud) == 0) {
             String msg = "NO TIENE PERMISO PARA REALIZAR ESTA OPERACIÓN ";
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "wCiudad215...!", JOptionPane.OK_OPTION);
             return;
         }
         this.setData();
         ArrayList<Map<String, String>> alRegister;              //Declara un Array de Map
         alRegister = new ArrayList<>();      //Instancia el array
         alRegister.add(myData);                                //Agregamos el map en el array
-        int b = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array
+        int rowsAffected = this.tc.deleteReg(alRegister);               //Invocamos el método deleteReg del Modelo que procesa un array
         //int b =   this.tc.deleteReg(tf_id_ciudad.getText());
-        if (b <= 0) {
-            String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + tf_id.getText();
+        if (rowsAffected <= 0) {
+            String msg = "NO SE HA PODIDO ELIMINAR EL REGISTRO: " + jtfId.getText();
             System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "wCiudad227...!", JOptionPane.OK_OPTION);
             return;
         }
-        if (b > 0) {
-            String msg = "EL REGISTRO: " + tf_id.getText() + " SE HA ELIMINADO CORRECTAMENTE";
+        if (rowsAffected > 0) {
+            String msg = "EL REGISTRO: " + jtfId.getText() + " SE HA ELIMINADO CORRECTAMENTE";
             System.out.println(msg);
-            JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
+            JOptionPane.showMessageDialog(this, msg, "wCiudad233...!", JOptionPane.DEFAULT_OPTION);
         }
         imNuevo();
     }
@@ -237,7 +246,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
         this.setData();
         myData = tc.searchById(this.myData);
         if (this.myData.size() <= 0) {
-            String msg = "NO SE HA PODIDO RECUPERAR EL REGISTRO: " + tf_id.getText();
+            String msg = "NO SE HA PODIDO RECUPERAR EL REGISTRO: " + jtfId.getText();
             this.resetData();
             JOptionPane.showMessageDialog(this, msg, "ATENCIÓN...!", JOptionPane.DEFAULT_OPTION);
         }
@@ -248,28 +257,28 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
     @Override
     public void imPrimero() {
         this.setData();
-        this.myData = this.tc.navegationReg(tf_id.getText(), "FIRST");
+        this.myData = this.tc.navegationReg(jtfId.getText(), "FIRST");
         this.fillView(this.myData);
     }
 
     @Override
     public void imSiguiente() {
         this.setData();
-        this.myData = this.tc.navegationReg(tf_id.getText(), "NEXT");
+        this.myData = this.tc.navegationReg(jtfId.getText(), "NEXT");
         this.fillView(this.myData);
     }
 
     @Override
     public void imAnterior() {
         this.setData();
-        this.myData = this.tc.navegationReg(tf_id.getText(), "PRIOR");
+        this.myData = this.tc.navegationReg(jtfId.getText(), "PRIOR");
         this.fillView(this.myData);
     }
 
     @Override
     public void imUltimo() {
         this.setData();
-        this.myData = this.tc.navegationReg(tf_id.getText(), "LAST");
+        this.myData = this.tc.navegationReg(jtfId.getText(), "LAST");
         this.fillView(this.myData);
     }
 
@@ -314,7 +323,7 @@ public class wCiudad extends javax.swing.JInternalFrame implements ActiveFrame {
                 break;
         }
 
-        wBuscar frame = new wBuscar(sql, this.tf_id);
+        wBuscar frame = new wBuscar(sql, this.jtfId);
         frame.setVisible(true);
         wPrincipal.desktop.add(frame);
         try {
